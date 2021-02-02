@@ -13,10 +13,23 @@ public class Warship : Agent
     public int playerId;
     public int teamId;
     [HideInInspector] public WeaponSystemsOfficer weaponSystemsOfficer;
-    [HideInInspector] public float currentHealth { get; private set; }
+    [HideInInspector] public float CurrentHealth {
+        get => _currentHealth;
+        private set {
+            healthChange = value - _currentHealth;
+            _currentHealth = value;
+        }
+    }
     public Transform battleField;
+    [HideInInspector] public Engine Engine { get; private set; }
 
-    private Engine m_Engine;
+    private float healthChange = 0f;
+    private float _currentHealth = 0f;
+    private bool isCollisionWithWarship = false;
+
+    private const float rewardFuelLoss = -1 / 21600;
+    private const float rewardDistance = -1 / 100000;
+    private const float rewardHpChange = 0.5f;
 
     public void Reset()
     {
@@ -26,7 +39,8 @@ public class Warship : Agent
         transform.position = startingPoint.position;
         transform.rotation = startingPoint.rotation;
 
-        currentHealth = m_Durability;
+        CurrentHealth = m_Durability;
+        isCollisionWithWarship = false;
 
         weaponSystemsOfficer.Reset();
     }
@@ -93,7 +107,7 @@ public class Warship : Agent
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
-        m_Engine = GetComponent<Engine>();
+        Engine = GetComponent<Engine>();
 
         MeshRenderer[] meshRenderers = GetComponentsInChildren<MeshRenderer>();
         for (int i = 0; i < meshRenderers.Length; i++)
@@ -102,8 +116,6 @@ public class Warship : Agent
         }
 
         Reset();
-
-        // Academy.Instance.AutomaticSteppingEnabled = false;
     }
 
     public override void OnEpisodeBegin()
@@ -122,8 +134,11 @@ public class Warship : Agent
         sensor.AddObservation(Mathf.Sin(radian));
 
         // Opponent
-        sensor.AddObservation(target.transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
-        sensor.AddObservation(target.transform.position.z / (battleField.transform.localScale.z / 2) - 1f);
+        // sensor.AddObservation(target.transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
+        // sensor.AddObservation(target.transform.position.z / (battleField.transform.localScale.z / 2) - 1f);
+        Vector3 relativePosition = target.transform.position - transform.position;
+        sensor.AddObservation(relativePosition.x / (battleField.transform.localScale.x / 2) - 1f);
+        sensor.AddObservation(relativePosition.z / (battleField.transform.localScale.x / 2) - 1f);
 
         float targetRadian = (target.transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(targetRadian));
@@ -157,19 +172,10 @@ public class Warship : Agent
         }
         sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
         sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
-
-        // Penalty
-        float distance = Vector3.Distance(transform.position, target.transform.position);
-        float penalty = -Mathf.Pow(distance, 2f) / 10000f;
-        AddReward(penalty);
-        
-        float fuelLoss = -1 / 10000f;
-        AddReward(fuelLoss);
     }
 
     public override void OnActionReceived(float[] vectorAction)
     {
-        // Interpret signals
         float enginePower = Mathf.Clamp(vectorAction[0], -1f, 1f);
         float rudderPower = Mathf.Clamp(vectorAction[1], -1f, 1f);
         bool[] fireMainBatteryCommands = new bool[6];
@@ -183,7 +189,7 @@ public class Warship : Agent
             aimOffsets[i].x = Mathf.Clamp(vectorAction[i*2+8], -1f, 1f);
             aimOffsets[i].y = Mathf.Clamp(vectorAction[i*2+9], -1f, 1f);
         }
-        // bool launchTorpedo = (vectorAction[5] >= 0.5f);
+        bool launchTorpedo = (vectorAction[5] >= 0.5f);
 
         for (int i = 0; i < 6; i++)
         {
@@ -193,15 +199,45 @@ public class Warship : Agent
             }
         }
 
-        /*
         if (launchTorpedo)
         {
             weaponSystemsOfficer.FireTorpedoAt(target.transform.position);
         }
-        */
 
-        m_Engine.Combust(enginePower);
-        m_Engine.Steer(rudderPower);
+        Engine.Combust(enginePower);
+        Engine.Steer(rudderPower);
+
+        /**
+         * Reward
+         */
+        AddReward(rewardFuelLoss);
+
+        float distance = Vector3.Distance(transform.position, target.transform.position);
+        float penalty = Mathf.Pow(distance, 2f) * rewardDistance;
+        AddReward(penalty);
+        
+        float damageTaken = healthChange / m_Durability;
+        healthChange = 0f;
+        AddReward(damageTaken * rewardHpChange);
+
+        /**
+         * EndEpisode
+         */
+        if (isCollisionWithWarship)
+        {
+            SetReward(-1f);
+            EndEpisode();
+        }
+        else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
+        {
+            SetReward(1f);
+            EndEpisode();
+        }
+        else if (CurrentHealth <= 0f + Mathf.Epsilon)
+        {
+            SetReward(-1f);
+            EndEpisode();
+        }
     }
 
     public override void Heuristic(float[] actionsOut)
@@ -223,39 +259,23 @@ public class Warship : Agent
 
         if (collision.collider.tag == "Player")
         {
-            SetReward(-10000.0f);
-            target.SetReward(-10000.0f);
-            EndEpisode();
-            target.EndEpisode();
+            isCollisionWithWarship = true;
             return;
         }
         else if (collision.collider.tag == "Torpedo")
         {
-            currentHealth = 0f;
+            CurrentHealth = 0f;
         }
         else if (collision.collider.tag.StartsWith("Bullet")
                  && !collision.collider.tag.EndsWith(teamId.ToString()))
         {
             float damage = collision.rigidbody?.velocity.magnitude ?? 0f;
-            // Debug.Log($"[{teamId}-{playerId}] OnCollisionEnter(collision: {collision.collider.name}) ({collision.collider.tag} / {damage})");
-            currentHealth -= damage;
-
-            AddReward(-damage / m_Durability * 1000f);
-            target.AddReward(damage / m_Durability * 1000f);
+            CurrentHealth -= damage;
         }
         else if (collision.collider.tag == "Terrain")
         {
             float damage = rb.velocity.magnitude * rb.mass;
-            // Debug.Log($"[{teamId}-{playerId}] OnCollisionEnter(collision: {collision.collider.name}) ({collision.collider.tag} / {damage})");
-            currentHealth -= damage;
-        }
-
-        if (currentHealth <= 0f + Mathf.Epsilon)
-        {
-            SetReward(-1000.0f);
-            target.SetReward(1000.0f);
-            EndEpisode();
-            target.EndEpisode();
+            CurrentHealth -= damage;
         }
     }
 
@@ -264,5 +284,6 @@ public class Warship : Agent
         explosion.transform.position = other.transform.position;
         explosion.transform.rotation = other.transform.rotation;
         explosion.Play();
+        // explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 }

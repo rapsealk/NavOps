@@ -37,8 +37,6 @@ public class WarshipAgent : Agent, IWarshipController
 
     public override void Initialize()
     {
-        // Academy.Instance.AutomaticSteppingEnabled = false;
-
         m_Warship = GetComponent<Warship>();
         m_Warship.m_PlayerId = m_PlayerId;
 

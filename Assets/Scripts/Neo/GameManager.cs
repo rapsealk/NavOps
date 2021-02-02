@@ -25,11 +25,11 @@ public class GameManager : MonoBehaviour
         Vector3 rotation1 = player1.transform.rotation.eulerAngles;
         player1PositionText.text = string.Format("({0:F2}, {1:F2})", position1.x, position1.z);
         player1RotationText.text = string.Format("{0:F2}", rotation1.y);
-        player1HpText.text = string.Format("{0:F2}", player1.currentHealth);
+        player1HpText.text = string.Format("{0:F2}", player1.CurrentHealth);
         Vector3 position2 = player2.transform.position;
         Vector3 rotation2 = player2.transform.rotation.eulerAngles;
         player2PositionText.text = string.Format("({0:F2}, {1:F2})", position2.x, position2.z);
         player2RotationText.text = string.Format("{0:F2}", rotation2.y);
-        player2HpText.text = string.Format("{0:F2}", player2.currentHealth);
+        player2HpText.text = string.Format("{0:F2}", player2.CurrentHealth);
     }
 }

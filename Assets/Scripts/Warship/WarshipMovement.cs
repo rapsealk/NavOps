@@ -23,13 +23,9 @@ public class WarshipMovement : MonoBehaviour
     private int m_MinSteerLevel = -2;
     private int m_MaxSteerLevel = 2;
 
-    private RandomAgent m_RandomAgent;
-
     private void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
-
-        m_RandomAgent = new RandomAgent();
     }
 
     // Start is called before the first frame update
@@ -66,7 +62,7 @@ public class WarshipMovement : MonoBehaviour
         }
         else
         {
-            int action = m_RandomAgent.GetAction();
+            int action = Random.Range(0, 6);
             if (action == 0)
             {
                 // pass
