@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 
@@ -189,7 +190,7 @@ public class Warship : Agent
             aimOffsets[i].x = Mathf.Clamp(vectorAction[i*2+8], -1f, 1f);
             aimOffsets[i].y = Mathf.Clamp(vectorAction[i*2+9], -1f, 1f);
         }
-        bool launchTorpedo = (vectorAction[5] >= 0.5f);
+        bool launchTorpedo = (vectorAction[20] >= 0.5f);
 
         for (int i = 0; i < 6; i++)
         {
@@ -226,17 +227,23 @@ public class Warship : Agent
         if (isCollisionWithWarship)
         {
             SetReward(-1f);
+            target.SetReward(-1f);
             EndEpisode();
-        }
-        else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
-        {
-            SetReward(1f);
-            EndEpisode();
+            target.EndEpisode();
         }
         else if (CurrentHealth <= 0f + Mathf.Epsilon)
         {
             SetReward(-1f);
+            target.SetReward(1f);
             EndEpisode();
+            target.EndEpisode();
+        }
+        else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
+        {
+            SetReward(1f);
+            target.SetReward(-1f);
+            EndEpisode();
+            target.EndEpisode();
         }
     }
 
@@ -260,7 +267,6 @@ public class Warship : Agent
         if (collision.collider.tag == "Player")
         {
             isCollisionWithWarship = true;
-            return;
         }
         else if (collision.collider.tag == "Torpedo")
         {
@@ -269,7 +275,7 @@ public class Warship : Agent
         else if (collision.collider.tag.StartsWith("Bullet")
                  && !collision.collider.tag.EndsWith(teamId.ToString()))
         {
-            float damage = collision.rigidbody?.velocity.magnitude ?? 0f;
+            float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
             CurrentHealth -= damage;
         }
         else if (collision.collider.tag == "Terrain")
@@ -281,9 +287,23 @@ public class Warship : Agent
 
     public void OnTriggerEnter(Collider other)
     {
+        //explosion.transform.position = other.transform.position;
+        //explosion.transform.rotation = other.transform.rotation;
+        //explosion.Play();
+        // explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        StartCoroutine(DisplayExplosionEffect(other));
+    }
+
+    private IEnumerator DisplayExplosionEffect(Collider other)
+    {
         explosion.transform.position = other.transform.position;
         explosion.transform.rotation = other.transform.rotation;
         explosion.Play();
-        // explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+        yield return new WaitForSeconds(2f);
+
+        explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+        yield break;
     }
 }
