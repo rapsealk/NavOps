@@ -31,6 +31,7 @@ public class Grid : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        /*
         if (!IsGizmosInitialized)   // true
         {
             Debug.Log($"{name} OnDrawGizmos");
@@ -56,6 +57,7 @@ public class Grid : MonoBehaviour
 
             IsGizmosInitialized = true;
         }
+        */
     }
 
     private void CreateGrid()

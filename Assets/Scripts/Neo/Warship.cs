@@ -3,13 +3,13 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 
-public class Warship : Agent
+public class Warship : MonoBehaviour // Agent
 {
     public const float m_Durability = 200f;
     public Transform startingPoint;
     public Color rendererColor;
     public ParticleSystem explosion;
-    public Warship target;
+    public GameObject target;   //public Warship target;
     [HideInInspector] public Rigidbody rb;
     public int playerId;
     public int teamId;
@@ -49,18 +49,33 @@ public class Warship : Agent
     // Start is called before the first frame update
     void Start()
     {
-        
+        weaponSystemsOfficer = GetComponent<WeaponSystemsOfficer>();
+        weaponSystemsOfficer.Assign(teamId, playerId);
+
+        rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+        Engine = GetComponent<Engine>();
+
+        MeshRenderer[] meshRenderers = GetComponentsInChildren<MeshRenderer>();
+        for (int i = 0; i < meshRenderers.Length; i++)
+        {
+            meshRenderers[i].material.color = rendererColor;
+        }
+
+        Reset();
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
-                weaponSystemsOfficer.FireMainBattery();
+                int numberOfWeapons = weaponSystemsOfficer.Summary().Length;
+                for (int i = 0; i < numberOfWeapons; i++)
+                weaponSystemsOfficer.FireMainBattery(i);
             }
             else if (Input.GetKeyDown(KeyCode.Mouse1))
             {
@@ -69,21 +84,44 @@ public class Warship : Agent
             }
             else if (Input.GetKeyDown(KeyCode.R))
             {
-                EndEpisode();
-                target.EndEpisode();
+                Reset();
+                //EndEpisode();
+                //target.EndEpisode();
             }
 
-            float vertical = Input.GetAxisRaw("Vertical");
-            float horizontal = Input.GetAxisRaw("Horizontal");
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                Engine.Steer(-1.0f);
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                Engine.Steer(1.0f);
+            }
 
-            // engine.Steer(horizontal);
-            // engine.Combust(vertical);
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                Engine.Combust(1.0f);
+            }
+            else if (Input.GetKey(KeyCode.DownArrow))
+            {
+                Engine.Combust(-1.0f);
+            }
         }
-        */
     }
 
     void FixedUpdate()
     {
+        /*
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            //
+        }
+        else if (Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            
+        }
+        */
+
         Vector3 rotation = Vector3.zero;
         rotation.y = Geometry.GetAngleBetween(transform.position, target.transform.position);
 
@@ -99,6 +137,7 @@ public class Warship : Agent
         weaponSystemsOfficer.Aim(Quaternion.Euler(rotation));
     }
 
+#if !UNITY_EDITOR
     #region MLAgent
     public override void Initialize()
     {
@@ -190,7 +229,7 @@ public class Warship : Agent
             aimOffsets[i].x = Mathf.Clamp(vectorAction[i*2+8], -1f, 1f);
             aimOffsets[i].y = Mathf.Clamp(vectorAction[i*2+9], -1f, 1f);
         }
-        bool launchTorpedo = (vectorAction[20] >= 0.5f);
+        //bool launchTorpedo = (vectorAction[20] >= 0.5f);
 
         for (int i = 0; i < 6; i++)
         {
@@ -200,17 +239,15 @@ public class Warship : Agent
             }
         }
 
-        if (launchTorpedo)
-        {
-            weaponSystemsOfficer.FireTorpedoAt(target.transform.position);
-        }
+        //if (launchTorpedo)
+        //{
+        //    weaponSystemsOfficer.FireTorpedoAt(target.transform.position);
+        //}
 
         Engine.Combust(enginePower);
         Engine.Steer(rudderPower);
 
-        /**
-         * Reward
-         */
+        // Reward
         AddReward(rewardFuelLoss);
 
         float distance = Vector3.Distance(transform.position, target.transform.position);
@@ -221,9 +258,7 @@ public class Warship : Agent
         healthChange = 0f;
         AddReward(damageTaken * rewardHpChange);
 
-        /**
-         * EndEpisode
-         */
+        // EndEpisode
         if (isCollisionWithWarship)
         {
             SetReward(-1f);
@@ -252,6 +287,7 @@ public class Warship : Agent
         //
     }
     #endregion  // MLAgent
+#endif
 
     public void OnCollisionEnter(Collision collision)
     {
@@ -285,6 +321,7 @@ public class Warship : Agent
         }
     }
 
+    /*
     public void OnTriggerEnter(Collider other)
     {
         //explosion.transform.position = other.transform.position;
@@ -305,5 +342,11 @@ public class Warship : Agent
         explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
         yield break;
+    }
+    */
+
+    public void TakeDamage()
+    {
+        Debug.Log($"Warship({name}).TakeDamage()");
     }
 }

@@ -9,6 +9,8 @@ TagManager:
   - RadarBlip
   - Torpedo
   - Terrain
+  - Wall
+  - Turret
   layers:
   - Default
   - TransparentFX

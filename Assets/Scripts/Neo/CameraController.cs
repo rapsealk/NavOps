@@ -32,7 +32,13 @@ public class CameraController : MonoBehaviour
             transform.rotation = Quaternion.Euler(rotation);
         }
 
-        //TargetObject.SetTargetPoint(transform.rotation);
         Radar.ViewDirection = rotation.y;
+
+        /*
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            TargetObject.weaponSystemsOfficer.Aim(transform.rotation);
+        }
+        */
     }
 }

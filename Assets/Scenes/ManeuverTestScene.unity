@@ -938,6 +938,11 @@ PrefabInstance:
       propertyPath: TeamId
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 5937945958753050524, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_RootOrder
@@ -952,7 +957,7 @@ PrefabInstance:
         type: 3}
       propertyPath: target
       value: 
-      objectReference: {fileID: 8769870294542925724}
+      objectReference: {fileID: 8769870294542925723}
     - target: {fileID: 7312774272413534956, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: teamId
@@ -962,6 +967,11 @@ PrefabInstance:
         type: 3}
       propertyPath: playerId
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7312774272413534956, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7312774272413534956, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -3184,7 +3194,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1604472948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3671,6 +3681,11 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 5937945958753050524, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_RootOrder
@@ -3685,7 +3700,7 @@ PrefabInstance:
         type: 3}
       propertyPath: target
       value: 
-      objectReference: {fileID: 376399234}
+      objectReference: {fileID: 376399235}
     - target: {fileID: 7312774272413534956, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: battleField
@@ -3789,17 +3804,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 955db0c2d465a8142ada7886fba9c288, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8769870294542925725
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8769870294542925723}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42dad2189facd86428a33e55d934ce16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
