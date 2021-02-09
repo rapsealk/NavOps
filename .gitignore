@@ -1,6 +1,9 @@
 # Unity Build
 Build/
 
+# Unity ML-Agents
+#Assets/ML-Agents/Timers
+
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
