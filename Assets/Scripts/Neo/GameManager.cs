@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     public Text player1PositionText;
     public Text player1RotationText;
     public Text player1HpText;
+    public Text player1AmmoText;
+    public Slider player1FuelSlider;
     public Text player2PositionText;
     public Text player2RotationText;
     public Text player2HpText;
@@ -26,6 +28,8 @@ public class GameManager : MonoBehaviour
         player1PositionText.text = string.Format("({0:F2}, {1:F2})", position1.x, position1.z);
         player1RotationText.text = string.Format("{0:F2}", rotation1.y);
         player1HpText.text = string.Format("{0:F2}", player1.CurrentHealth);
+        player1AmmoText.text = string.Format("Ammo: {0}", player1.weaponSystemsOfficer.Ammo);
+        player1FuelSlider.value = player1.Engine.Fuel / Engine.maxFuel;
         Vector3 position2 = player2.transform.position;
         Vector3 rotation2 = player2.transform.rotation.eulerAngles;
         player2PositionText.text = string.Format("({0:F2}, {1:F2})", position2.x, position2.z);

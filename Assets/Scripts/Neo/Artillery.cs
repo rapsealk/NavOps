@@ -32,6 +32,7 @@ public class Artillery : MonoBehaviour
         }
     }
 
+    private Warship Warship;
     private TurretType m_TurretType;
     private float m_InitialEulerRotation;
     private Vector2 m_FirePower = new Vector2(8000f, 100f);
@@ -78,6 +79,8 @@ public class Artillery : MonoBehaviour
 
     private void Initialize()
     {
+        Warship = GetComponentInParent<Warship>();
+
         m_InitialEulerRotation = (transform.localRotation.eulerAngles.y + 360) % 360;
 
         if (m_InitialEulerRotation <= Mathf.Epsilon)
@@ -155,11 +158,11 @@ public class Artillery : MonoBehaviour
         // Debug.DrawRay(transform.position, transform.forward * 100, Color.red);
     }
 
-    public void Fire(Vector2 offset = new Vector2())
+    public bool Fire(Vector2 offset = new Vector2())
     {
         if (!isReloaded || isDamaged)
         {
-            return;
+            return false;
         }
 
         /*
@@ -222,13 +225,14 @@ public class Artillery : MonoBehaviour
             if (hit.collider.tag.Equals("Player"))
             {
                 Debug.Log($"{name} -> {hit.collider.name} ({hit.collider.tag}, {hit.point})");
+
+                hit.collider.GetComponent<Warship>().TakeDamage();
             }
             else if (hit.collider.tag.Equals("Turret"))
             {
                 Debug.Log($"{name} -> {hit.collider.name} ({hit.collider.tag}, {hit.point})");
 
                 hit.collider.GetComponent<Artillery>().TakeDamage();
-                //(hit.collider.gameObject as Artillery).GetComponent<Warship>().OnTriggerEnter(hit.collider);
             }
         }
 
@@ -249,6 +253,8 @@ public class Artillery : MonoBehaviour
 
         isReloaded = false;
         cooldownTimer = 0f;
+
+        return true;
     }
 
     public void Rotate(Quaternion target)
@@ -338,6 +344,6 @@ public class Artillery : MonoBehaviour
         meshRenderer.material.color = Color.cyan;
 
         Debug.Log($"Turret({name}).TakeDamage()");
-        GetComponentInParent<Warship>().TakeDamage();
+        Warship.TakeDamage();
     }
 }

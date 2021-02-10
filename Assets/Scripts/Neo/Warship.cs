@@ -1,20 +1,19 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 
-public class Warship : MonoBehaviour // Agent
+public class Warship : Agent
 {
-    public const float m_Durability = 200f;
+    public const int m_Durability = 20;
     public Transform startingPoint;
     public Color rendererColor;
     public ParticleSystem explosion;
-    public GameObject target;   //public Warship target;
+    public Warship target;
     [HideInInspector] public Rigidbody rb;
     public int playerId;
     public int teamId;
     [HideInInspector] public WeaponSystemsOfficer weaponSystemsOfficer;
-    [HideInInspector] public float CurrentHealth {
+    [HideInInspector] public int CurrentHealth {
         get => _currentHealth;
         private set {
             healthChange = value - _currentHealth;
@@ -25,7 +24,7 @@ public class Warship : MonoBehaviour // Agent
     [HideInInspector] public Engine Engine { get; private set; }
 
     private float healthChange = 0f;
-    private float _currentHealth = 0f;
+    private int _currentHealth = m_Durability;
     private bool isCollisionWithWarship = false;
 
     private const float rewardFuelLoss = -1 / 21600;
@@ -44,11 +43,13 @@ public class Warship : MonoBehaviour // Agent
         isCollisionWithWarship = false;
 
         weaponSystemsOfficer.Reset();
+        Engine.Reset();
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        /*
         weaponSystemsOfficer = GetComponent<WeaponSystemsOfficer>();
         weaponSystemsOfficer.Assign(teamId, playerId);
 
@@ -64,6 +65,7 @@ public class Warship : MonoBehaviour // Agent
         }
 
         Reset();
+        */
     }
 
     // Update is called once per frame
@@ -71,22 +73,27 @@ public class Warship : MonoBehaviour // Agent
     {
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            KeyCode[] keyCodes = {
+                KeyCode.Q, KeyCode.W, KeyCode.E,
+                KeyCode.A, KeyCode.S, KeyCode.D
+            };
+            for (int i = 0; i < keyCodes.Length; i++)
             {
-                int numberOfWeapons = weaponSystemsOfficer.Summary().Length;
-                for (int i = 0; i < numberOfWeapons; i++)
-                weaponSystemsOfficer.FireMainBattery(i);
+                if (Input.GetKeyDown(keyCodes[i]))
+                {
+                    weaponSystemsOfficer.FireMainBattery(i);
+                }
             }
-            else if (Input.GetKeyDown(KeyCode.Mouse1))
+            
+            if (Input.GetKeyDown(KeyCode.Z))
             {
                 // TODO: Animation
                 weaponSystemsOfficer.FireTorpedoAt(target.transform.position);
             }
             else if (Input.GetKeyDown(KeyCode.R))
             {
-                Reset();
-                //EndEpisode();
-                //target.EndEpisode();
+                EndEpisode();
+                target.EndEpisode();
             }
 
             if (Input.GetKey(KeyCode.LeftArrow))
@@ -111,17 +118,6 @@ public class Warship : MonoBehaviour // Agent
 
     void FixedUpdate()
     {
-        /*
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            //
-        }
-        else if (Application.platform == RuntimePlatform.WindowsPlayer)
-        {
-            
-        }
-        */
-
         Vector3 rotation = Vector3.zero;
         rotation.y = Geometry.GetAngleBetween(transform.position, target.transform.position);
 
@@ -137,7 +133,7 @@ public class Warship : MonoBehaviour // Agent
         weaponSystemsOfficer.Aim(Quaternion.Euler(rotation));
     }
 
-#if !UNITY_EDITOR
+// #if !UNITY_EDITOR
     #region MLAgent
     public override void Initialize()
     {
@@ -201,8 +197,8 @@ public class Warship : MonoBehaviour // Agent
         for (int i = 0; i < batterySummary.Length; i++)
         {
             WeaponSystemsOfficer.BatterySummary summary = batterySummary[i];
-            sensor.AddObservation(Mathf.Cos(summary.rotation.x));
-            sensor.AddObservation(Mathf.Sin(summary.rotation.x));
+            //sensor.AddObservation(Mathf.Cos(summary.rotation.x));
+            //sensor.AddObservation(Mathf.Sin(summary.rotation.x));
             sensor.AddObservation(Mathf.Cos(summary.rotation.y));
             sensor.AddObservation(Mathf.Sin(summary.rotation.y));
             sensor.AddObservation(summary.isReloaded);
@@ -212,6 +208,9 @@ public class Warship : MonoBehaviour // Agent
         }
         sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
         sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
+
+        sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
+        sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
     }
 
     public override void OnActionReceived(float[] vectorAction)
@@ -223,19 +222,21 @@ public class Warship : MonoBehaviour // Agent
         {
             fireMainBatteryCommands[i] = (vectorAction[2+i] >= 0.5f);
         }
+        /*
         Vector2[] aimOffsets = new Vector2[6];
         for (int i = 0; i < 6; i++)
         {
             aimOffsets[i].x = Mathf.Clamp(vectorAction[i*2+8], -1f, 1f);
             aimOffsets[i].y = Mathf.Clamp(vectorAction[i*2+9], -1f, 1f);
         }
+        */
         //bool launchTorpedo = (vectorAction[20] >= 0.5f);
 
         for (int i = 0; i < 6; i++)
         {
             if (fireMainBatteryCommands[i])
             {
-                weaponSystemsOfficer.FireMainBattery(i, aimOffsets[i]);
+                weaponSystemsOfficer.FireMainBattery(i/*, aimOffsets[i]*/);
             }
         }
 
@@ -280,6 +281,20 @@ public class Warship : MonoBehaviour // Agent
             EndEpisode();
             target.EndEpisode();
         }
+        else if (Engine.Fuel <= 0f + Mathf.Epsilon)
+        {
+            SetReward(-1f);
+            target.SetReward(1f);
+            EndEpisode();
+            target.EndEpisode();
+        }
+        else if (weaponSystemsOfficer.Ammo == 0)
+        {
+            SetReward(-1f);
+            target.SetReward(1f);
+            EndEpisode();
+            target.EndEpisode();
+        }
     }
 
     public override void Heuristic(float[] actionsOut)
@@ -287,7 +302,7 @@ public class Warship : MonoBehaviour // Agent
         //
     }
     #endregion  // MLAgent
-#endif
+// #endif
 
     public void OnCollisionEnter(Collision collision)
     {
@@ -306,18 +321,21 @@ public class Warship : MonoBehaviour // Agent
         }
         else if (collision.collider.tag == "Torpedo")
         {
-            CurrentHealth = 0f;
+            CurrentHealth = 0;
         }
+        /*
         else if (collision.collider.tag.StartsWith("Bullet")
                  && !collision.collider.tag.EndsWith(teamId.ToString()))
         {
             float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
             CurrentHealth -= damage;
         }
+        */
         else if (collision.collider.tag == "Terrain")
         {
-            float damage = rb.velocity.magnitude * rb.mass;
-            CurrentHealth -= damage;
+            //float damage = rb.velocity.magnitude * rb.mass;
+            //CurrentHealth -= damage;
+            CurrentHealth = 0;
         }
     }
 
@@ -348,5 +366,6 @@ public class Warship : MonoBehaviour // Agent
     public void TakeDamage()
     {
         Debug.Log($"Warship({name}).TakeDamage()");
+        CurrentHealth -= 1;
     }
 }

@@ -9,8 +9,14 @@ public class WeaponSystemsOfficer : MonoBehaviour
     [HideInInspector] public const float m_TorpedoReloadTime = 40f;
     [HideInInspector] public bool isTorpedoReady { get; private set; } = true;
     [HideInInspector] public float torpedoCooldown { get; private set; } = 0f;
+    [HideInInspector] public const uint maxAmmo = 192;
+    [HideInInspector] public uint Ammo {
+        get => _ammo;
+        private set { _ammo = value; }
+    }
 
     private Artillery[] m_Batteries;
+    private uint _ammo;
 
     public void Reset()
     {
@@ -27,6 +33,8 @@ public class WeaponSystemsOfficer : MonoBehaviour
         {
             m_Batteries[i].Reset();
         }
+
+        Ammo = maxAmmo;
     }
 
     // Start is called before the first frame update
@@ -91,7 +99,16 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     public void FireMainBattery(int id, Vector2 offset = new Vector2())
     {
-        m_Batteries[id].Fire(offset);
+        if (Ammo == 0)
+        {
+            return;
+        }
+
+        if (m_Batteries[id].Fire(offset))
+        {
+            // Interlocked.Decrement(ref _ammo);
+            Ammo -= 1;
+        }
     }
 
     public void FireTorpedoAt(Vector3 position)

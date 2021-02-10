@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Radar : MonoBehaviour
 {
@@ -44,7 +42,7 @@ public class Radar : MonoBehaviour
         Vector3 position = Player.transform.position;
         Vector3 targetPosition = Opponent.transform.position;
         float distance = Vector3.Distance(position, targetPosition);
-        Debug.Log($"Radar(target: {targetPosition}, distance: {distance}/{RadarRange})");
+        // Debug.Log($"Radar(target: {targetPosition}, distance: {distance}/{RadarRange})");
         if (distance <= RadarRange)
         {
             Vector3 normalizedTargetPosition = (targetPosition - position) / RadarRange;
@@ -62,7 +60,7 @@ public class Radar : MonoBehaviour
             x += (radarWidth * 0.5f) - blipWidth * 0.5f;
             y += (radarHeight * 0.5f) - blipHeight * 0.5f;
             Vector2 blipPosition = new Vector2(x, y);
-            Debug.Log($"BlipPosition: {blipPosition}");
+            // Debug.Log($"BlipPosition: {blipPosition}");
 
             GameObject blip = Instantiate(BlipRedPrefab);
             blip.transform.SetParent(UserInterface.transform);
