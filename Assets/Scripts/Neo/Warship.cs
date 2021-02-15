@@ -71,49 +71,7 @@ public class Warship : Agent
     // Update is called once per frame
     void Update()
     {
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            KeyCode[] keyCodes = {
-                KeyCode.Q, KeyCode.W, KeyCode.E,
-                KeyCode.A, KeyCode.S, KeyCode.D
-            };
-            for (int i = 0; i < keyCodes.Length; i++)
-            {
-                if (Input.GetKeyDown(keyCodes[i]))
-                {
-                    weaponSystemsOfficer.FireMainBattery(i);
-                }
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                // TODO: Animation
-                weaponSystemsOfficer.FireTorpedoAt(target.transform.position);
-            }
-            else if (Input.GetKeyDown(KeyCode.R))
-            {
-                EndEpisode();
-                target.EndEpisode();
-            }
 
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                Engine.Steer(-1.0f);
-            }
-            else if (Input.GetKey(KeyCode.RightArrow))
-            {
-                Engine.Steer(1.0f);
-            }
-
-            if (Input.GetKey(KeyCode.UpArrow))
-            {
-                Engine.Combust(1.0f);
-            }
-            else if (Input.GetKey(KeyCode.DownArrow))
-            {
-                Engine.Combust(-1.0f);
-            }
-        }
     }
 
     void FixedUpdate()
@@ -215,38 +173,38 @@ public class Warship : Agent
 
     public override void OnActionReceived(float[] vectorAction)
     {
-        float enginePower = Mathf.Clamp(vectorAction[0], -1f, 1f);
-        float rudderPower = Mathf.Clamp(vectorAction[1], -1f, 1f);
-        bool[] fireMainBatteryCommands = new bool[6];
-        for (int i = 0; i < 6; i++)
-        {
-            fireMainBatteryCommands[i] = (vectorAction[2+i] >= 0.5f);
-        }
-        /*
-        Vector2[] aimOffsets = new Vector2[6];
-        for (int i = 0; i < 6; i++)
-        {
-            aimOffsets[i].x = Mathf.Clamp(vectorAction[i*2+8], -1f, 1f);
-            aimOffsets[i].y = Mathf.Clamp(vectorAction[i*2+9], -1f, 1f);
-        }
-        */
-        //bool launchTorpedo = (vectorAction[20] >= 0.5f);
+        float action = vectorAction[0];
 
-        for (int i = 0; i < 6; i++)
+        if (action == 0f)
         {
-            if (fireMainBatteryCommands[i])
+            // NOOP
+        }
+        else if (action == 1f)
+        {
+            Engine.Combust(1f);
+        }
+        else if (action == 2f)
+        {
+            Engine.Combust(-1f);
+        }
+        else if (action == 3f)
+        {
+            Engine.Steer(-1f);
+        }
+        else if (action == 4f)
+        {
+            Engine.Steer(1f);
+        }
+        else {
+            for (int i = 0; i < 6; i++)
             {
-                weaponSystemsOfficer.FireMainBattery(i/*, aimOffsets[i]*/);
+                if (action == 5f + i)
+                {
+                    weaponSystemsOfficer.FireMainBattery(i);
+                    break;
+                }
             }
         }
-
-        //if (launchTorpedo)
-        //{
-        //    weaponSystemsOfficer.FireTorpedoAt(target.transform.position);
-        //}
-
-        Engine.Combust(enginePower);
-        Engine.Steer(rudderPower);
 
         // Reward
         AddReward(rewardFuelLoss);
@@ -299,7 +257,29 @@ public class Warship : Agent
 
     public override void Heuristic(float[] actionsOut)
     {
-        //
+        KeyCode[] keyCodes = {
+            KeyCode.UpArrow, KeyCode.DownArrow,
+            KeyCode.LeftArrow, KeyCode.RightArrow,
+            KeyCode.Q, KeyCode.W, KeyCode.E,
+            KeyCode.A, KeyCode.S, KeyCode.D
+        };
+        for (int i = 0; i < 4; i++)
+        {
+            if (Input.GetKey(keyCodes[i]))
+            {
+                actionsOut[0] = (float) (i+1);
+                return;
+            }
+        }
+        for (int i = 4; i < keyCodes.Length; i++)
+        {
+            if (Input.GetKeyDown(keyCodes[i]))
+            {
+                actionsOut[0] = (float) (i+1);
+                return;
+            }
+        }
+        actionsOut[0] = 0f;
     }
     #endregion  // MLAgent
 // #endif
