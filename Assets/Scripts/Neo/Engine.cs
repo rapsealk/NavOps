@@ -30,6 +30,11 @@ public class Engine : MonoBehaviour
         
     }
 
+    void FixedUpdate()
+    {
+        Fuel -= HorsePower / 20f;
+    }
+
     public void Combust(float fuel = 1.0f)
     {
         if (_fuel < Mathf.Epsilon)
