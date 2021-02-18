@@ -155,8 +155,6 @@ public class Warship : Agent
         for (int i = 0; i < batterySummary.Length; i++)
         {
             WeaponSystemsOfficer.BatterySummary summary = batterySummary[i];
-            //sensor.AddObservation(Mathf.Cos(summary.rotation.x));
-            //sensor.AddObservation(Mathf.Sin(summary.rotation.x));
             sensor.AddObservation(Mathf.Cos(summary.rotation.y));
             sensor.AddObservation(Mathf.Sin(summary.rotation.y));
             sensor.AddObservation(summary.isReloaded);
@@ -169,6 +167,9 @@ public class Warship : Agent
 
         sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
         sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
+
+        sensor.AddObservation(CurrentHealth / (float) m_Durability);
+        sensor.AddObservation(target.CurrentHealth / (float) target.m_Durability);
     }
 
     public override void OnActionReceived(float[] vectorAction)
