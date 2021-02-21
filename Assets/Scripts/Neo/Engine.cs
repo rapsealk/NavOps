@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Engine : MonoBehaviour
 {
@@ -7,11 +8,24 @@ public class Engine : MonoBehaviour
         get => _fuel;
         private set { _fuel = value; }
     }
+    public const int MinSpeedLevel = -2;
+    public const int MaxSpeedLevel = 2;
+    public int SpeedLevel {
+        get => _speedLevel;
+        private set { _speedLevel = value; }
+    }
+    public const int MinSteerLevel = -2;
+    public const int MaxSteerLevel = 2;
+    public int SteerLevel {
+        get => _steerLevel;
+        private set { _steerLevel = value; }
+    }
 
     private Rigidbody m_Rigidbody;
 
-    private float HorsePower = 30f;
     private float _fuel = 10000f;
+    private int _speedLevel = 0;
+    private int _steerLevel = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -21,20 +35,34 @@ public class Engine : MonoBehaviour
 
     public void Reset()
     {
+        SpeedLevel = 0;
+        SteerLevel = 0;
+
         _fuel = maxFuel;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (SpeedLevel != 0)
+        {
+            Fuel -= 1.0f;
+        }
+
+        if (Fuel > 0)
+        {
+            float horsePower = (SpeedLevel > 0) ? 30f : 15f;
+            m_Rigidbody.AddForce(transform.forward * horsePower * SpeedLevel, ForceMode.Acceleration);
+        }
+        m_Rigidbody.transform.Rotate(Vector3.up, SteerLevel * 0.1f);
     }
 
     void FixedUpdate()
     {
-        Fuel -= HorsePower / 20f;
+        // Fuel -= HorsePower / 20f;
     }
 
+    /*
     public void Combust(float fuel = 1.0f)
     {
         if (_fuel < Mathf.Epsilon)
@@ -49,5 +77,16 @@ public class Engine : MonoBehaviour
     public void Steer(float rudder = 1.0f)
     {
         m_Rigidbody.transform.Rotate(Vector3.up, rudder * 0.1f);
+    }
+    */
+
+    public void SetSpeedLevel(int level)
+    {
+        SpeedLevel = Math.Min(Math.Max(MinSpeedLevel, level), MaxSpeedLevel);
+    }
+
+    public void SetSteerLevel(int level)
+    {
+        SteerLevel = Math.Min(Math.Max(MinSteerLevel, level), MaxSteerLevel);
     }
 }

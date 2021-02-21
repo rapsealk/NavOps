@@ -97,17 +97,22 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     private Vector2 mainBatteryOffset = Vector2.zero;
 
-    public void FireMainBattery(int id, Vector2 offset = new Vector2())
+    public void FireMainBattery(Vector2 offset = new Vector2())
     {
         if (Ammo == 0)
         {
             return;
         }
 
-        if (m_Batteries[id].Fire(offset))
+        for (int i = 0; i < m_Batteries.Length; i++)
         {
-            // Interlocked.Decrement(ref _ammo);
-            Ammo -= 1;
+            if (m_Batteries[i].IsTargetLocked)
+            {
+                if (m_Batteries[i].Fire(offset))
+                {
+                    Ammo -= 1;
+                }
+            }
         }
     }
 
@@ -132,6 +137,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
     public class BatterySummary
     {
         public Vector2 rotation;
+        public bool IsTargetLocked;
         public bool isReloaded;
         public float cooldown;
         public bool isDamaged;
@@ -141,6 +147,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
         {
             Vector3 batteryRotation = battery.transform.rotation.eulerAngles;
             rotation = new Vector2(batteryRotation.x, batteryRotation.y);
+            IsTargetLocked = battery.IsTargetLocked;
             isReloaded = battery.isReloaded;
             cooldown = battery.cooldownTimer / Artillery.m_ReloadTime;
             isDamaged = battery.isDamaged;

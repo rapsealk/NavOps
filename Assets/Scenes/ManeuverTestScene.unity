@@ -1056,12 +1056,12 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 53
+      value: 54
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
-      value: 11
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5937945958753050524, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -4077,7 +4077,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 53
+      value: 54
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -4087,7 +4087,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
-      value: 11
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}

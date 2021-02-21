@@ -117,7 +117,7 @@ public class Warship : Agent
         Reset();
     }
 
-    public override void CollectObservations(VectorSensor sensor)
+    public override void CollectObservations(VectorSensor sensor)   // 54
     {
         // Player
         sensor.AddObservation(transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
@@ -126,7 +126,6 @@ public class Warship : Agent
         float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(radian));
         sensor.AddObservation(Mathf.Sin(radian));
-
         // Opponent
         // sensor.AddObservation(target.transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
         // sensor.AddObservation(target.transform.position.z / (battleField.transform.localScale.z / 2) - 1f);
@@ -138,6 +137,7 @@ public class Warship : Agent
         sensor.AddObservation(Mathf.Cos(targetRadian));
         sensor.AddObservation(Mathf.Sin(targetRadian));
 
+        /* Torpedo
         bool isEnemyTorpedoLaunched = false;
         Vector3 enemyTorpedoPosition = Vector3.zero;
         GameObject torpedo = target.weaponSystemsOfficer.torpedoInstance;
@@ -145,10 +145,10 @@ public class Warship : Agent
         {
             isEnemyTorpedoLaunched = true;
             enemyTorpedoPosition = torpedo.transform.position;
-        }
-        sensor.AddObservation(isEnemyTorpedoLaunched);
-        sensor.AddObservation(enemyTorpedoPosition.x / (battleField.transform.localScale.x / 2) - 1f);
-        sensor.AddObservation(enemyTorpedoPosition.z / (battleField.transform.localScale.z / 2) - 1f);
+        }*/
+        //sensor.AddObservation(isEnemyTorpedoLaunched);
+        //sensor.AddObservation(enemyTorpedoPosition.x / (battleField.transform.localScale.x / 2) - 1f);
+        //sensor.AddObservation(enemyTorpedoPosition.z / (battleField.transform.localScale.z / 2) - 1f);
 
         // Weapon
         WeaponSystemsOfficer.BatterySummary[] batterySummary = weaponSystemsOfficer.Summary();
@@ -157,19 +157,20 @@ public class Warship : Agent
             WeaponSystemsOfficer.BatterySummary summary = batterySummary[i];
             sensor.AddObservation(Mathf.Cos(summary.rotation.y));
             sensor.AddObservation(Mathf.Sin(summary.rotation.y));
+            sensor.AddObservation(summary.IsTargetLocked);
             sensor.AddObservation(summary.isReloaded);
             sensor.AddObservation(summary.cooldown);
             sensor.AddObservation(summary.isDamaged);
             sensor.AddObservation(summary.repairProgress);
         }
-        sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
-        sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
+        //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
+        //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
 
         sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
         sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
 
         sensor.AddObservation(CurrentHealth / (float) m_Durability);
-        sensor.AddObservation(target.CurrentHealth / (float) target.m_Durability);
+        sensor.AddObservation(target.CurrentHealth / (float) m_Durability);
     }
 
     public override void OnActionReceived(float[] vectorAction)
@@ -182,29 +183,23 @@ public class Warship : Agent
         }
         else if (action == 1f)
         {
-            Engine.Combust(1f);
+            Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
         }
         else if (action == 2f)
         {
-            Engine.Combust(-1f);
+            Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
         }
         else if (action == 3f)
         {
-            Engine.Steer(-1f);
+            Engine.SetSteerLevel(Engine.SteerLevel - 1);
         }
         else if (action == 4f)
         {
-            Engine.Steer(1f);
+            Engine.SetSteerLevel(Engine.SteerLevel + 1);
         }
-        else {
-            for (int i = 0; i < 6; i++)
-            {
-                if (action == 5f + i)
-                {
-                    weaponSystemsOfficer.FireMainBattery(i);
-                    break;
-                }
-            }
+        else if (action == 5f)
+        {
+            weaponSystemsOfficer.FireMainBattery();
         }
 
         // Reward
@@ -261,20 +256,11 @@ public class Warship : Agent
         KeyCode[] keyCodes = {
             KeyCode.UpArrow, KeyCode.DownArrow,
             KeyCode.LeftArrow, KeyCode.RightArrow,
-            KeyCode.Q, KeyCode.W, KeyCode.E,
-            KeyCode.A, KeyCode.S, KeyCode.D
+            KeyCode.Space
         };
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < keyCodes.Length; i++)
         {
             if (Input.GetKey(keyCodes[i]))
-            {
-                actionsOut[0] = (float) (i+1);
-                return;
-            }
-        }
-        for (int i = 4; i < keyCodes.Length; i++)
-        {
-            if (Input.GetKeyDown(keyCodes[i]))
             {
                 actionsOut[0] = (float) (i+1);
                 return;

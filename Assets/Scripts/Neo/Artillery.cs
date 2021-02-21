@@ -31,6 +31,11 @@ public class Artillery : MonoBehaviour
             _isDamaged = value;
         }
     }
+    [HideInInspector] public bool IsTargetLocked {
+        get => _isTargetLocked;
+        private set { _isTargetLocked = value; }
+    }
+    public const float AttackRange = 1000f;
 
     private Warship Warship;
     private TurretType m_TurretType;
@@ -42,6 +47,7 @@ public class Artillery : MonoBehaviour
     private MeshRenderer meshRenderer;
     private Color meshRendererColor;
     private bool _isDamaged = false;
+    private bool _isTargetLocked = false;
 
     public void Reset()
     {
@@ -56,6 +62,7 @@ public class Artillery : MonoBehaviour
         isReloaded = true;
         repairTimer = 0f;
         isDamaged = false;
+        IsTargetLocked = false;
 
         Vector3 localRotation = transform.localRotation.eulerAngles;
         if (m_TurretType == TurretType.FRONTAL)
@@ -155,7 +162,16 @@ public class Artillery : MonoBehaviour
             }
         }
 
-        // Debug.DrawRay(transform.position, transform.forward * 100, Color.red);
+        IsTargetLocked = false;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, AttackRange))
+        {
+            if (hit.collider.tag.Equals("Player")
+                || hit.collider.tag.Equals("Turret"))
+            {
+                IsTargetLocked = true;
+            }
+        }
     }
 
     public bool Fire(Vector2 offset = new Vector2())
@@ -214,10 +230,10 @@ public class Artillery : MonoBehaviour
         }
         */
 
-        float distance = 1000f;
+        float distance = AttackRange;
 
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 1000f))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, AttackRange))
         {
             distance = hit.distance;
             //hit.collider.gameObject.tag
