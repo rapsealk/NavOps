@@ -99,19 +99,16 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     public void FireMainBattery(Vector2 offset = new Vector2())
     {
-        if (Ammo == 0)
-        {
-            return;
-        }
-
         for (int i = 0; i < m_Batteries.Length; i++)
         {
-            if (m_Batteries[i].IsTargetLocked)
+            if (Ammo == 0)
             {
-                if (m_Batteries[i].Fire(offset))
-                {
-                    Ammo -= 1;
-                }
+                return;
+            }
+
+            if (m_Batteries[i].Fire(offset))
+            {
+                Ammo -= 1;
             }
         }
     }
