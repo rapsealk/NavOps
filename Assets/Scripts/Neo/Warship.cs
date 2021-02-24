@@ -120,8 +120,8 @@ public class Warship : Agent
     public override void CollectObservations(VectorSensor sensor)   // 54
     {
         // Player
-        sensor.AddObservation(transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
-        sensor.AddObservation(transform.position.z / (battleField.transform.localScale.z / 2) - 1f);
+        sensor.AddObservation(transform.position.x / battleField.transform.localScale.x);
+        sensor.AddObservation(transform.position.z / battleField.transform.localScale.z);
 
         float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(radian));
@@ -130,8 +130,8 @@ public class Warship : Agent
         // sensor.AddObservation(target.transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
         // sensor.AddObservation(target.transform.position.z / (battleField.transform.localScale.z / 2) - 1f);
         Vector3 relativePosition = target.transform.position - transform.position;
-        sensor.AddObservation(relativePosition.x / (battleField.transform.localScale.x / 2) - 1f);
-        sensor.AddObservation(relativePosition.z / (battleField.transform.localScale.x / 2) - 1f);
+        sensor.AddObservation(relativePosition.x / (battleField.transform.localScale.x * 2));
+        sensor.AddObservation(relativePosition.z / (battleField.transform.localScale.x * 2));
 
         float targetRadian = (target.transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(targetRadian));
@@ -298,12 +298,14 @@ public class Warship : Agent
             CurrentHealth -= damage;
         }
         */
+        /*
         else if (collision.collider.tag == "Terrain")
         {
             //float damage = rb.velocity.magnitude * rb.mass;
             //CurrentHealth -= damage;
             CurrentHealth = 0;
         }
+        */
     }
 
     /*

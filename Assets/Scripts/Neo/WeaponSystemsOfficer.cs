@@ -146,7 +146,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
             rotation = new Vector2(batteryRotation.x, batteryRotation.y);
             IsTargetLocked = battery.IsTargetLocked;
             isReloaded = battery.isReloaded;
-            cooldown = battery.cooldownTimer / Artillery.m_ReloadTime;
+            cooldown = Mathf.Min(battery.cooldownTimer / Artillery.m_ReloadTime, 1.0f);
             isDamaged = battery.isDamaged;
             repairProgress = battery.repairTimer / Artillery.m_RepairTime;
         }
