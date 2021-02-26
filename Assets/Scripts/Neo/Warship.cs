@@ -169,6 +169,9 @@ public class Warship : Agent
         sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
         sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
 
+        sensor.AddOneHotObservation(Engine.SpeedLevel+2, 5);
+        sensor.AddOneHotObservation(Engine.SteerLevel+2, 5);
+
         sensor.AddObservation(CurrentHealth / (float) m_Durability);
         sensor.AddObservation(target.CurrentHealth / (float) m_Durability);
     }
@@ -260,7 +263,7 @@ public class Warship : Agent
         };
         for (int i = 0; i < keyCodes.Length; i++)
         {
-            if (Input.GetKey(keyCodes[i]))
+            if (Input.GetKeyDown(keyCodes[i]))
             {
                 actionsOut[0] = (float) (i+1);
                 return;
