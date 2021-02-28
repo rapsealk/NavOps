@@ -256,20 +256,140 @@ public class Warship : Agent
 
     public override void Heuristic(float[] actionsOut)
     {
-        KeyCode[] keyCodes = {
-            KeyCode.UpArrow, KeyCode.DownArrow,
-            KeyCode.LeftArrow, KeyCode.RightArrow,
-            KeyCode.Space
-        };
-        for (int i = 0; i < keyCodes.Length; i++)
+        actionsOut[0] = 0f;
+
+        if (playerId == 1)
         {
-            if (Input.GetKeyDown(keyCodes[i]))
+            KeyCode[] keyCodes = {
+                KeyCode.UpArrow, KeyCode.DownArrow,
+                KeyCode.LeftArrow, KeyCode.RightArrow,
+                KeyCode.Space
+            };
+            for (int i = 0; i < keyCodes.Length; i++)
             {
-                actionsOut[0] = (float) (i+1);
-                return;
+                if (Input.GetKeyDown(keyCodes[i]))
+                {
+                    actionsOut[0] = (float) (i+1);
+                    return;
+                }
             }
         }
-        actionsOut[0] = 0f;
+        else
+        {
+            float radius = 30f;
+
+            Vector3 currentPosition = transform.position;
+            Vector3 opponentPosition = target.transform.position;
+            Vector3 vector = currentPosition - opponentPosition;
+            float gradient = vector.z / vector.x;
+            float x = Mathf.Sqrt(Mathf.Pow(radius, 2) / (Mathf.Pow(gradient, 2) + 1));
+            float z = gradient * x;
+
+            float distance1 = Geometry.GetDistance(currentPosition, opponentPosition + new Vector3(x, 0f, z));
+            float distance2 = Geometry.GetDistance(currentPosition, opponentPosition - new Vector3(x, 0f, z));
+            Vector3 targetPosition = Vector3.zero;
+            if (distance1 < distance2)
+            {
+                targetPosition = opponentPosition + new Vector3(x, 0f, z);
+            }
+            else
+            {
+                targetPosition = opponentPosition - new Vector3(x, 0f, z);
+            }
+            Vector3 targetDirection = targetPosition - currentPosition;
+            Debug.DrawRay(currentPosition, targetDirection, Color.red);
+
+            if (Geometry.GetDistance(currentPosition, opponentPosition) < radius + 50f)
+            {
+                //actionsOut[0] = 5f;
+                weaponSystemsOfficer.FireMainBattery();
+            }
+
+            if (Mathf.Min(distance1, distance2) < radius)
+            {
+                if (Engine.SpeedLevel > 0)
+                {
+                    Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
+                    //actionsOut[0] = 2f;
+                    return;
+                }
+            }
+            else if (Engine.SpeedLevel <= 0)
+            {
+                Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
+                actionsOut[0] = 1f;
+                return;
+            }
+
+            // #2. Direction
+            Vector3 rotation = transform.rotation.eulerAngles;
+            float angle = (Geometry.GetAngleBetween(currentPosition, targetPosition) + 360) % 360;
+            float gap = angle - rotation.y;
+            if ((gap > 0f && gap < 180f) || gap < -180f)
+            {
+                Engine.SetSteerLevel(Engine.SteerLevel + 1);
+                //actionsOut[0] = 4f; // Right
+            }
+            else
+            {
+                Engine.SetSteerLevel(Engine.SteerLevel - 1);
+                actionsOut[0] = 3f; // Left
+            }
+            /*
+            if (Mathf.Abs(gap) > 90f)
+            {
+                warship.m_Warship.SetEngineLevel(Warship.EngineLevel.BACKWARD_MAX);
+            }
+            else
+            {
+                warship.m_Warship.SetEngineLevel(Warship.EngineLevel.FORWARD_MAX);
+            }
+            */
+            /*
+            float distance = Geometry.GetDistance(transform.position, target.transform.position);
+            Vector3 dir = target.transform.position - transform.position;
+            Debug.DrawRay(transform.position, dir, Color.red, Time.deltaTime);
+            Debug.DrawRay(transform.position, dir.normalized * (dir.magnitude - 30f), Color.green, Time.deltaTime);
+
+            actionsOut[0] = 0f;
+            if (Engine.SpeedLevel == 0f)
+            {
+                actionsOut[0] = 1f;
+                return;
+            }
+            else if (distance < 30f)
+            {
+                actionsOut[0] = 2f;
+                return;
+            }
+            //else if ()
+            float angle = Geometry.GetAngleBetween(transform.position, target.transform.position);
+            if (angle > 10f)
+            {
+                actionsOut[0] = 4f; // Right
+                //return;
+            }
+            else if (angle < -10f)
+            {
+                actionsOut[0] = 3f; // Left
+                //return;
+            }
+            //
+            else if (Engine.SteerLevel > 0)
+            {
+                actionsOut[0] = 3f;
+            }
+            else if (Engine.SteerLevel < 0)
+            {
+                actionsOut[0] = 4f;
+            }
+            else {
+                actionsOut[0] = 5f;
+            }
+            //
+            Debug.Log($"Distance: {distance}, Angle: {angle}, Steer: {Engine.SteerLevel}, Action: {actionsOut[0]}");
+            */
+        }
     }
     #endregion  // MLAgent
 // #endif
