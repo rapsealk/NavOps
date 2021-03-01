@@ -13,6 +13,10 @@ public class GameManager : MonoBehaviour
     public Text player2PositionText;
     public Text player2RotationText;
     public Text player2HpText;
+    // Speed Level
+    public Text[] speedLevelTexts;
+    // Steer Level
+    public Text[] steerLevelTexts;
 
     // Start is called before the first frame update
     void Start()
@@ -35,5 +39,17 @@ public class GameManager : MonoBehaviour
         player2PositionText.text = string.Format("({0:F2}, {1:F2})", position2.x, position2.z);
         player2RotationText.text = string.Format("{0:F2}", rotation2.y);
         player2HpText.text = string.Format("{0:F2}", player2.CurrentHealth);
+
+        for (int i = 0; i < speedLevelTexts.Length; i++)
+        {
+            speedLevelTexts[i].color = Color.gray;
+        }
+        speedLevelTexts[player1.Engine.SpeedLevel+2].color = Color.green;
+
+        for (int i = 0; i < steerLevelTexts.Length; i++)
+        {
+            steerLevelTexts[i].color = Color.gray;
+        }
+        steerLevelTexts[player1.Engine.SteerLevel+2].color = Color.green;
     }
 }
