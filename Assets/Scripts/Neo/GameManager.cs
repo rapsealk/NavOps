@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public Text player2HpText;
     // Speed Level
     public Text[] speedLevelTexts;
+    public Text speedKnotText;
     // Steer Level
     public Text[] steerLevelTexts;
 
@@ -42,14 +43,16 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < speedLevelTexts.Length; i++)
         {
-            speedLevelTexts[i].color = Color.gray;
+            speedLevelTexts[i].color = Color.black;
         }
-        speedLevelTexts[player1.Engine.SpeedLevel+2].color = Color.green;
+        speedLevelTexts[player1.Engine.SpeedLevel+2].color = Color.white;
 
         for (int i = 0; i < steerLevelTexts.Length; i++)
         {
             steerLevelTexts[i].color = Color.gray;
         }
         steerLevelTexts[player1.Engine.SteerLevel+2].color = Color.green;
+
+        speedKnotText.text = string.Format("{0:F1} kts", (player1.Engine.IsBackward ? -1 : 1) * player1.rb.velocity.magnitude);
     }
 }

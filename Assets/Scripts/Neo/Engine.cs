@@ -20,6 +20,8 @@ public class Engine : MonoBehaviour
         get => _steerLevel;
         private set { _steerLevel = value; }
     }
+    public bool IsForward { get => SpeedLevel > 0; }
+    public bool IsBackward { get => SpeedLevel < 0; }
 
     private Rigidbody m_Rigidbody;
 
@@ -61,24 +63,6 @@ public class Engine : MonoBehaviour
     {
         // Fuel -= HorsePower / 20f;
     }
-
-    /*
-    public void Combust(float fuel = 1.0f)
-    {
-        if (_fuel < Mathf.Epsilon)
-        {
-            return;
-        }
-
-        Fuel -= fuel;
-        m_Rigidbody.AddForce(transform.forward * fuel * HorsePower, ForceMode.Acceleration);
-    }
-
-    public void Steer(float rudder = 1.0f)
-    {
-        m_Rigidbody.transform.Rotate(Vector3.up, rudder * 0.1f);
-    }
-    */
 
     public void SetSpeedLevel(int level)
     {

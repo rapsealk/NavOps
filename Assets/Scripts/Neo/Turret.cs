@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public enum TurretType
 {
@@ -8,9 +9,9 @@ public enum TurretType
     LEFT = 3
 }
 
-public class Artillery : MonoBehaviour
+public class Turret : MonoBehaviour, DamagableObject
 {
-    public LaserBeam beamPrefab;
+    public GameObject ShellPrefab;
     public Transform muzzle;
     public ParticleSystem muzzleFlash;
     [HideInInspector] public int playerId;
@@ -27,33 +28,33 @@ public class Artillery : MonoBehaviour
         get => _isDamaged;
         private set
         {
-            meshRenderer.material.color = value ? Color.cyan : meshRendererColor;
+            m_MeshRenderer.material.color = value ? Color.cyan : m_MeshRendererColor;
             _isDamaged = value;
         }
     }
-    [HideInInspector] public bool IsTargetLocked {
-        get => _isTargetLocked;
-        private set { _isTargetLocked = value; }
+    [HideInInspector] public bool Enabled {
+        get => _enabled;
+        private set { _enabled = value; }
     }
     public const float AttackRange = 1000f;
 
-    private Warship Warship;
+    private Warship m_Warship;
     private TurretType m_TurretType;
     private float m_InitialEulerRotation;
-    private Vector2 m_FirePower = new Vector2(8000f, 100f);
-    private float offsetX = 3f;
-    private float offsetY = 5f;
-    private bool initialized = false;
-    private MeshRenderer meshRenderer;
-    private Color meshRendererColor;
+    private Vector2 m_FirePower = new Vector2(12000f, 400f);
+    //private float offsetX = 3f;
+    //private float offsetY = 5f;
+    private bool m_Initialized = false;
+    private MeshRenderer m_MeshRenderer;
+    private Color m_MeshRendererColor;
     private bool _isDamaged = false;
-    private bool _isTargetLocked = false;
+    private bool _enabled = false;
 
     public void Reset()
     {
-        if (!initialized)
+        if (!m_Initialized)
         {
-            initialized = true;
+            m_Initialized = true;
 
             Initialize();
         }
@@ -62,7 +63,6 @@ public class Artillery : MonoBehaviour
         isReloaded = true;
         repairTimer = 0f;
         isDamaged = false;
-        IsTargetLocked = false;
 
         Vector3 localRotation = transform.localRotation.eulerAngles;
         if (m_TurretType == TurretType.FRONTAL)
@@ -86,7 +86,7 @@ public class Artillery : MonoBehaviour
 
     private void Initialize()
     {
-        Warship = GetComponentInParent<Warship>();
+        m_Warship = GetComponentInParent<Warship>();
 
         m_InitialEulerRotation = (transform.localRotation.eulerAngles.y + 360) % 360;
 
@@ -107,35 +107,13 @@ public class Artillery : MonoBehaviour
             m_TurretType = TurretType.LEFT;
         }
 
-        meshRenderer = GetComponent<MeshRenderer>();
-        meshRendererColor = meshRenderer.material.color;
+        m_MeshRenderer = GetComponent<MeshRenderer>();
+        m_MeshRendererColor = m_MeshRenderer.material.color;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        m_InitialEulerRotation = (transform.localRotation.eulerAngles.y + 360) % 360;
-
-        if (m_InitialEulerRotation <= Mathf.Epsilon)
-        {
-            m_TurretType = TurretType.FRONTAL;
-        }
-        else if (m_InitialEulerRotation <= 90f + Mathf.Epsilon)
-        {
-            m_TurretType = TurretType.RIGHT;
-        }
-        else if (m_InitialEulerRotation <= 180f + Mathf.Epsilon)
-        {
-            m_TurretType = TurretType.REAR;
-        }
-        else
-        {
-            m_TurretType = TurretType.LEFT;
-        }
-        */
-
-        // Debug.Log($"{GetType().Name}({name} {TurretType}) InitialEulerRotation: {InitialEulerRotation}");
         Reset();
     }
 
@@ -149,7 +127,7 @@ public class Artillery : MonoBehaviour
             if (repairTimer >= m_RepairTime)
             {
                 isDamaged = false;
-                meshRenderer.material.color = meshRendererColor;
+                m_MeshRenderer.material.color = m_MeshRendererColor;
             }
         }
         else if (!isReloaded)
@@ -161,116 +139,46 @@ public class Artillery : MonoBehaviour
                 isReloaded = true;
             }
         }
-
-        IsTargetLocked = false;
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, AttackRange))
-        {
-            if (hit.collider.tag.Equals("Player")
-                || hit.collider.tag.Equals("Turret"))
-            {
-                IsTargetLocked = true;
-            }
-        }
     }
 
     public bool Fire(Vector2 offset = new Vector2())
     {
-        if (!isReloaded || isDamaged)
+        if (!Enabled || !isReloaded || isDamaged)
         {
             return false;
         }
 
-        /*
-        Vector3 rotation = transform.rotation.eulerAngles;
-        rotation.x = (rotation.x + offset.x * offsetX + 360) % 360;
-        if (rotation.x < 180f)
-        {
-            rotation.x = 0f;
-        }
-        else if (360 - rotation.x > 60f)
-        {
-            rotation.x = -60f;
-        }
-        rotation.y = (rotation.y + offset.y * offsetY + 360) % 360;
-        transform.rotation = Quaternion.Euler(rotation);
-
-        Vector3 localRotation = transform.localRotation.eulerAngles;
-        localRotation.y = (localRotation.y > 180f) ? (localRotation.y - 360f) : localRotation.y;
-        switch (m_TurretType)
-        {
-            case TurretType.FRONTAL:
-                if (Mathf.Abs(localRotation.y) >= m_Traverse + Mathf.Epsilon)
-                {
-                    localRotation.y = Mathf.Sign(localRotation.y) * m_Traverse;
-                    transform.localRotation = Quaternion.Euler(localRotation);
-                }
-                break;
-            case TurretType.REAR:
-                if (Mathf.Abs(localRotation.y) <= 180f - (m_Traverse + Mathf.Epsilon))
-                {
-                    localRotation.y = 180f - Mathf.Sign(localRotation.y) * m_Traverse;
-                    transform.localRotation = Quaternion.Euler(localRotation);
-                }
-                break;
-            case TurretType.LEFT:
-                if (Mathf.Abs(localRotation.y + 90f) >= m_Traverse + Mathf.Epsilon)
-                {
-                    localRotation.y = -90f + Mathf.Sign(localRotation.y + 90f) * m_Traverse;
-                    transform.localRotation = Quaternion.Euler(localRotation);
-                }
-                break;
-            case TurretType.RIGHT:
-                if (Mathf.Abs(localRotation.y - 90f) >= m_Traverse + Mathf.Epsilon)
-                {
-                    localRotation.y = 90f + Mathf.Sign(localRotation.y - 90f) * m_Traverse;
-                    transform.localRotation = Quaternion.Euler(localRotation);
-                }
-                break;
-        }
-        */
-
-        float distance = AttackRange;
-
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, AttackRange))
-        {
-            distance = hit.distance;
-            //hit.collider.gameObject.tag
-
-            if (hit.collider.tag.Equals("Player"))
-            {
-                Debug.Log($"{name} -> {hit.collider.name} ({hit.collider.tag}, {hit.point})");
-
-                hit.collider.GetComponent<Warship>().TakeDamage();
-            }
-            else if (hit.collider.tag.Equals("Turret"))
-            {
-                Debug.Log($"{name} -> {hit.collider.name} ({hit.collider.tag}, {hit.point})");
-
-                hit.collider.GetComponent<Artillery>().TakeDamage();
-            }
-        }
-
+        Vector3 firePosition = muzzle.position + muzzle.forward * 3;
+        muzzleFlash.transform.position = firePosition;
         muzzleFlash.Play();
 
-        LaserBeam beam = Instantiate<LaserBeam>(beamPrefab, muzzle.position + muzzle.forward * 3, muzzle.rotation);
-        beam.Distance = distance;
-        // GameObject.Destroy(projectile, 3f);
-
-        /* FIXME
-        GameObject projectile = Instantiate(shellPrefab, muzzle.position + muzzle.forward * 3, muzzle.rotation);
+        GameObject projectile = Instantiate(ShellPrefab, firePosition, muzzle.rotation);
         projectile.tag = $"Bullet{teamId}";
+        projectile.GetComponent<Shell>().Warship = m_Warship;
 
         Vector3 velocity = muzzle.transform.forward * m_FirePower.x + muzzle.transform.up * m_FirePower.y;
         Rigidbody rigidbody = projectile.GetComponent<Rigidbody>();
         rigidbody.velocity = velocity / rigidbody.mass;
-        */
 
         isReloaded = false;
         cooldownTimer = 0f;
 
+        StartCoroutine(StopMuzzleFlashAnimation());
+
         return true;
+    }
+
+    private IEnumerator StopMuzzleFlashAnimation()
+    {
+        yield return new WaitForSeconds(3f);
+
+        if (muzzleFlash.IsAlive())
+        {
+            muzzleFlash.Stop();
+            muzzleFlash.Clear();
+        }
+
+        yield return null;
     }
 
     public void Rotate(Quaternion target)
@@ -279,19 +187,16 @@ public class Artillery : MonoBehaviour
         // Base: Horizontal, Barrel: Vertical
         Vector3 rotation = target.eulerAngles;
 
-        /*
         float x = (rotation.x + 360) % 360;
         if (x < 180f)
         {
-            x = 0f;
+            x = Mathf.Min(x, 15f);  // 0f
         }
-        else if (360 - x > 60f)
+        else if (360f - x > 60f)
         {
             x = -60f;
         }
-        rotation.x = x;
-        */
-        rotation.x = 0f;
+        rotation.x = x; // 0f
         rotation.y = (rotation.y + 360) % 360;
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(rotation), m_TraverseSpeed * Time.deltaTime);
@@ -299,6 +204,7 @@ public class Artillery : MonoBehaviour
         ///
         /// Post-processing (FIXME)
         ///
+        bool enableTurret = true;
         Vector3 localRotation = transform.localRotation.eulerAngles;
         localRotation.y = (localRotation.y > 180f + Mathf.Epsilon) ? (localRotation.y - 360f) : localRotation.y;
         switch (m_TurretType)
@@ -309,6 +215,7 @@ public class Artillery : MonoBehaviour
                     localRotation.y = Mathf.Sign(localRotation.y) * m_Traverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
                     transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    enableTurret = false;
                 }
                 break;
             case TurretType.REAR:
@@ -317,6 +224,7 @@ public class Artillery : MonoBehaviour
                     localRotation.y = 180f - Mathf.Sign(localRotation.y) * m_Traverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
                     transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    enableTurret = false;
                 }
                 break;
             case TurretType.LEFT:
@@ -325,6 +233,7 @@ public class Artillery : MonoBehaviour
                     localRotation.y = -90f + Mathf.Sign(localRotation.y + 90f) * m_SideTraverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
                     transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    enableTurret = false;
                 }
                 break;
             case TurretType.RIGHT:
@@ -333,33 +242,26 @@ public class Artillery : MonoBehaviour
                     localRotation.y = 90f + Mathf.Sign(localRotation.y - 90f) * m_SideTraverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
                     transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    enableTurret = false;
                 }
                 break;
         }
-    }
 
-    /*
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log($"[{teamId}-{playerId}] Artillery({name}).OnCollisionEnter(collision: {collision.collider.tag})");
+        Enabled = enableTurret;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Debug.Log($"Artillery({name}).OnTriggerEnter(other: {other})");
-        isDamaged = true;
-        repairTimer = 0f;
-        meshRenderer.material.color = Color.cyan;
+        Debug.Log($"Turret({name}).OnTriggerEnter(other: {other})");
+        OnDamageTaken();
     }
-    */
 
-    public void TakeDamage()
+    public void OnDamageTaken()
     {
         isDamaged = true;
         repairTimer = 0f;
-        meshRenderer.material.color = Color.cyan;
 
-        Debug.Log($"Turret({name}).TakeDamage()");
-        Warship.TakeDamage();
+        Debug.Log($"Turret({name}).OnDamageTaken()");
+        m_Warship.OnDamageTaken();
     }
 }

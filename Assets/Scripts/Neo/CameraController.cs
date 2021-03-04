@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -34,11 +32,11 @@ public class CameraController : MonoBehaviour
 
         Radar.ViewDirection = rotation.y;
 
-        /*
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
-            TargetObject.weaponSystemsOfficer.Aim(transform.rotation);
+            //string quaternion = string.Format("({0:F2}, {1:F2}, {2:F2}, {3:F2})", transform.rotation.w, transform.rotation.x, transform.rotation.y, transform.rotation.z);
+            //Debug.Log($"Transform.Rotation: (Quaternion=({quaternion}), Euler={transform.rotation.eulerAngles})");
+            //TargetObject.weaponSystemsOfficer.Aim(transform.rotation);
         }
-        */
     }
 }

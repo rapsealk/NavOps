@@ -15,7 +15,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
         private set { _ammo = value; }
     }
 
-    private Artillery[] m_Batteries;
+    private Turret[] m_Turrets;
     private uint _ammo;
 
     public void Reset()
@@ -29,9 +29,9 @@ public class WeaponSystemsOfficer : MonoBehaviour
         isTorpedoReady = true;
         torpedoCooldown = 0f;
 
-        for (int i = 0; i < m_Batteries.Length; i++)
+        for (int i = 0; i < m_Turrets.Length; i++)
         {
-            m_Batteries[i].Reset();
+            m_Turrets[i].Reset();
         }
 
         Ammo = maxAmmo;
@@ -40,7 +40,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_Batteries = GetComponentsInChildren<Artillery>();
+        m_Turrets = GetComponentsInChildren<Turret>();
 
         Reset();
     }
@@ -72,41 +72,34 @@ public class WeaponSystemsOfficer : MonoBehaviour
         this.teamId = teamId;
         this.playerId = playerId;
 
-        m_Batteries = GetComponentsInChildren<Artillery>();
-        for (int i = 0; i < m_Batteries.Length; i++)
+        m_Turrets = GetComponentsInChildren<Turret>();
+        for (int i = 0; i < m_Turrets.Length; i++)
         {
-            m_Batteries[i].playerId = playerId;
-            m_Batteries[i].teamId = teamId;
+            m_Turrets[i].playerId = playerId;
+            m_Turrets[i].teamId = teamId;
         }
     }
 
     public void Aim(Quaternion target)
     {
-        for (int i = 0; i < m_Batteries.Length; i++)
+        for (int i = 0; i < m_Turrets.Length; i++)
         {
-            m_Batteries[i].Rotate(target);
+            m_Turrets[i].Rotate(target);
         }
     }
-
-    /*
-    public void ForceAimOffset(float offset)
-    {
-        throw new System.NotImplementedException();
-    }
-    */
 
     private Vector2 mainBatteryOffset = Vector2.zero;
 
     public void FireMainBattery(Vector2 offset = new Vector2())
     {
-        for (int i = 0; i < m_Batteries.Length; i++)
+        for (int i = 0; i < m_Turrets.Length; i++)
         {
             if (Ammo == 0)
             {
                 return;
             }
 
-            if (m_Batteries[i].Fire(offset))
+            if (m_Turrets[i].Fire(offset))
             {
                 Ammo -= 1;
             }
@@ -134,31 +127,29 @@ public class WeaponSystemsOfficer : MonoBehaviour
     public class BatterySummary
     {
         public Vector2 rotation;
-        public bool IsTargetLocked;
         public bool isReloaded;
         public float cooldown;
         public bool isDamaged;
         public float repairProgress;
 
-        public void Copy(Artillery battery)
+        public void Copy(Turret battery)
         {
             Vector3 batteryRotation = battery.transform.rotation.eulerAngles;
             rotation = new Vector2(batteryRotation.x, batteryRotation.y);
-            IsTargetLocked = battery.IsTargetLocked;
             isReloaded = battery.isReloaded;
-            cooldown = Mathf.Min(battery.cooldownTimer / Artillery.m_ReloadTime, 1.0f);
+            cooldown = Mathf.Min(battery.cooldownTimer / Turret.m_ReloadTime, 1.0f);
             isDamaged = battery.isDamaged;
-            repairProgress = battery.repairTimer / Artillery.m_RepairTime;
+            repairProgress = battery.repairTimer / Turret.m_RepairTime;
         }
     }
 
     public BatterySummary[] Summary()
     {
-        BatterySummary[] summary = new BatterySummary[m_Batteries.Length];
-        for (int i = 0; i < m_Batteries.Length; i++)
+        BatterySummary[] summary = new BatterySummary[m_Turrets.Length];
+        for (int i = 0; i < m_Turrets.Length; i++)
         {
             summary[i] = new BatterySummary();
-            summary[i].Copy(m_Batteries[i]);
+            summary[i].Copy(m_Turrets[i]);
         }
         return summary;
     }

@@ -2,7 +2,7 @@
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 
-public class Warship : Agent
+public class Warship : Agent, DamagableObject
 {
     public const int m_Durability = 20;
     public Transform startingPoint;
@@ -30,6 +30,7 @@ public class Warship : Agent
     private const float rewardFuelLoss = -1 / 21600;
     private const float rewardDistance = -1 / 100000;
     private const float rewardHpChange = 0.5f;
+    private Vector3 m_AimingPoint;
 
     public void Reset()
     {
@@ -42,6 +43,7 @@ public class Warship : Agent
         CurrentHealth = m_Durability;
         isCollisionWithWarship = false;
 
+        m_AimingPoint = Vector3.zero;   // new Vector3(0f, transform.rotation.eulerAngles.y, 0f);
         weaponSystemsOfficer.Reset();
         Engine.Reset();
     }
@@ -49,33 +51,62 @@ public class Warship : Agent
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        weaponSystemsOfficer = GetComponent<WeaponSystemsOfficer>();
-        weaponSystemsOfficer.Assign(teamId, playerId);
-
-        rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-
-        Engine = GetComponent<Engine>();
-
-        MeshRenderer[] meshRenderers = GetComponentsInChildren<MeshRenderer>();
-        for (int i = 0; i < meshRenderers.Length; i++)
-        {
-            meshRenderers[i].material.color = rendererColor;
-        }
-
-        Reset();
-        */
+        Init();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
+            }
+            else if (Input.GetKeyDown(KeyCode.A))
+            {
+                Engine.SetSteerLevel(Engine.SteerLevel - 1);
+            }
+            else if (Input.GetKeyDown(KeyCode.D))
+            {
+                Engine.SetSteerLevel(Engine.SteerLevel + 1);
+            }
+            else if (Input.GetKeyDown(KeyCode.Space))
+            {
+                weaponSystemsOfficer.FireMainBattery();
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                m_AimingPoint.y = (m_AimingPoint.y - 5f) % 360f;
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 5f, -20f);
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 5f, 10f);
+            }
 
+            weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
+        }
+
+        //Vector3 aimingDirection = new Vector3(Mathf.Sin(m_AimingPoint.y) * 30f, Mathf.Cos(m_AimingPoint.y) * 30f, -m_AimingPoint.x);
+        //Debug.DrawRay(transform.position, aimingDirection, Color.red, duration: Time.deltaTime);
+        Debug.Log($"AimingPoint: {m_AimingPoint} / Rotation: {transform.rotation.eulerAngles}");
     }
 
     void FixedUpdate()
     {
+        /*
         Vector3 rotation = Vector3.zero;
         rotation.y = Geometry.GetAngleBetween(transform.position, target.transform.position);
 
@@ -89,11 +120,10 @@ public class Warship : Agent
         rotation.x = Mathf.Atan((G * r) / (vz * 2f)) * Mathf.Rad2Deg;   // max: 140
 
         weaponSystemsOfficer.Aim(Quaternion.Euler(rotation));
+        */
     }
 
-// #if !UNITY_EDITOR
-    #region MLAgent
-    public override void Initialize()
+    private void Init()
     {
         weaponSystemsOfficer = GetComponent<WeaponSystemsOfficer>();
         weaponSystemsOfficer.Assign(teamId, playerId);
@@ -112,6 +142,13 @@ public class Warship : Agent
         Reset();
     }
 
+// #if !UNITY_EDITOR
+    #region MLAgent
+    public override void Initialize()
+    {
+        Init();
+    }
+
     public override void OnEpisodeBegin()
     {
         Reset();
@@ -120,22 +157,55 @@ public class Warship : Agent
     public override void CollectObservations(VectorSensor sensor)   // 54
     {
         // Player
-        sensor.AddObservation(transform.position.x / battleField.transform.localScale.x);
-        sensor.AddObservation(transform.position.z / battleField.transform.localScale.z);
+        if (teamId == 1)
+        {
+            sensor.AddObservation(transform.position.x / battleField.transform.localScale.x);
+            sensor.AddObservation(transform.position.z / battleField.transform.localScale.z);
+        }
+        else
+        {
+            sensor.AddObservation(-transform.position.x / battleField.transform.localScale.x);
+            sensor.AddObservation(-transform.position.z / battleField.transform.localScale.z);
+        }
 
         float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
-        sensor.AddObservation(Mathf.Cos(radian));
-        sensor.AddObservation(Mathf.Sin(radian));
+        if (teamId == 1)
+        {
+            sensor.AddObservation(Mathf.Cos(radian));
+            sensor.AddObservation(Mathf.Sin(radian));
+        }
+        else
+        {
+            sensor.AddObservation(-Mathf.Cos(radian));
+            sensor.AddObservation(-Mathf.Sin(radian));
+        }
+
         // Opponent
         // sensor.AddObservation(target.transform.position.x / (battleField.transform.localScale.x / 2) - 1f);
         // sensor.AddObservation(target.transform.position.z / (battleField.transform.localScale.z / 2) - 1f);
         Vector3 relativePosition = target.transform.position - transform.position;
-        sensor.AddObservation(relativePosition.x / (battleField.transform.localScale.x * 2));
-        sensor.AddObservation(relativePosition.z / (battleField.transform.localScale.x * 2));
+        if (teamId == 1)
+        {
+            sensor.AddObservation(relativePosition.x / (battleField.transform.localScale.x * 2));
+            sensor.AddObservation(relativePosition.z / (battleField.transform.localScale.x * 2));
+        }
+        else
+        {
+            sensor.AddObservation(-relativePosition.x / (battleField.transform.localScale.x * 2));
+            sensor.AddObservation(-relativePosition.z / (battleField.transform.localScale.x * 2));
+        }
 
         float targetRadian = (target.transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
-        sensor.AddObservation(Mathf.Cos(targetRadian));
-        sensor.AddObservation(Mathf.Sin(targetRadian));
+        if (teamId == 1)
+        {
+            sensor.AddObservation(Mathf.Cos(targetRadian));
+            sensor.AddObservation(Mathf.Sin(targetRadian));
+        }
+        else
+        {
+            sensor.AddObservation(-Mathf.Cos(targetRadian));
+            sensor.AddObservation(-Mathf.Sin(targetRadian));
+        }
 
         /* Torpedo
         bool isEnemyTorpedoLaunched = false;
@@ -149,22 +219,21 @@ public class Warship : Agent
         //sensor.AddObservation(isEnemyTorpedoLaunched);
         //sensor.AddObservation(enemyTorpedoPosition.x / (battleField.transform.localScale.x / 2) - 1f);
         //sensor.AddObservation(enemyTorpedoPosition.z / (battleField.transform.localScale.z / 2) - 1f);
+        //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
+        //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
 
         // Weapon
         WeaponSystemsOfficer.BatterySummary[] batterySummary = weaponSystemsOfficer.Summary();
         for (int i = 0; i < batterySummary.Length; i++)
         {
-            WeaponSystemsOfficer.BatterySummary summary = batterySummary[i];
-            sensor.AddObservation(Mathf.Cos(summary.rotation.y));
-            sensor.AddObservation(Mathf.Sin(summary.rotation.y));
-            sensor.AddObservation(summary.IsTargetLocked);
-            sensor.AddObservation(summary.isReloaded);
-            sensor.AddObservation(summary.cooldown);
-            sensor.AddObservation(summary.isDamaged);
-            sensor.AddObservation(summary.repairProgress);
+            WeaponSystemsOfficer.BatterySummary battery = batterySummary[i];
+            sensor.AddObservation(Mathf.Cos(battery.rotation.y));
+            sensor.AddObservation(Mathf.Sin(battery.rotation.y));
+            sensor.AddObservation(battery.isReloaded);
+            sensor.AddObservation(battery.cooldown);
+            sensor.AddObservation(battery.isDamaged);
+            sensor.AddObservation(battery.repairProgress);
         }
-        //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
-        //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
 
         sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
         sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
@@ -204,17 +273,18 @@ public class Warship : Agent
         {
             weaponSystemsOfficer.FireMainBattery();
         }
+        //weaponSystemsOfficer.Aim();
 
         // Reward
-        AddReward(rewardFuelLoss);
+        //AddReward(rewardFuelLoss);
 
-        float distance = Vector3.Distance(transform.position, target.transform.position);
-        float penalty = Mathf.Pow(distance, 2f) * rewardDistance;
-        AddReward(penalty);
+        //float distance = Vector3.Distance(transform.position, target.transform.position);
+        //float penalty = Mathf.Pow(distance, 2f) * rewardDistance;
+        //AddReward(penalty);
         
-        float damageTaken = healthChange / m_Durability;
-        healthChange = 0f;
-        AddReward(damageTaken * rewardHpChange);
+        //float damageTaken = healthChange / m_Durability;
+        //healthChange = 0f;
+        //AddReward(damageTaken * rewardHpChange);
 
         // EndEpisode
         if (isCollisionWithWarship)
@@ -224,7 +294,9 @@ public class Warship : Agent
             EndEpisode();
             target.EndEpisode();
         }
-        else if (CurrentHealth <= 0f + Mathf.Epsilon)
+        else if (CurrentHealth <= 0f + Mathf.Epsilon
+                 || Engine.Fuel <= 0f + Mathf.Epsilon
+                 || weaponSystemsOfficer.Ammo == 0)
         {
             SetReward(-1f);
             target.SetReward(1f);
@@ -238,158 +310,11 @@ public class Warship : Agent
             EndEpisode();
             target.EndEpisode();
         }
-        else if (Engine.Fuel <= 0f + Mathf.Epsilon)
-        {
-            SetReward(-1f);
-            target.SetReward(1f);
-            EndEpisode();
-            target.EndEpisode();
-        }
-        else if (weaponSystemsOfficer.Ammo == 0)
-        {
-            SetReward(-1f);
-            target.SetReward(1f);
-            EndEpisode();
-            target.EndEpisode();
-        }
     }
 
     public override void Heuristic(float[] actionsOut)
     {
         actionsOut[0] = 0f;
-
-        if (playerId == 1)
-        {
-            KeyCode[] keyCodes = {
-                KeyCode.UpArrow, KeyCode.DownArrow,
-                KeyCode.LeftArrow, KeyCode.RightArrow,
-                KeyCode.Space
-            };
-            for (int i = 0; i < keyCodes.Length; i++)
-            {
-                if (Input.GetKeyDown(keyCodes[i]))
-                {
-                    actionsOut[0] = (float) (i+1);
-                    return;
-                }
-            }
-        }
-        else
-        {
-            float radius = 30f;
-
-            Vector3 currentPosition = transform.position;
-            Vector3 opponentPosition = target.transform.position;
-            Vector3 vector = currentPosition - opponentPosition;
-            float gradient = vector.z / vector.x;
-            float x = Mathf.Sqrt(Mathf.Pow(radius, 2) / (Mathf.Pow(gradient, 2) + 1));
-            float z = gradient * x;
-
-            float distance1 = Geometry.GetDistance(currentPosition, opponentPosition + new Vector3(x, 0f, z));
-            float distance2 = Geometry.GetDistance(currentPosition, opponentPosition - new Vector3(x, 0f, z));
-            Vector3 targetPosition = Vector3.zero;
-            if (distance1 < distance2)
-            {
-                targetPosition = opponentPosition + new Vector3(x, 0f, z);
-            }
-            else
-            {
-                targetPosition = opponentPosition - new Vector3(x, 0f, z);
-            }
-            Vector3 targetDirection = targetPosition - currentPosition;
-            Debug.DrawRay(currentPosition, targetDirection, Color.red);
-
-            if (Geometry.GetDistance(currentPosition, opponentPosition) < radius + 50f)
-            {
-                //actionsOut[0] = 5f;
-                weaponSystemsOfficer.FireMainBattery();
-            }
-
-            if (Mathf.Min(distance1, distance2) < radius)
-            {
-                if (Engine.SpeedLevel > 0)
-                {
-                    Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
-                    //actionsOut[0] = 2f;
-                    return;
-                }
-            }
-            else if (Engine.SpeedLevel <= 0)
-            {
-                Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
-                actionsOut[0] = 1f;
-                return;
-            }
-
-            // #2. Direction
-            Vector3 rotation = transform.rotation.eulerAngles;
-            float angle = (Geometry.GetAngleBetween(currentPosition, targetPosition) + 360) % 360;
-            float gap = angle - rotation.y;
-            if ((gap > 0f && gap < 180f) || gap < -180f)
-            {
-                Engine.SetSteerLevel(Engine.SteerLevel + 1);
-                //actionsOut[0] = 4f; // Right
-            }
-            else
-            {
-                Engine.SetSteerLevel(Engine.SteerLevel - 1);
-                actionsOut[0] = 3f; // Left
-            }
-            /*
-            if (Mathf.Abs(gap) > 90f)
-            {
-                warship.m_Warship.SetEngineLevel(Warship.EngineLevel.BACKWARD_MAX);
-            }
-            else
-            {
-                warship.m_Warship.SetEngineLevel(Warship.EngineLevel.FORWARD_MAX);
-            }
-            */
-            /*
-            float distance = Geometry.GetDistance(transform.position, target.transform.position);
-            Vector3 dir = target.transform.position - transform.position;
-            Debug.DrawRay(transform.position, dir, Color.red, Time.deltaTime);
-            Debug.DrawRay(transform.position, dir.normalized * (dir.magnitude - 30f), Color.green, Time.deltaTime);
-
-            actionsOut[0] = 0f;
-            if (Engine.SpeedLevel == 0f)
-            {
-                actionsOut[0] = 1f;
-                return;
-            }
-            else if (distance < 30f)
-            {
-                actionsOut[0] = 2f;
-                return;
-            }
-            //else if ()
-            float angle = Geometry.GetAngleBetween(transform.position, target.transform.position);
-            if (angle > 10f)
-            {
-                actionsOut[0] = 4f; // Right
-                //return;
-            }
-            else if (angle < -10f)
-            {
-                actionsOut[0] = 3f; // Left
-                //return;
-            }
-            //
-            else if (Engine.SteerLevel > 0)
-            {
-                actionsOut[0] = 3f;
-            }
-            else if (Engine.SteerLevel < 0)
-            {
-                actionsOut[0] = 4f;
-            }
-            else {
-                actionsOut[0] = 5f;
-            }
-            //
-            Debug.Log($"Distance: {distance}, Angle: {angle}, Steer: {Engine.SteerLevel}, Action: {actionsOut[0]}");
-            */
-        }
     }
     #endregion  // MLAgent
 // #endif
@@ -413,14 +338,13 @@ public class Warship : Agent
         {
             CurrentHealth = 0;
         }
-        /*
         else if (collision.collider.tag.StartsWith("Bullet")
-                 && !collision.collider.tag.EndsWith(teamId.ToString()))
+                 /*&& !collision.collider.tag.EndsWith(teamId.ToString())*/)
         {
-            float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
-            CurrentHealth -= damage;
+            //float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
+            //CurrentHealth -= damage;
+            OnDamageTaken();
         }
-        */
         /*
         else if (collision.collider.tag == "Terrain")
         {
@@ -455,9 +379,9 @@ public class Warship : Agent
     }
     */
 
-    public void TakeDamage()
+    public void OnDamageTaken()
     {
-        Debug.Log($"Warship({name}).TakeDamage()");
+        Debug.Log($"Warship.OnDamageTaken()");
         CurrentHealth -= 1;
     }
 }

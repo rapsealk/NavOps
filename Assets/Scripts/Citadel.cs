@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Citadel : MonoBehaviour
+public class Citadel : MonoBehaviour, DamagableObject
 {
     private Warship warship;
 
@@ -16,10 +16,10 @@ public class Citadel : MonoBehaviour
         
     }
     
-    public void TakeDamage()
+    public void OnDamageTaken()
     {
-        Debug.Log($"Citadel({name}).TakeDamage()");
+        Debug.Log($"Citadel({name}).OnDamageTaken()");
 
-        warship.TakeDamage();
+        warship.OnDamageTaken();
     }
 }
