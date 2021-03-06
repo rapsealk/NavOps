@@ -313,8 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
-    type: 3}
+  ShellPrefab: {fileID: 0}
   muzzle: {fileID: 3389645990330441364}
   muzzleFlash: {fileID: 5113589405927876365}
   playerId: 0
@@ -616,8 +615,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
-    type: 3}
+  ShellPrefab: {fileID: 0}
   muzzle: {fileID: 7279004818194950533}
   muzzleFlash: {fileID: 4326471398924531944}
   playerId: 0
@@ -1051,8 +1049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
-    type: 3}
+  ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6946408783533097452}
   muzzleFlash: {fileID: 4697427901299551054}
   playerId: 0
@@ -1261,8 +1258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
-    type: 3}
+  ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6502262637646839465}
   muzzleFlash: {fileID: 1702443285242911901}
   playerId: 0
@@ -1378,8 +1374,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
-    type: 3}
+  ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6530759934103057187}
   muzzleFlash: {fileID: 2094771177814017959}
   playerId: 0
@@ -1731,8 +1726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
-    type: 3}
+  ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6308531739989902113}
   muzzleFlash: {fileID: 2570583651749003384}
   playerId: 0
@@ -1962,15 +1956,21 @@ MonoBehaviour:
   m_BrainParameters:
     VectorObservationSize: 58
     NumStackedVectorObservations: 1
-    VectorActionSize: 06000000
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 0a000000
+    VectorActionSize: 0a000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 1
   m_BehaviorType: 0
   m_BehaviorName: RimpacBehavior
   TeamId: 1
   m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
 --- !u!114 &6421240962107525320
 MonoBehaviour:
   m_ObjectHideFlags: 0

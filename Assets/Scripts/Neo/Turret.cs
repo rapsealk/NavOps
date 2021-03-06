@@ -37,6 +37,8 @@ public class Turret : MonoBehaviour, DamagableObject
         private set { _enabled = value; }
     }
     public const float AttackRange = 1000f;
+    public const float k_VerticalMax = 15f;
+    public const float k_VerticalMin = -60f;
 
     private Warship m_Warship;
     private TurretType m_TurretType;
