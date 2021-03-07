@@ -331,9 +331,15 @@ public class Warship : Agent, DamagableObject
             EndEpisode();
             target.EndEpisode();
         }
-        else if (CurrentHealth <= 0f + Mathf.Epsilon
-                 || Engine.Fuel <= 0f + Mathf.Epsilon
+        else if (Engine.Fuel <= 0f + Mathf.Epsilon
                  || weaponSystemsOfficer.Ammo == 0)
+        {
+            SetReward(-1f);
+            target.SetReward(0.5f);
+            EndEpisode();
+            target.EndEpisode();
+        }
+        else if (CurrentHealth <= 0f + Mathf.Epsilon)
         {
             SetReward(-1f);
             target.SetReward(1f);
