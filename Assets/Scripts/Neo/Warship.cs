@@ -31,6 +31,11 @@ public class Warship : Agent, DamagableObject
     }
     public Transform battleField;
     [HideInInspector] public Engine Engine { get; private set; }
+    [HideInInspector] public int EpisodeCount = 0;
+    [HideInInspector] public int ObservationCount;
+    [HideInInspector] public int ActionCount;
+    [HideInInspector] public int FrameCount;
+    [HideInInspector] public float TimeCount;
 
     private int _currentHealth = k_MaxHealth;
     private int _accumulatedDamage = 0;
@@ -61,6 +66,12 @@ public class Warship : Agent, DamagableObject
         Engine.Reset();
 
         m_InputQueue.Clear();
+        
+        EpisodeCount += 1;
+        ObservationCount = 0;
+        ActionCount = 0;
+        FrameCount = 0;
+        TimeCount = 0f;
     }
 
     // Start is called before the first frame update
@@ -101,6 +112,9 @@ public class Warship : Agent, DamagableObject
 
             weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
         }
+
+        FrameCount += 1;
+        TimeCount += Time.deltaTime;
     }
 
     void FixedUpdate()
@@ -260,6 +274,8 @@ public class Warship : Agent, DamagableObject
 
         sensor.AddObservation(CurrentHealth / (float) k_MaxHealth);
         sensor.AddObservation(target.CurrentHealth / (float) k_MaxHealth);
+
+        ObservationCount += 1;
     }
 
     public override void OnActionReceived(float[] vectorAction)
@@ -335,7 +351,7 @@ public class Warship : Agent, DamagableObject
                  || weaponSystemsOfficer.Ammo == 0)
         {
             SetReward(-1f);
-            target.SetReward(0.5f);
+            target.SetReward(0f);
             EndEpisode();
             target.EndEpisode();
         }
@@ -353,6 +369,8 @@ public class Warship : Agent, DamagableObject
             EndEpisode();
             target.EndEpisode();
         }
+
+        ActionCount += 1;
     }
 
     public override void Heuristic(float[] actionsOut)
@@ -429,7 +447,6 @@ public class Warship : Agent, DamagableObject
 
     public void OnDamageTaken()
     {
-        Debug.Log($"Warship.OnDamageTaken()");
         CurrentHealth -= 1;
     }
 }
