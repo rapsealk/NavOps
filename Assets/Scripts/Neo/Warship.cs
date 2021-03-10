@@ -324,20 +324,9 @@ public class Warship : Agent, DamagableObject
         }
 
         weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
-        //weaponSystemsOfficer.Aim();
 
-        // Reward
-        //AddReward(rewardFuelLoss);
-
-        //float distance = Vector3.Distance(transform.position, target.transform.position);
-        //float penalty = Mathf.Pow(distance, 2f) * rewardDistance;
-        //AddReward(penalty);
-        
-        //float damageTaken = m_HealthChange / k_MaxHealth;
-        //m_HealthChange = 0f;
-        //AddReward(damageTaken * rewardHpChange);
-        //AddReward((m_HealthChange - target.m_HealthChange) / 10f);
-        AddReward(-target.AccumulatedDamage * 0.05f);
+        // Default Time Penalty
+        AddReward(-0.0001f);
 
         // EndEpisode
         if (m_IsCollisionWithWarship)
@@ -350,10 +339,28 @@ public class Warship : Agent, DamagableObject
         else if (Engine.Fuel <= 0f + Mathf.Epsilon
                  || weaponSystemsOfficer.Ammo == 0)
         {
-            SetReward(-1f);
-            target.SetReward(0f);
-            EndEpisode();
-            target.EndEpisode();
+            // Time-out
+            if (CurrentHealth > target.CurrentHealth)
+            {
+                SetReward(1f);
+                target.SetReward(-1f);
+                EndEpisode();
+                target.EndEpisode();
+            }
+            else if (CurrentHealth < target.CurrentHealth)
+            {
+                SetReward(-1f);
+                target.SetReward(1f);
+                EndEpisode();
+                target.EndEpisode();
+            }
+            else
+            {
+                SetReward(-1f);
+                target.SetReward(-1f);
+                EndEpisode();
+                target.EndEpisode();
+            }
         }
         else if (CurrentHealth <= 0f + Mathf.Epsilon)
         {
