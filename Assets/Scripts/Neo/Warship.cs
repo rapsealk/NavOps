@@ -412,7 +412,7 @@ public class Warship : Agent, DamagableObject
             CurrentHealth = 0;
         }
         else if (collision.collider.tag.StartsWith("Bullet")
-                 /*&& !collision.collider.tag.EndsWith(teamId.ToString())*/)
+                 && !collision.collider.tag.EndsWith(teamId.ToString()))
         {
             //float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
             //CurrentHealth -= damage;
