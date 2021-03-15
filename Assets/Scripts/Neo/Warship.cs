@@ -172,15 +172,15 @@ public class Warship : Agent, DamagableObject
     public override void CollectObservations(VectorSensor sensor)   // 54
     {
         // Player
+        Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
+                                             transform.position.z / battleField.transform.localScale.z);
         if (teamId == 1)
         {
-            sensor.AddObservation(transform.position.x / battleField.transform.localScale.x);
-            sensor.AddObservation(transform.position.z / battleField.transform.localScale.z);
+            sensor.AddObservation(playerPosition);
         }
         else
         {
-            sensor.AddObservation(-transform.position.x / battleField.transform.localScale.x);
-            sensor.AddObservation(-transform.position.z / battleField.transform.localScale.z);
+            sensor.AddObservation(-playerPosition);
         }
 
         float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
@@ -196,29 +196,27 @@ public class Warship : Agent, DamagableObject
         }
 
         // Opponent
-        if (teamId == 1)
-        {
-            sensor.AddObservation(target.transform.position.x / battleField.transform.localScale.x);
-            sensor.AddObservation(target.transform.position.z / battleField.transform.localScale.z);
-        }
-        else
-        {
-            sensor.AddObservation(-target.transform.position.x / battleField.transform.localScale.x);
-            sensor.AddObservation(-target.transform.position.z / battleField.transform.localScale.z);
-        }
+        Vector2 opponentPosition = new Vector2(target.transform.position.x / battleField.transform.localScale.x,
+                                               target.transform.position.z / battleField.transform.localScale.z);
         /*
-        Vector3 relativePosition = target.transform.position - transform.position;
         if (teamId == 1)
         {
-            sensor.AddObservation(relativePosition.x / (battleField.transform.localScale.x));
-            sensor.AddObservation(relativePosition.z / (battleField.transform.localScale.x));
+            sensor.AddObservation(opponentPosition);
         }
         else
         {
-            sensor.AddObservation(-relativePosition.x / (battleField.transform.localScale.x));
-            sensor.AddObservation(-relativePosition.z / (battleField.transform.localScale.x));
+            sensor.AddObservation(-opponentPosition);
         }
         */
+        Vector2 relativePosition = playerPosition - opponentPosition;
+        if (teamId == 1)
+        {
+            sensor.AddObservation(relativePosition);
+        }
+        else
+        {
+            sensor.AddObservation(-relativePosition);
+        }
 
         float targetRadian = (target.transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
         if (teamId == 1)
@@ -326,7 +324,16 @@ public class Warship : Agent, DamagableObject
         weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
 
         // Default Time Penalty
-        AddReward(-0.0001f);
+        Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
+                                             transform.position.z / battleField.transform.localScale.z);
+        Vector2 opponentPosition = new Vector2(target.transform.position.x / battleField.transform.localScale.x,
+                                               target.transform.position.z / battleField.transform.localScale.z);
+        // float penalty = Mathf.Max(0.0001f, Vector2.Distance(playerPosition, opponentPosition));
+        float distance = Vector2.Distance(playerPosition, opponentPosition);
+        float penalty = 4 * Mathf.Pow(distance, 2f) / 10000;
+        // float penalty = Vector2.Distance(playerPosition, opponentPosition) / 10000;
+        AddReward(-penalty);
+        Debug.Log(string.Format("Distance: {0:F6}, Penalty: {1:F6}, Distance^2: {2:F6}", distance, penalty, Mathf.Pow(distance, 2f)));
 
         // EndEpisode
         if (m_IsCollisionWithWarship)
