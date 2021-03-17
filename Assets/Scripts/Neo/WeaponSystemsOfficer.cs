@@ -90,13 +90,15 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     private Vector2 mainBatteryOffset = Vector2.zero;
 
-    public void FireMainBattery(Vector2 offset = new Vector2())
+    public uint FireMainBattery(Vector2 offset = new Vector2())
     {
+        uint previousAmmo = Ammo;
+
         for (int i = 0; i < m_Turrets.Length; i++)
         {
             if (Ammo == 0)
             {
-                return;
+                return 0;
             }
 
             if (m_Turrets[i].Fire(offset))
@@ -104,6 +106,8 @@ public class WeaponSystemsOfficer : MonoBehaviour
                 Ammo -= 1;
             }
         }
+
+        return previousAmmo - Ammo;
     }
 
     public void FireTorpedoAt(Vector3 position)

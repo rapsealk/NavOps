@@ -300,7 +300,8 @@ public class Warship : Agent, DamagableObject
         }
         else if (action == 5f)
         {
-            weaponSystemsOfficer.FireMainBattery();
+            uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
+            AddReward(usedAmmos / 10000f);
         }
         else if (action == 6f)
         {
@@ -331,7 +332,7 @@ public class Warship : Agent, DamagableObject
         float penalty = 4 * Mathf.Pow(distance, 2f) / 10000;
         // float penalty = Vector2.Distance(playerPosition, opponentPosition) / 10000;
         AddReward(-penalty);
-        Debug.Log(string.Format("Distance: {0:F6}, Penalty: {1:F6}, Distance^2: {2:F6}", distance, penalty, Mathf.Pow(distance, 2f)));
+        // Debug.Log(string.Format("Distance: {0:F6}, Penalty: {1:F6}, Distance^2: {2:F6}", distance, penalty, Mathf.Pow(distance, 2f)));
 
         CurrentHealth -= AccumulatedDamage;
         float hitpointReward = (CurrentHealth - m_PreviousHealth) - (target.CurrentHealth - m_PreviousOpponentHealth);
