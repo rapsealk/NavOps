@@ -252,6 +252,11 @@ public class Turret : MonoBehaviour, DamagableObject
         Enabled = enableTurret;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        OnDamageTaken();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log($"Turret({name}).OnTriggerEnter(other: {other})");

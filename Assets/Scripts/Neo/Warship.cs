@@ -5,7 +5,7 @@ using Unity.MLAgents.Sensors;
 
 public class Warship : Agent, DamagableObject
 {
-    public const int k_MaxHealth = 20;
+    public const float k_MaxHealth = 10f;
     public Transform startingPoint;
     public Color rendererColor;
     public ParticleSystem explosion;
@@ -14,16 +14,13 @@ public class Warship : Agent, DamagableObject
     public int playerId;
     public int teamId;
     [HideInInspector] public WeaponSystemsOfficer weaponSystemsOfficer;
-    [HideInInspector] public int CurrentHealth {
+    [HideInInspector] public float CurrentHealth {
         get => _currentHealth;
-        private set {
-            AccumulatedDamage = value - _currentHealth;
-            _currentHealth = value;
-        }
+        private set { _currentHealth = value; }
     }
-    [HideInInspector] public int AccumulatedDamage {
+    [HideInInspector] public float AccumulatedDamage {
         get {
-            int damage = _accumulatedDamage;
+            float damage = _accumulatedDamage;
             _accumulatedDamage = 0;
             return damage;
         }
@@ -37,13 +34,12 @@ public class Warship : Agent, DamagableObject
     [HideInInspector] public int FrameCount;
     [HideInInspector] public float TimeCount;
 
-    private int _currentHealth = k_MaxHealth;
-    private int _accumulatedDamage = 0;
+    private float _currentHealth = k_MaxHealth;
+    private float _accumulatedDamage = 0;
     private bool m_IsCollisionWithWarship = false;
+    private float m_PreviousHealth = k_MaxHealth;
+    private float m_PreviousOpponentHealth = k_MaxHealth;
 
-    private const float k_RewardFuelLoss = -1 / 21600;
-    private const float k_RewardDistance = -1 / 100000;
-    private const float k_RewardHpChange = 0.5f;
     private Vector3 m_AimingPoint;
     private const float k_AimingPointVerticalMin = -5f;
     private const float k_AimingPointVerticalMax = 3f;
@@ -58,6 +54,8 @@ public class Warship : Agent, DamagableObject
         transform.rotation = startingPoint.rotation;
 
         CurrentHealth = k_MaxHealth;
+        m_PreviousHealth = k_MaxHealth;
+        m_PreviousOpponentHealth = k_MaxHealth;
         AccumulatedDamage = 0;
         m_IsCollisionWithWarship = false;
 
@@ -335,6 +333,12 @@ public class Warship : Agent, DamagableObject
         AddReward(-penalty);
         Debug.Log(string.Format("Distance: {0:F6}, Penalty: {1:F6}, Distance^2: {2:F6}", distance, penalty, Mathf.Pow(distance, 2f)));
 
+        CurrentHealth -= AccumulatedDamage;
+        float hitpointReward = (CurrentHealth - m_PreviousHealth) - (target.CurrentHealth - m_PreviousOpponentHealth);
+        AddReward(hitpointReward / k_MaxHealth);
+        m_PreviousHealth = CurrentHealth;
+        m_PreviousOpponentHealth = target.CurrentHealth;
+
         // EndEpisode
         if (m_IsCollisionWithWarship)
         {
@@ -461,6 +465,6 @@ public class Warship : Agent, DamagableObject
 
     public void OnDamageTaken()
     {
-        CurrentHealth -= 1;
+        AccumulatedDamage += 1f;
     }
 }
