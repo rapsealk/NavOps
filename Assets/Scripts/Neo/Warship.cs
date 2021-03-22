@@ -41,8 +41,8 @@ public class Warship : Agent, DamagableObject
     private float m_PreviousOpponentHealth = k_MaxHealth;
 
     private Vector3 m_AimingPoint;
-    private const float k_AimingPointVerticalMin = -5f;
-    private const float k_AimingPointVerticalMax = 3f;
+    private const float k_AimingPointVerticalMin = -2f;
+    private const float k_AimingPointVerticalMax = 1f;
     private Queue<int> m_InputQueue;
 
     public void Reset()
@@ -86,7 +86,8 @@ public class Warship : Agent, DamagableObject
             return;
         }
 
-        if (Application.platform == RuntimePlatform.WindowsEditor)
+        if (Application.platform == RuntimePlatform.WindowsEditor
+            || Application.platform == RuntimePlatform.OSXEditor)
         {
             if (playerId == 2)
             {
@@ -108,7 +109,7 @@ public class Warship : Agent, DamagableObject
                 }
             }
 
-            weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
+            // weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
         }
 
         FrameCount += 1;
@@ -117,10 +118,10 @@ public class Warship : Agent, DamagableObject
 
     void FixedUpdate()
     {
-        /*
         Vector3 rotation = Vector3.zero;
         rotation.y = Geometry.GetAngleBetween(transform.position, target.transform.position);
 
+        /*
         Vector3 projectilexz = transform.position;
         projectilexz.y = 0f;
         Vector3 targetxz = target.transform.position;
@@ -129,9 +130,10 @@ public class Warship : Agent, DamagableObject
         float G = Physics.gravity.y;
         float vz = 8000f;
         rotation.x = Mathf.Atan((G * r) / (vz * 2f)) * Mathf.Rad2Deg;   // max: 140
+        */
+        rotation.x = m_AimingPoint.x;
 
         weaponSystemsOfficer.Aim(Quaternion.Euler(rotation));
-        */
     }
 
     private void Init()
@@ -303,6 +305,7 @@ public class Warship : Agent, DamagableObject
             uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
             AddReward(usedAmmos / 10000f);
         }
+        /*
         else if (action == 6f)
         {
             m_AimingPoint.y = (m_AimingPoint.y - 5f) % 360f;
@@ -311,16 +314,17 @@ public class Warship : Agent, DamagableObject
         {
             m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
         }
-        else if (action == 8f)
+        */
+        else if (action == 6f)
         {
             m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 1f, k_AimingPointVerticalMin);
         }
-        else if (action == 9f)
+        else if (action == 7f)
         {
             m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 1f, k_AimingPointVerticalMax);
         }
 
-        weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
+        // weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
 
         // Default Time Penalty
         Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
