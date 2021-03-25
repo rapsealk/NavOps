@@ -1789,18 +1789,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
       propertyPath: m_BrainParameters.NumStackedVectorObservations
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
-      value: 8
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[1]
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
-      value: 8
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[1]
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2957803498651142145, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -2073,7 +2093,7 @@ GameObject:
   - component: {fileID: 392130022}
   - component: {fileID: 392130021}
   m_Layer: 5
-  m_Name: RimpacWatermarkText
+  m_Name: NavOpsWatermarkText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2095,7 +2115,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -20, y: -20}
+  m_AnchoredPosition: {x: -120, y: -15}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &392130021
@@ -2131,7 +2151,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Rimpac-v0
+  m_Text: NavOpsMultiDiscrete-v0
 --- !u!222 &392130022
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7590,13 +7610,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
       propertyPath: m_BrainParameters.VectorActionSize.Array.data[0]
-      value: 8
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorActionSize.Array.data[1]
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[0]
-      value: 8
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.m_ActionSpec.BranchSizes.Array.data[1]
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2957803498651142145, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}

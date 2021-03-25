@@ -29,6 +29,11 @@ public class Shell : MonoBehaviour
 
     void OnDestroy()
     {
+        if (m_Hit)
+        {
+            return;
+        }
+
         Vector3 position3D = transform.position;
         Vector3 targetPosition3D = Warship.target.transform.position;
         Vector2 position = new Vector2(position3D.x, position3D.z);

@@ -278,48 +278,56 @@ public class Warship : Agent, DamagableObject
 
     public override void OnActionReceived(float[] vectorAction)
     {
-        float action = vectorAction[0];
+        float movementAction = vectorAction[0];
+        float attackAction = vectorAction[1];
 
-        if (action == 0f)
+        // Movement Actions
+        if (0f == movementAction)
         {
             // NOOP
         }
-        else if (action == 1f)
+        else if (1f == movementAction)
         {
             Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
         }
-        else if (action == 2f)
+        else if (2f == movementAction)
         {
             Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
         }
-        else if (action == 3f)
+        else if (3f == movementAction)
         {
             Engine.SetSteerLevel(Engine.SteerLevel - 1);
         }
-        else if (action == 4f)
+        else if (4f == movementAction)
         {
             Engine.SetSteerLevel(Engine.SteerLevel + 1);
         }
-        else if (action == 5f)
+
+        // Attack Actions
+        if (0f == attackAction)
+        {
+            // NOOP
+        }
+        else if (1f == attackAction)
         {
             uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
             AddReward(usedAmmos / 10000f);
         }
         /*
-        else if (action == 6f)
+        else if (2f == attackAction)
         {
             m_AimingPoint.y = (m_AimingPoint.y - 5f) % 360f;
         }
-        else if (action == 7f)
+        else if (3f == attackAction)
         {
             m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
         }
         */
-        else if (action == 6f)
+        else if (2f == attackAction)
         {
             m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 1f, k_AimingPointVerticalMin);
         }
-        else if (action == 7f)
+        else if (3f == attackAction)
         {
             m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 1f, k_AimingPointVerticalMax);
         }
