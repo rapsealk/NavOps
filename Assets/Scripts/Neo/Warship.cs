@@ -281,6 +281,11 @@ public class Warship : Agent, DamagableObject
         float movementAction = vectorAction[0];
         float attackAction = vectorAction[1];
 
+        if (playerId == 1)
+        {
+            Debug.Log($"OnActionReceived: ({movementAction}, {attackAction})");
+        }
+
         // Movement Actions
         if (0f == movementAction)
         {
@@ -406,12 +411,82 @@ public class Warship : Agent, DamagableObject
 
     public override void Heuristic(float[] actionsOut)
     {
-        actionsOut[0] = 0f;
-
-        if (m_InputQueue.Count > 0)
+        // TODO: Heuristic
+        /*
+        if (playerId == 1)
         {
-            actionsOut[0] = (float) m_InputQueue.Dequeue();
+            actionsOut[0] = 0f;
+            actionsOut[1] = 0f;
+            if (m_InputQueue.Count > 0)
+            {
+                actionsOut[0] = (float) m_InputQueue.Dequeue();
+            }
+            return;
         }
+        */
+
+        actionsOut[0] = 0f; // Movement (5)
+        actionsOut[1] = 0f; // Attack (4)
+
+        Vector3 heading = transform.rotation.eulerAngles;
+        Vector3 opponentHeading = target.transform.rotation.eulerAngles;
+
+        float angle = (heading.y - opponentHeading.y + 360f) % 360f;    // (heading.y - opponentHeading.y) % 180f;
+
+        ///
+        const float radius = 40;
+
+        Vector3 position = transform.position;
+        Vector3 targetPosition = target.transform.position;
+        Vector3 positionGapVector = position - targetPosition;
+        float gradient = positionGapVector.z / positionGapVector.x;
+        float x = Mathf.Sqrt(Mathf.Pow(radius, 2) / (Mathf.Pow(gradient, 2) + 1));
+        float z = gradient * x;
+
+        float distancePositive = Geometry.GetDistance(position, targetPosition + new Vector3(x, 0f, z));
+        float distanceNegative = Geometry.GetDistance(position, targetPosition - new Vector3(x, 0f, z));
+        Debug.Log($"Heuristic.Distance: ({distancePositive}, {distanceNegative}) (x, y) = ({x}, {z}), Angle = {angle}");
+        Vector3 nextReachPosition = targetPosition - Mathf.Sign(distancePositive - distanceNegative) * new Vector3(x, 0f, z);
+        Vector3 targetDirection = nextReachPosition - position;
+        Debug.DrawRay(position, targetDirection, Color.red);
+
+        Vector3 rotation = transform.rotation.eulerAngles;
+        float degreeToRotate = angle - heading.y;
+        //Debug.Log($"DegreeToRotation: {degreeToRotate}");
+        if (Engine.SpeedLevel < 2)
+        {
+            actionsOut[0] = 1f;
+            return;
+        }
+
+        if (Mathf.Min(distancePositive, distanceNegative) < 50f)
+        {
+            actionsOut[1] = 1f;
+        }
+
+        if ((degreeToRotate > 0f && degreeToRotate < 180f))
+        {
+            Debug.Log($"Heuristic -> (4)");
+            actionsOut[0] = 4f;
+        }
+        else if (degreeToRotate > -360f && degreeToRotate < -180f)
+        {
+            Debug.Log($"Heuristic -> (3)");
+            actionsOut[0] = 3f;
+        }
+        /*
+        if (Mathf.Abs(degreeToRotate) > 90f)
+        {
+            Debug.Log($"Heuristic -> (2)");
+            actionsOut[0] = 2f;
+        }
+        else
+        {
+            Debug.Log($"Heuristic -> (1)");
+            actionsOut[0] = 1f;
+        }
+        */
+        Debug.Log($"Heuristic: ({actionsOut[0]}, {actionsOut[1]}) (degree: {degreeToRotate})");
     }
     #endregion  // MLAgent
 // #endif
