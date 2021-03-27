@@ -267,8 +267,8 @@ public class Warship : Agent, DamagableObject
         sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
         sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
 
-        sensor.AddOneHotObservation(Engine.SpeedLevel+2, 5);
-        sensor.AddOneHotObservation(Engine.SteerLevel+2, 5);
+        sensor.AddOneHotObservation(Engine.SpeedLevel + 2, 5);
+        sensor.AddOneHotObservation(Engine.SteerLevel + 2, 5);
 
         sensor.AddObservation(CurrentHealth / (float) k_MaxHealth);
         sensor.AddObservation(target.CurrentHealth / (float) k_MaxHealth);
@@ -412,6 +412,12 @@ public class Warship : Agent, DamagableObject
     public override void Heuristic(float[] actionsOut)
     {
         // TODO: Heuristic
+        if (playerId == 2)
+        {
+            actionsOut[0] = (float) Random.Range(0, 5);
+            actionsOut[1] = (float) Random.Range(0, 4);
+            return;
+        }
         /*
         if (playerId == 1)
         {
@@ -435,6 +441,7 @@ public class Warship : Agent, DamagableObject
 
         ///
         const float radius = 40;
+        const float attackRange = 160f;
 
         Vector3 position = transform.position;
         Vector3 targetPosition = target.transform.position;
@@ -445,48 +452,50 @@ public class Warship : Agent, DamagableObject
 
         float distancePositive = Geometry.GetDistance(position, targetPosition + new Vector3(x, 0f, z));
         float distanceNegative = Geometry.GetDistance(position, targetPosition - new Vector3(x, 0f, z));
-        Debug.Log($"Heuristic.Distance: ({distancePositive}, {distanceNegative}) (x, y) = ({x}, {z}), Angle = {angle}");
         Vector3 nextReachPosition = targetPosition - Mathf.Sign(distancePositive - distanceNegative) * new Vector3(x, 0f, z);
-        Vector3 targetDirection = nextReachPosition - position;
-        Debug.DrawRay(position, targetDirection, Color.red);
+        Vector3 nextReachDirection = nextReachPosition - position;
+        Debug.DrawRay(position, nextReachDirection, Color.red);
 
-        Vector3 rotation = transform.rotation.eulerAngles;
-        float degreeToRotate = angle - heading.y;
-        //Debug.Log($"DegreeToRotation: {degreeToRotate}");
+        RaycastHit hit;
+        for (int i = 0; i < 8; i++)
+        {
+            float rad = (45f * i) / 180f * Mathf.PI;
+            Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
+            if (Physics.Raycast(position, dir, out hit, maxDistance: 160f))
+            {
+                Vector3 force = position - hit.point;
+                nextReachDirection = (nextReachDirection.normalized + force.normalized) * nextReachDirection.magnitude;
+                nextReachPosition = position + nextReachDirection;
+            }
+        }
+
+        Debug.DrawRay(position, nextReachPosition, Color.white);
+
         if (Engine.SpeedLevel < 2)
         {
             actionsOut[0] = 1f;
             return;
         }
 
-        if (Mathf.Min(distancePositive, distanceNegative) < 50f)
+        float y = Geometry.GetAngleBetween(transform.position, nextReachPosition);
+        float ydir = (transform.rotation.eulerAngles.y - y + 180f) % 360f - 180f;
+        if (ydir > 0f)
+        {
+            actionsOut[0] = 3f; // Left
+        }
+        else if (ydir < 0f)
+        {
+            actionsOut[0] = 4f; // Right
+        }
+
+        if (m_AimingPoint.x > -1f)
+        {
+            actionsOut[1] = 2f;
+        }
+        else if (Mathf.Min(distancePositive, distanceNegative) < attackRange)
         {
             actionsOut[1] = 1f;
         }
-
-        if ((degreeToRotate > 0f && degreeToRotate < 180f))
-        {
-            Debug.Log($"Heuristic -> (4)");
-            actionsOut[0] = 4f;
-        }
-        else if (degreeToRotate > -360f && degreeToRotate < -180f)
-        {
-            Debug.Log($"Heuristic -> (3)");
-            actionsOut[0] = 3f;
-        }
-        /*
-        if (Mathf.Abs(degreeToRotate) > 90f)
-        {
-            Debug.Log($"Heuristic -> (2)");
-            actionsOut[0] = 2f;
-        }
-        else
-        {
-            Debug.Log($"Heuristic -> (1)");
-            actionsOut[0] = 1f;
-        }
-        */
-        Debug.Log($"Heuristic: ({actionsOut[0]}, {actionsOut[1]}) (degree: {degreeToRotate})");
     }
     #endregion  // MLAgent
 // #endif
