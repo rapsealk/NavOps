@@ -40,7 +40,7 @@ public class Shell : MonoBehaviour
         Vector2 targetPosition = new Vector2(targetPosition3D.x, targetPosition3D.z);
         float distance = Vector2.Distance(position, targetPosition);
         float encouragement = 1 / (1 + Mathf.Pow(distance, 2f));
-        Debug.Log($"Shell({tag}): {transform.position} -> {targetPosition} (encouragement: {encouragement:F8})");
+        // Debug.Log($"Shell({tag}): {transform.position} -> {targetPosition} (encouragement: {encouragement:F8})");
         Warship.AddReward(encouragement);
     }
 

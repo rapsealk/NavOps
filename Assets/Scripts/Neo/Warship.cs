@@ -281,11 +281,6 @@ public class Warship : Agent, DamagableObject
         float movementAction = vectorAction[0];
         float attackAction = vectorAction[1];
 
-        if (playerId == 1)
-        {
-            Debug.Log($"OnActionReceived: ({movementAction}, {attackAction})");
-        }
-
         // Movement Actions
         if (0f == movementAction)
         {
@@ -411,13 +406,6 @@ public class Warship : Agent, DamagableObject
 
     public override void Heuristic(float[] actionsOut)
     {
-        // TODO: Heuristic
-        if (playerId == 2)
-        {
-            actionsOut[0] = (float) Random.Range(0, 5);
-            actionsOut[1] = (float) Random.Range(0, 4);
-            return;
-        }
         /*
         if (playerId == 1)
         {
@@ -440,8 +428,9 @@ public class Warship : Agent, DamagableObject
         float angle = (heading.y - opponentHeading.y + 360f) % 360f;    // (heading.y - opponentHeading.y) % 180f;
 
         ///
-        const float radius = 40;
+        const float radius = 100f;
         const float attackRange = 160f;
+        const float attackRangeShort = 100f;
 
         Vector3 position = transform.position;
         Vector3 targetPosition = target.transform.position;
@@ -488,14 +477,47 @@ public class Warship : Agent, DamagableObject
             actionsOut[0] = 4f; // Right
         }
 
-        if (m_AimingPoint.x > -1f)
+        /*
+        if (m_AimingPoint.x < 1f)
         {
-            actionsOut[1] = 2f;
+            actionsOut[1] = 3f;
         }
-        else if (Mathf.Min(distancePositive, distanceNegative) < attackRange)
+        else*/
+        float distance = Vector3.Distance(position, targetPosition);
+        if (/*Mathf.Min(distancePositive, distanceNegative)*/ distance < attackRange)
         {
-            actionsOut[1] = 1f;
+            if (/*Mathf.Min(distancePositive, distanceNegative)*/ distance < attackRangeShort)
+            {
+                if (m_AimingPoint.x < 1f)
+                {
+                    actionsOut[1] = 3f; // Down
+                }
+                else if (m_AimingPoint.x > 1f)
+                {
+                    actionsOut[1] = 2f; // Up
+                }
+                else
+                {
+                    actionsOut[1] = 1f;
+                }
+
+                return;
+            }
+
+            if (m_AimingPoint.x > 0f)
+            {
+                actionsOut[1] = 2f;
+            }
+            else if (m_AimingPoint.x < 0f)
+            {
+                actionsOut[1] = 3f;
+            }
+            else
+            {
+                actionsOut[1] = 1f;
+            }
         }
+        // Debug.Log($"Distance: {distance} / attackRange: {attackRange} / AimingPoint: {m_AimingPoint.x}");
     }
     #endregion  // MLAgent
 // #endif
@@ -506,6 +528,8 @@ public class Warship : Agent, DamagableObject
         {
             return;
         }
+
+        //Debug.Log($"Warship.OnCollisionEnter(collision: {collision.collider.tag}, {collision.collider.tag.StartsWith("Bullet")})");
 
         explosion.transform.position = collision.transform.position;
         explosion.transform.rotation = collision.transform.rotation;
