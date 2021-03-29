@@ -43,7 +43,6 @@ public class Warship : Agent, DamagableObject
     private Vector3 m_AimingPoint;
     private const float k_AimingPointVerticalMin = -2f;
     private const float k_AimingPointVerticalMax = 1f;
-    private Queue<int> m_InputQueue;
 
     public void Reset()
     {
@@ -62,8 +61,6 @@ public class Warship : Agent, DamagableObject
         m_AimingPoint = Vector3.zero;   // new Vector3(0f, transform.rotation.eulerAngles.y, 0f);
         weaponSystemsOfficer.Reset();
         Engine.Reset();
-
-        m_InputQueue.Clear();
         
         EpisodeCount += 1;
         ObservationCount = 0;
@@ -81,37 +78,6 @@ public class Warship : Agent, DamagableObject
     // Update is called once per frame
     void Update()
     {
-        if (playerId != 1)
-        {
-            return;
-        }
-
-        if (Application.platform == RuntimePlatform.WindowsEditor
-            || Application.platform == RuntimePlatform.OSXEditor)
-        {
-            if (playerId == 2)
-            {
-                m_InputQueue.Enqueue(Random.Range(0, 10));
-                return;
-            }
-
-            KeyCode[] keyCodes = new KeyCode[] {
-                KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D,
-                KeyCode.Space,
-                KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow
-            };
-            for (int i = 0; i < keyCodes.Length; i++)
-            {
-                if (Input.GetKeyDown(keyCodes[i]))
-                {
-                    m_InputQueue.Enqueue(i+1);
-                    break;
-                }
-            }
-
-            // weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
-        }
-
         FrameCount += 1;
         TimeCount += Time.deltaTime;
     }
@@ -151,8 +117,6 @@ public class Warship : Agent, DamagableObject
         {
             meshRenderers[i].material.color = rendererColor;
         }
-
-        m_InputQueue = new Queue<int>();
 
         Reset();
     }
@@ -406,19 +370,6 @@ public class Warship : Agent, DamagableObject
 
     public override void Heuristic(float[] actionsOut)
     {
-        /*
-        if (playerId == 1)
-        {
-            actionsOut[0] = 0f;
-            actionsOut[1] = 0f;
-            if (m_InputQueue.Count > 0)
-            {
-                actionsOut[0] = (float) m_InputQueue.Dequeue();
-            }
-            return;
-        }
-        */
-
         actionsOut[0] = 0f; // Movement (5)
         actionsOut[1] = 0f; // Attack (4)
 
@@ -429,7 +380,7 @@ public class Warship : Agent, DamagableObject
 
         ///
         const float radius = 100f;
-        const float attackRange = 160f;
+        const float attackRange = 200f;
         const float attackRangeShort = 100f;
 
         Vector3 position = transform.position;
@@ -443,20 +394,27 @@ public class Warship : Agent, DamagableObject
         float distanceNegative = Geometry.GetDistance(position, targetPosition - new Vector3(x, 0f, z));
         Vector3 nextReachPosition = targetPosition - Mathf.Sign(distancePositive - distanceNegative) * new Vector3(x, 0f, z);
         Vector3 nextReachDirection = nextReachPosition - position;
-        Debug.DrawRay(position, nextReachDirection, Color.red);
+        Debug.DrawRay(position, nextReachDirection, Color.green);
 
         RaycastHit hit;
+        Vector3 forceRepulsive = Vector3.zero;
         for (int i = 0; i < 8; i++)
         {
             float rad = (45f * i) / 180f * Mathf.PI;
             Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
             if (Physics.Raycast(position, dir, out hit, maxDistance: 160f))
             {
-                Vector3 force = position - hit.point;
-                nextReachDirection = (nextReachDirection.normalized + force.normalized) * nextReachDirection.magnitude;
-                nextReachPosition = position + nextReachDirection;
+                forceRepulsive += position - hit.point;
+                // Vector3 force = position - hit.point;
+                // nextReachDirection = (nextReachDirection.normalized + force.normalized) * nextReachDirection.magnitude;
+                // nextReachPosition = position + nextReachDirection;
+
+                Debug.DrawRay(position, hit.point, Color.yellow);
             }
         }
+
+        nextReachDirection = (nextReachDirection.normalized + forceRepulsive.normalized) * nextReachDirection.magnitude;
+        nextReachPosition = position + nextReachDirection;
 
         Debug.DrawRay(position, nextReachPosition, Color.white);
 
@@ -468,11 +426,11 @@ public class Warship : Agent, DamagableObject
 
         float y = Geometry.GetAngleBetween(transform.position, nextReachPosition);
         float ydir = (transform.rotation.eulerAngles.y - y + 180f) % 360f - 180f;
-        if (ydir > 0f)
+        if (ydir > 3f)
         {
             actionsOut[0] = 3f; // Left
         }
-        else if (ydir < 0f)
+        else if (ydir < -3f)
         {
             actionsOut[0] = 4f; // Right
         }

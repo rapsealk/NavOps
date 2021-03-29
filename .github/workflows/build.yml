@@ -36,4 +36,4 @@ jobs:
           # Platform that the build should target.
           targetPlatform: StandaloneLinux64
           # Name of the build.
-          buildName: Rimpac
+          buildName: NavOps

@@ -40,7 +40,7 @@ public class Engine : MonoBehaviour
         SpeedLevel = 0;
         SteerLevel = 0;
 
-        _fuel = maxFuel;
+        Fuel = maxFuel;
     }
 
     // Update is called once per frame

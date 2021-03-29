@@ -46,7 +46,7 @@ public class Shell : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.tag} ({collision.collider.name})");
+        // Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.tag} ({collision.collider.name})");
         if (collision.collider.tag.Equals("Player"))
         {
             m_Hit = true;
@@ -57,7 +57,7 @@ public class Shell : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Shell.OnTriggerEnter: {tag} -> {other.tag} ({other.name})");
+        // Debug.Log($"Shell.OnTriggerEnter: {tag} -> {other.tag} ({other.name})");
         if (other.tag.StartsWith("Bullet") || other.name.StartsWith("Dominion"))
         {
             return;

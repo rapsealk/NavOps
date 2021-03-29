@@ -259,7 +259,7 @@ public class Turret : MonoBehaviour, DamagableObject
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Turret({name}).OnTriggerEnter(other: {other})");
+        // Debug.Log($"Turret({name}).OnTriggerEnter(other: {other})");
         OnDamageTaken();
     }
 
@@ -268,7 +268,7 @@ public class Turret : MonoBehaviour, DamagableObject
         isDamaged = true;
         repairTimer = 0f;
 
-        Debug.Log($"Turret({name}).OnDamageTaken()");
+        // Debug.Log($"Turret({name}).OnDamageTaken()");
         m_Warship.OnDamageTaken();
     }
 }
