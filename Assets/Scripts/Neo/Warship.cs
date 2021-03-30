@@ -319,8 +319,8 @@ public class Warship : Agent, DamagableObject
         // EndEpisode
         if (m_IsCollisionWithWarship)
         {
-            SetReward(-1f);
-            target.SetReward(-1f);
+            SetReward(0f);
+            target.SetReward(0f);
             EndEpisode();
             target.EndEpisode();
         }
@@ -344,8 +344,8 @@ public class Warship : Agent, DamagableObject
             }
             else
             {
-                SetReward(-1f);
-                target.SetReward(-1f);
+                SetReward(0f);
+                target.SetReward(0f);
                 EndEpisode();
                 target.EndEpisode();
             }
