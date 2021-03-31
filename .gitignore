@@ -2,7 +2,7 @@
 Build/
 
 # Unity ML-Agents
-#Assets/ML-Agents/Timers
+Assets/ML-Agents/Timers
 ml-agents/
 
 /[Ll]ibrary/

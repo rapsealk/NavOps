@@ -22,7 +22,7 @@ public class Dominion : MonoBehaviour
 
         if (collider.tag.Equals("Player"))
         {
-            Debug.Log($"OnTriggerEnter: {collider.GetComponent<Warship>().playerId}");
+            Debug.Log($"OnTriggerEnter: {collider.GetComponent<Warship>().PlayerId}");
         }
     }
 
@@ -32,7 +32,7 @@ public class Dominion : MonoBehaviour
 
         if (collider.tag.Equals("Player"))
         {
-            Debug.Log($"OnTriggerEnter: {collider.GetComponent<Warship>().playerId}");
+            Debug.Log($"OnTriggerEnter: {collider.GetComponent<Warship>().PlayerId}");
         }
     }
 }

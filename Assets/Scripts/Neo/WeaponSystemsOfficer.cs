@@ -2,8 +2,8 @@
 
 public class WeaponSystemsOfficer : MonoBehaviour
 {
-    [HideInInspector] public int playerId;
-    [HideInInspector] public int teamId;
+    [HideInInspector] public int PlayerId;
+    [HideInInspector] public int TeamId;
     public GameObject torpedoPrefab;
     [HideInInspector] public GameObject torpedoInstance = null;
     [HideInInspector] public const float m_TorpedoReloadTime = 40f;
@@ -69,14 +69,14 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     public void Assign(int teamId, int playerId)
     {
-        this.teamId = teamId;
-        this.playerId = playerId;
+        TeamId = teamId;
+        PlayerId = playerId;
 
         m_Turrets = GetComponentsInChildren<Turret>();
         for (int i = 0; i < m_Turrets.Length; i++)
         {
-            m_Turrets[i].playerId = playerId;
-            m_Turrets[i].teamId = teamId;
+            m_Turrets[i].PlayerId = PlayerId;
+            m_Turrets[i].TeamId = TeamId;
         }
     }
 

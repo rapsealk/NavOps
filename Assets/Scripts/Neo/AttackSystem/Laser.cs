@@ -5,8 +5,8 @@ public class Laser : MonoBehaviour
     public LaserBeam beamPrefab;
     public Transform muzzle;
     public ParticleSystem muzzleFlash;
-    [HideInInspector] public int playerId;
-    [HideInInspector] public int teamId;
+    [HideInInspector] public int PlayerId;
+    [HideInInspector] public int TeamId;
     [HideInInspector] public const float m_Traverse = 120f;
     [HideInInspector] public const float m_SideTraverse = 60f;
     [HideInInspector] public const float m_TraverseSpeed = 15f;

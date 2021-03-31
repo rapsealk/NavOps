@@ -6,13 +6,13 @@ using Unity.MLAgents.Sensors;
 public class Warship : Agent, DamagableObject
 {
     public const float k_MaxHealth = 10f;
-    public Transform startingPoint;
-    public Color rendererColor;
+    public Transform StartingPoint;
+    public Color RendererColor;
     public ParticleSystem explosion;
     public Warship target;
     [HideInInspector] public Rigidbody rb;
-    public int playerId;
-    public int teamId;
+    public int PlayerId;
+    public int TeamId;
     [HideInInspector] public WeaponSystemsOfficer weaponSystemsOfficer;
     [HideInInspector] public float CurrentHealth {
         get => _currentHealth;
@@ -34,6 +34,8 @@ public class Warship : Agent, DamagableObject
     [HideInInspector] public int FrameCount;
     [HideInInspector] public float TimeCount;
 
+    private TaskForce m_TaskForce;
+
     private float _currentHealth = k_MaxHealth;
     private float _accumulatedDamage = 0;
     private bool m_IsCollisionWithWarship = false;
@@ -49,8 +51,8 @@ public class Warship : Agent, DamagableObject
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
-        transform.position = startingPoint.position;
-        transform.rotation = startingPoint.rotation;
+        transform.position = StartingPoint.position;
+        transform.rotation = StartingPoint.rotation;
 
         CurrentHealth = k_MaxHealth;
         m_PreviousHealth = k_MaxHealth;
@@ -104,8 +106,11 @@ public class Warship : Agent, DamagableObject
 
     private void Init()
     {
+        m_TaskForce = GetComponentInParent<TaskForce>();
+        Debug.Log($"[Warship({PlayerId})] TaskForce: {m_TaskForce}");
+
         weaponSystemsOfficer = GetComponent<WeaponSystemsOfficer>();
-        weaponSystemsOfficer.Assign(teamId, playerId);
+        weaponSystemsOfficer.Assign(TeamId, PlayerId);
 
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
@@ -115,7 +120,7 @@ public class Warship : Agent, DamagableObject
         MeshRenderer[] meshRenderers = GetComponentsInChildren<MeshRenderer>();
         for (int i = 0; i < meshRenderers.Length; i++)
         {
-            meshRenderers[i].material.color = rendererColor;
+            meshRenderers[i].material.color = RendererColor;
         }
 
         Reset();
@@ -138,7 +143,7 @@ public class Warship : Agent, DamagableObject
         // Player
         Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
                                              transform.position.z / battleField.transform.localScale.z);
-        if (teamId == 1)
+        if (TeamId == 1)
         {
             sensor.AddObservation(playerPosition);
         }
@@ -148,7 +153,7 @@ public class Warship : Agent, DamagableObject
         }
 
         float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
-        if (teamId == 1)
+        if (TeamId == 1)
         {
             sensor.AddObservation(Mathf.Cos(radian));
             sensor.AddObservation(Mathf.Sin(radian));
@@ -163,7 +168,7 @@ public class Warship : Agent, DamagableObject
         Vector2 opponentPosition = new Vector2(target.transform.position.x / battleField.transform.localScale.x,
                                                target.transform.position.z / battleField.transform.localScale.z);
         /*
-        if (teamId == 1)
+        if (TeamId == 1)
         {
             sensor.AddObservation(opponentPosition);
         }
@@ -173,7 +178,7 @@ public class Warship : Agent, DamagableObject
         }
         */
         Vector2 relativePosition = playerPosition - opponentPosition;
-        if (teamId == 1)
+        if (TeamId == 1)
         {
             sensor.AddObservation(relativePosition);
         }
@@ -183,7 +188,7 @@ public class Warship : Agent, DamagableObject
         }
 
         float targetRadian = (target.transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
-        if (teamId == 1)
+        if (TeamId == 1)
         {
             sensor.AddObservation(Mathf.Cos(targetRadian));
             sensor.AddObservation(Mathf.Sin(targetRadian));
@@ -368,6 +373,7 @@ public class Warship : Agent, DamagableObject
         ActionCount += 1;
     }
 
+    // [Obsolete]
     public override void Heuristic(float[] actionsOut)
     {
         actionsOut[0] = 0f; // Movement (5)
@@ -502,7 +508,7 @@ public class Warship : Agent, DamagableObject
             CurrentHealth = 0;
         }
         else if (collision.collider.tag.StartsWith("Bullet")
-                 && !collision.collider.tag.EndsWith(teamId.ToString()))
+                 && !collision.collider.tag.EndsWith(TeamId.ToString()))
         {
             //float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
             //CurrentHealth -= damage;

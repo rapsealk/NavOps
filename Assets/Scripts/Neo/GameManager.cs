@@ -1,8 +1,15 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public TaskForce TaskForceBlue;
+    public TaskForce TaskForceRed;
+    public Slider[] TaskForceBlueHpSliders;
+    public Slider[] TaskForceRedHpSliders;
+    /*
     public Warship player1;
     public Warship player2;
     public Text player1PositionText;
@@ -18,6 +25,7 @@ public class GameManager : MonoBehaviour
     public Text speedKnotText;
     // Steer Level
     public Text[] steerLevelTexts;
+    */
     public Text EpisodeText;
     public Text ObservationText;
     public Text ActionText;
@@ -33,6 +41,18 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float[] taskForceBlueHpValues = TaskForceBlue.HpValues;
+        for (int i = 0; i < taskForceBlueHpValues.Length; i++)
+        {
+            TaskForceBlueHpSliders[i].value = taskForceBlueHpValues[i] / Warship.k_MaxHealth;
+        }
+        float [] taskForceRedHpValues = TaskForceRed.HpValues;
+        for (int i = 0; i < taskForceRedHpValues.Length; i++)
+        {
+            TaskForceRedHpSliders[i].value = taskForceRedHpValues[i] / Warship.k_MaxHealth;
+        }
+
+        /*
         Vector3 position1 = player1.transform.position;
         Vector3 rotation1 = player1.transform.rotation.eulerAngles;
         player1PositionText.text = string.Format("({0:F2}, {1:F2})", position1.x, position1.z);
@@ -59,11 +79,14 @@ public class GameManager : MonoBehaviour
         steerLevelTexts[player1.Engine.SteerLevel+2].color = Color.green;
 
         speedKnotText.text = string.Format("{0:F1} kts", (player1.Engine.IsBackward ? -1 : 1) * player1.rb.velocity.magnitude);
+        */
 
+        /*
         EpisodeText.text = $"Episode: {player1.EpisodeCount}";
         ObservationText.text = $"Observation: {player1.ObservationCount}";
         ActionText.text = $"Action: {player1.ActionCount}";
         FrameText.text = string.Format("Frame: {0} ({1:F2})", player1.FrameCount, 1 / Time.deltaTime);
         TimeText.text = string.Format("Time: {0:F2}", player1.TimeCount);
+        */
     }
 }

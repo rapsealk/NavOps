@@ -14,8 +14,8 @@ public class Turret : MonoBehaviour, DamagableObject
     public GameObject ShellPrefab;
     public Transform muzzle;
     public ParticleSystem muzzleFlash;
-    [HideInInspector] public int playerId;
-    [HideInInspector] public int teamId;
+    [HideInInspector] public int PlayerId;
+    [HideInInspector] public int TeamId;
     [HideInInspector] public const float m_Traverse = 120f;
     [HideInInspector] public const float m_SideTraverse = 60f;
     [HideInInspector] public const float m_TraverseSpeed = 15f;
@@ -155,7 +155,7 @@ public class Turret : MonoBehaviour, DamagableObject
         muzzleFlash.Play();
 
         GameObject projectile = Instantiate(ShellPrefab, firePosition, muzzle.rotation);
-        projectile.tag = $"Bullet{teamId}";
+        projectile.tag = $"Bullet{TeamId}";
         projectile.GetComponent<Shell>().Warship = m_Warship;
 
         Vector3 velocity = muzzle.transform.forward * m_FirePower.x + muzzle.transform.up * m_FirePower.y;

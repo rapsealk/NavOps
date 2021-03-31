@@ -264,6 +264,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -288,6 +289,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745019346995459412
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -316,8 +318,8 @@ MonoBehaviour:
   ShellPrefab: {fileID: 0}
   muzzle: {fileID: 3389645990330441364}
   muzzleFlash: {fileID: 5113589405927876365}
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   cooldownTimer: 0
   isReloaded: 1
   repairTimer: 0
@@ -377,6 +379,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -401,6 +404,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745179430806505416
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -470,6 +474,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -494,6 +499,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8742538611163314632
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -566,6 +572,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -590,6 +597,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745626317821317018
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -618,8 +626,8 @@ MonoBehaviour:
   ShellPrefab: {fileID: 0}
   muzzle: {fileID: 7279004818194950533}
   muzzleFlash: {fileID: 4326471398924531944}
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   cooldownTimer: 0
   isReloaded: 1
   repairTimer: 0
@@ -679,6 +687,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -703,6 +712,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745687864921976546
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1000,6 +1010,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1024,6 +1035,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8744888601410306468
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1052,8 +1064,8 @@ MonoBehaviour:
   ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6946408783533097452}
   muzzleFlash: {fileID: 4697427901299551054}
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   cooldownTimer: 0
   isReloaded: 1
   repairTimer: 0
@@ -1113,6 +1125,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1137,6 +1150,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745064495256220526
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1209,6 +1223,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1233,6 +1248,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745704807994348358
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1261,8 +1277,8 @@ MonoBehaviour:
   ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6502262637646839465}
   muzzleFlash: {fileID: 1702443285242911901}
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   cooldownTimer: 0
   isReloaded: 1
   repairTimer: 0
@@ -1325,6 +1341,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1349,6 +1366,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745193599616257370
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1377,8 +1395,8 @@ MonoBehaviour:
   ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6530759934103057187}
   muzzleFlash: {fileID: 2094771177814017959}
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   cooldownTimer: 0
   isReloaded: 1
   repairTimer: 0
@@ -1438,6 +1456,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1462,6 +1481,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8745354387638137204
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1531,6 +1551,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1555,6 +1576,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8742346433424448852
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1677,6 +1699,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1701,6 +1724,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &8742599817471069896
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1729,8 +1753,8 @@ MonoBehaviour:
   ShellPrefab: {fileID: 0}
   muzzle: {fileID: 6308531739989902113}
   muzzleFlash: {fileID: 2570583651749003384}
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   cooldownTimer: 0
   isReloaded: 1
   repairTimer: 0
@@ -1816,6 +1840,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1843,6 +1868,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!64 &8743513858440526120
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1901,15 +1927,20 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  startingPoint: {fileID: 0}
-  rendererColor: {r: 0.3529412, g: 0.4862745, b: 0.7607843, a: 0}
+  StartingPoint: {fileID: 0}
+  RendererColor: {r: 0, g: 0, b: 0, a: 0}
   explosion: {fileID: 6329613978102475674}
   target: {fileID: 0}
   rb: {fileID: 0}
-  playerId: 1
-  teamId: 1
+  PlayerId: 0
+  TeamId: 0
   weaponSystemsOfficer: {fileID: 0}
   battleField: {fileID: 0}
+  EpisodeCount: 0
+  ObservationCount: 0
+  ActionCount: 0
+  FrameCount: 0
+  TimeCount: 0
 --- !u!114 &3835267860656973181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1922,8 +1953,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5f47d58efb44154ab8c9b7116954e7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerId: 0
-  teamId: 0
+  PlayerId: 0
+  TeamId: 0
   torpedoPrefab: {fileID: 1870133709723759398, guid: 6b810bf88c9c8b84d853bfa201c823bf,
     type: 3}
   torpedoInstance: {fileID: 0}
@@ -2365,15 +2396,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bba9cf244c53c5439505dfc96fdd11c, type: 3}
---- !u!198 &2094771177814017959 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 198856239026640498, guid: 9bba9cf244c53c5439505dfc96fdd11c,
-    type: 3}
-  m_PrefabInstance: {fileID: 2292444341254836693}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2288159748882873353 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4865135451303388, guid: 9bba9cf244c53c5439505dfc96fdd11c,
+    type: 3}
+  m_PrefabInstance: {fileID: 2292444341254836693}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &2094771177814017959 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 198856239026640498, guid: 9bba9cf244c53c5439505dfc96fdd11c,
     type: 3}
   m_PrefabInstance: {fileID: 2292444341254836693}
   m_PrefabAsset: {fileID: 0}
@@ -2768,15 +2799,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bba9cf244c53c5439505dfc96fdd11c, type: 3}
---- !u!4 &4891946771244224736 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4865135451303388, guid: 9bba9cf244c53c5439505dfc96fdd11c,
-    type: 3}
-  m_PrefabInstance: {fileID: 4896230264238931260}
-  m_PrefabAsset: {fileID: 0}
 --- !u!198 &4697427901299551054 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 198856239026640498, guid: 9bba9cf244c53c5439505dfc96fdd11c,
+    type: 3}
+  m_PrefabInstance: {fileID: 4896230264238931260}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4891946771244224736 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4865135451303388, guid: 9bba9cf244c53c5439505dfc96fdd11c,
     type: 3}
   m_PrefabInstance: {fileID: 4896230264238931260}
   m_PrefabAsset: {fileID: 0}
