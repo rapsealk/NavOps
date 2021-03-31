@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class TaskForce : MonoBehaviour  //, Agent
+public class TaskForce : MonoBehaviour
 {
     public int TeamId;
+    public Warship[] Units { get => m_Warships; }
     public float[] HpValues
     {
         get => (from warship in m_Warships
@@ -35,32 +36,4 @@ public class TaskForce : MonoBehaviour  //, Agent
     {
         //
     }
-
-    /*///
-    /// ML-Agents
-    ///
-    public override void Initialize()
-    {
-        //
-    }
-
-    public override void OnEpisodeBegin()
-    {
-        //
-    }
-
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        //
-    }
-
-    public override void OnActionReceived(float[] vectorAction)
-    {
-        //
-    }
-
-    public override void Heuristic(float[] actionsOut)
-    {
-        //
-    }*/
 }

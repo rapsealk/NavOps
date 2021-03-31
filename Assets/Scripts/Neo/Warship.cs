@@ -26,7 +26,8 @@ public class Warship : Agent, DamagableObject
         }
         private set { _accumulatedDamage = value; }
     }
-    public Transform battleField;
+    public Transform BattleField;
+    public bool IsDestroyed { get => CurrentHealth <= 0f + Mathf.Epsilon; }
     [HideInInspector] public Engine Engine { get; private set; }
     [HideInInspector] public int EpisodeCount = 0;
     [HideInInspector] public int ObservationCount;
@@ -48,6 +49,7 @@ public class Warship : Agent, DamagableObject
 
     public void Reset()
     {
+        SimpleMultiAgentGroup x = new SimpleMultiAgentGroup();
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -82,6 +84,14 @@ public class Warship : Agent, DamagableObject
     {
         FrameCount += 1;
         TimeCount += Time.deltaTime;
+
+        // Drawn
+        if (IsDestroyed)
+        {
+            Vector3 position = transform.position;
+            Vector3 underwaterPosition = new Vector3(position.x, -20f, position.z);
+            transform.position = Vector3.Lerp(position, underwaterPosition, Time.deltaTime);
+        }
     }
 
     void FixedUpdate()
@@ -141,8 +151,8 @@ public class Warship : Agent, DamagableObject
     public override void CollectObservations(VectorSensor sensor)   // 54
     {
         // Player
-        Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
-                                             transform.position.z / battleField.transform.localScale.z);
+        Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
+                                             transform.position.z / BattleField.transform.localScale.z);
         if (TeamId == 1)
         {
             sensor.AddObservation(playerPosition);
@@ -165,8 +175,8 @@ public class Warship : Agent, DamagableObject
         }
 
         // Opponent
-        Vector2 opponentPosition = new Vector2(target.transform.position.x / battleField.transform.localScale.x,
-                                               target.transform.position.z / battleField.transform.localScale.z);
+        Vector2 opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
+                                               target.transform.position.z / BattleField.transform.localScale.z);
         /*
         if (TeamId == 1)
         {
@@ -209,8 +219,8 @@ public class Warship : Agent, DamagableObject
             enemyTorpedoPosition = torpedo.transform.position;
         }*/
         //sensor.AddObservation(isEnemyTorpedoLaunched);
-        //sensor.AddObservation(enemyTorpedoPosition.x / (battleField.transform.localScale.x / 2) - 1f);
-        //sensor.AddObservation(enemyTorpedoPosition.z / (battleField.transform.localScale.z / 2) - 1f);
+        //sensor.AddObservation(enemyTorpedoPosition.x / (BattleField.transform.localScale.x / 2) - 1f);
+        //sensor.AddObservation(enemyTorpedoPosition.z / (BattleField.transform.localScale.z / 2) - 1f);
         //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
         //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
 
@@ -247,6 +257,13 @@ public class Warship : Agent, DamagableObject
 
     public override void OnActionReceived(float[] vectorAction)
     {
+        if (IsDestroyed)
+        {
+            Engine.SetSpeedLevel(0);
+            Engine.SetSteerLevel(0);
+            return;
+        }
+
         float movementAction = vectorAction[0];
         float attackAction = vectorAction[1];
 
@@ -295,10 +312,10 @@ public class Warship : Agent, DamagableObject
         }
 
         // Default Time Penalty
-        Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
-                                             transform.position.z / battleField.transform.localScale.z);
-        Vector2 opponentPosition = new Vector2(target.transform.position.x / battleField.transform.localScale.x,
-                                               target.transform.position.z / battleField.transform.localScale.z);
+        Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
+                                             transform.position.z / BattleField.transform.localScale.z);
+        Vector2 opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
+                                               target.transform.position.z / BattleField.transform.localScale.z);
         // float penalty = Mathf.Max(0.0001f, Vector2.Distance(playerPosition, opponentPosition));
         float distance = Vector2.Distance(playerPosition, opponentPosition);
         float penalty = 4 * Mathf.Pow(distance, 2f) / 10000;
@@ -315,10 +332,11 @@ public class Warship : Agent, DamagableObject
         // EndEpisode
         if (m_IsCollisionWithWarship)
         {
+            CurrentHealth = 0f;
             SetReward(0f);
             target.SetReward(0f);
-            EndEpisode();
-            target.EndEpisode();
+            //EndEpisode();
+            //target.EndEpisode();
         }
         else if (Engine.Fuel <= 0f + Mathf.Epsilon
                  || weaponSystemsOfficer.Ammo == 0)
@@ -328,37 +346,37 @@ public class Warship : Agent, DamagableObject
             {
                 SetReward(1f);
                 target.SetReward(-1f);
-                EndEpisode();
-                target.EndEpisode();
+                //EndEpisode();
+                //target.EndEpisode();
             }
             else if (CurrentHealth < target.CurrentHealth)
             {
                 SetReward(-1f);
                 target.SetReward(1f);
-                EndEpisode();
-                target.EndEpisode();
+                //EndEpisode();
+                //target.EndEpisode();
             }
             else
             {
                 SetReward(0f);
                 target.SetReward(0f);
-                EndEpisode();
-                target.EndEpisode();
+                //EndEpisode();
+                //target.EndEpisode();
             }
         }
         else if (CurrentHealth <= 0f + Mathf.Epsilon)
         {
             SetReward(-1f);
             target.SetReward(1f);
-            EndEpisode();
-            target.EndEpisode();
+            //EndEpisode();
+            //target.EndEpisode();
         }
         else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
         {
             SetReward(1f);
             target.SetReward(-1f);
-            EndEpisode();
-            target.EndEpisode();
+            //EndEpisode();
+            //target.EndEpisode();
         }
 
         ActionCount += 1;
@@ -496,7 +514,7 @@ public class Warship : Agent, DamagableObject
         }
         else if (collision.collider.tag == "Torpedo")
         {
-            CurrentHealth = 0;
+            CurrentHealth = 0f;
         }
         else if (collision.collider.tag.StartsWith("Bullet")
                  && !collision.collider.tag.EndsWith(TeamId.ToString()))
