@@ -251,57 +251,48 @@ public class Warship : Agent, DamagableObject
         float attackAction = vectorAction[1];
 
         // Movement Actions
-        if (0f == movementAction)
+        switch ((int) movementAction)
         {
-            // NOOP
-        }
-        else if (1f == movementAction)
-        {
-            Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
-        }
-        else if (2f == movementAction)
-        {
-            Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
-        }
-        else if (3f == movementAction)
-        {
-            Engine.SetSteerLevel(Engine.SteerLevel - 1);
-        }
-        else if (4f == movementAction)
-        {
-            Engine.SetSteerLevel(Engine.SteerLevel + 1);
+            case 0:
+                break;
+            case 1:
+                Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
+                break;
+            case 2:
+                Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
+                break;
+            case 3:
+                Engine.SetSteerLevel(Engine.SteerLevel - 1);
+                break;
+            case 4:
+                Engine.SetSteerLevel(Engine.SteerLevel + 1);
+                break;
         }
 
         // Attack Actions
-        if (0f == attackAction)
+        switch ((int) attackAction)
         {
-            // NOOP
+            case 0:
+                break;
+            case 1:
+                uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
+                AddReward(-usedAmmos / 10000f);
+                break;
+            /*
+            case 2:
+                m_AimingPoint.y = (m_AimingPoint.y - 5f) % 360f;
+                break;
+            case 3:
+                m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
+                break;
+            */
+            case 2:
+                m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 1f, k_AimingPointVerticalMin);
+                break;
+            case 3:
+                m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 1f, k_AimingPointVerticalMax);
+                break;
         }
-        else if (1f == attackAction)
-        {
-            uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
-            AddReward(usedAmmos / 10000f);
-        }
-        /*
-        else if (2f == attackAction)
-        {
-            m_AimingPoint.y = (m_AimingPoint.y - 5f) % 360f;
-        }
-        else if (3f == attackAction)
-        {
-            m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
-        }
-        */
-        else if (2f == attackAction)
-        {
-            m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 1f, k_AimingPointVerticalMin);
-        }
-        else if (3f == attackAction)
-        {
-            m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 1f, k_AimingPointVerticalMax);
-        }
-
-        // weaponSystemsOfficer.Aim(Quaternion.Euler(m_AimingPoint + transform.rotation.eulerAngles));
 
         // Default Time Penalty
         Vector2 playerPosition = new Vector2(transform.position.x / battleField.transform.localScale.x,
