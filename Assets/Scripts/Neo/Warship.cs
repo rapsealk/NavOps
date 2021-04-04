@@ -9,7 +9,7 @@ public class Warship : Agent, DamagableObject
     public Transform StartingPoint;
     public Color RendererColor;
     public ParticleSystem explosion;
-    public Warship target;
+    public Warship Target { get => m_Target; }
     [HideInInspector] public Rigidbody rb;
     public int PlayerId;
     public int TeamId;
@@ -36,6 +36,7 @@ public class Warship : Agent, DamagableObject
     [HideInInspector] public float TimeCount;
 
     private TaskForce m_TaskForce;
+    private Warship m_Target;
 
     private float _currentHealth = k_MaxHealth;
     private float _accumulatedDamage = 0;
@@ -71,6 +72,8 @@ public class Warship : Agent, DamagableObject
         ActionCount = 0;
         FrameCount = 0;
         TimeCount = 0f;
+
+        UpdateTarget();
     }
 
     // Start is called before the first frame update
@@ -96,10 +99,16 @@ public class Warship : Agent, DamagableObject
 
     void FixedUpdate()
     {
+        Warship target = m_Target;
+        if (target == null)
+        {
+            return;
+        }
+
         Vector3 rotation = Vector3.zero;
         rotation.y = Geometry.GetAngleBetween(transform.position, target.transform.position);
 
-        /*
+        /* Auto-Targeting
         Vector3 projectilexz = transform.position;
         projectilexz.y = 0f;
         Vector3 targetxz = target.transform.position;
@@ -136,6 +145,36 @@ public class Warship : Agent, DamagableObject
         Reset();
     }
 
+    public void UpdateTarget()
+    {
+        Warship newTarget = null;
+        Vector3 position = transform.position;
+        float distanceToTarget = Mathf.Infinity;
+        foreach (var warship in m_TaskForce.TargetTaskForce.Units)
+        {
+            if (warship.IsDestroyed)
+            {
+                continue;
+            }
+
+            float distance = Vector3.Distance(position, warship.transform.position);
+            if (distance < distanceToTarget)
+            {
+                newTarget = warship;
+                distanceToTarget = distance;
+            }
+
+            if (name == "Blue1")
+            {
+                Debug.Log($"[Blue1] -> {warship.name}({warship.IsDestroyed}): {distance}");
+            }
+        }
+
+        m_Target = newTarget;
+
+        // Debug.Log($"{name}.SetsTargetTo({newTarget.name})");
+    }
+
 // #if !UNITY_EDITOR
     #region MLAgent
     public override void Initialize()
@@ -150,6 +189,8 @@ public class Warship : Agent, DamagableObject
 
     public override void CollectObservations(VectorSensor sensor)   // 54
     {
+        UpdateTarget();
+
         // Player
         Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
                                              transform.position.z / BattleField.transform.localScale.z);
@@ -174,9 +215,14 @@ public class Warship : Agent, DamagableObject
             sensor.AddObservation(-Mathf.Sin(radian));
         }
 
-        // Opponent
-        Vector2 opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
-                                               target.transform.position.z / BattleField.transform.localScale.z);
+        // FIXME: Opponent
+        Warship target = m_Target;
+        Vector2 opponentPosition = Vector2.zero;
+        if (target != null)
+        {
+            opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
+                                           target.transform.position.z / BattleField.transform.localScale.z);
+        }
         /*
         if (TeamId == 1)
         {
@@ -197,7 +243,13 @@ public class Warship : Agent, DamagableObject
             sensor.AddObservation(-relativePosition);
         }
 
-        float targetRadian = (target.transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
+        // FIXME
+        Vector3 targetRotation = Vector3.zero;
+        if (target != null)
+        {
+            targetRotation = target.transform.rotation.eulerAngles;
+        }
+        float targetRadian = (targetRotation.y % 360) * Mathf.Deg2Rad;
         if (TeamId == 1)
         {
             sensor.AddObservation(Mathf.Cos(targetRadian));
@@ -250,7 +302,9 @@ public class Warship : Agent, DamagableObject
         sensor.AddOneHotObservation(Engine.SteerLevel + 2, 5);
 
         sensor.AddObservation(CurrentHealth / (float) k_MaxHealth);
-        sensor.AddObservation(target.CurrentHealth / (float) k_MaxHealth);
+        // FIXME
+        float targetCurrentHealth = (target != null) ? target.CurrentHealth / (float) k_MaxHealth : 0f;
+        sensor.AddObservation(targetCurrentHealth);
 
         ObservationCount += 1;
     }
@@ -312,22 +366,26 @@ public class Warship : Agent, DamagableObject
         }
 
         // Default Time Penalty
-        Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
-                                             transform.position.z / BattleField.transform.localScale.z);
-        Vector2 opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
-                                               target.transform.position.z / BattleField.transform.localScale.z);
-        // float penalty = Mathf.Max(0.0001f, Vector2.Distance(playerPosition, opponentPosition));
-        float distance = Vector2.Distance(playerPosition, opponentPosition);
-        float penalty = 4 * Mathf.Pow(distance, 2f) / 10000;
-        // float penalty = Vector2.Distance(playerPosition, opponentPosition) / 10000;
-        AddReward(-penalty);
-        // Debug.Log(string.Format("Distance: {0:F6}, Penalty: {1:F6}, Distance^2: {2:F6}", distance, penalty, Mathf.Pow(distance, 2f)));
+        // FIXME:
+        Warship target = m_Target;
+        if (target != null)
+        {
+            Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
+                                                 transform.position.z / BattleField.transform.localScale.z);
+            Vector2 opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
+                                                   target.transform.position.z / BattleField.transform.localScale.z);
+            float distance = Vector2.Distance(playerPosition, opponentPosition);
+            float penalty = -4 * Mathf.Pow(distance, 2f) / 10000;
+            AddReward(penalty);
+        }
 
         CurrentHealth -= AccumulatedDamage;
+        /* FIXME: GroupReward
         float hitpointReward = (CurrentHealth - m_PreviousHealth) - (target.CurrentHealth - m_PreviousOpponentHealth);
         AddReward(hitpointReward / k_MaxHealth);
         m_PreviousHealth = CurrentHealth;
         m_PreviousOpponentHealth = target.CurrentHealth;
+        */
 
         // EndEpisode
         if (m_IsCollisionWithWarship)
@@ -338,6 +396,7 @@ public class Warship : Agent, DamagableObject
             //EndEpisode();
             //target.EndEpisode();
         }
+        /* FIXME: Group
         else if (Engine.Fuel <= 0f + Mathf.Epsilon
                  || weaponSystemsOfficer.Ammo == 0)
         {
@@ -378,6 +437,7 @@ public class Warship : Agent, DamagableObject
             //EndEpisode();
             //target.EndEpisode();
         }
+        */
 
         ActionCount += 1;
     }
@@ -387,6 +447,30 @@ public class Warship : Agent, DamagableObject
     {
         actionsOut[0] = 0f; // Movement (5)
         actionsOut[1] = 0f; // Attack (4)
+
+        Warship target = m_Target;
+
+        // FIXME
+        if (target == null)
+        {
+            if (Engine.SteerLevel < 0)
+            {
+                actionsOut[0] = 4f;
+            }
+            else if (Engine.SteerLevel > 0)
+            {
+                actionsOut[0] = 3f;
+            }
+            else if (Engine.SpeedLevel > 0)
+            {
+                actionsOut[0] = 2f;
+            }
+            else if (Engine.SpeedLevel < 0)
+            {
+                actionsOut[0] = 1f;
+            }
+            return;
+        }
 
         Vector3 heading = transform.rotation.eulerAngles;
         Vector3 opponentHeading = target.transform.rotation.eulerAngles;
@@ -419,7 +503,8 @@ public class Warship : Agent, DamagableObject
             Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
             if (Physics.Raycast(position, dir, out hit, maxDistance: 160f))
             {
-                forceRepulsive += position - hit.point;
+                float weight = (hit.collider.tag == "Player") ? 4f : 1f;    // FIXME
+                forceRepulsive += (position - hit.point) * weight;
                 // Vector3 force = position - hit.point;
                 // nextReachDirection = (nextReachDirection.normalized + force.normalized) * nextReachDirection.magnitude;
                 // nextReachPosition = position + nextReachDirection;

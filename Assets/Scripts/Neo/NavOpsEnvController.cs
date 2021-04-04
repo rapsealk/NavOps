@@ -39,13 +39,13 @@ public class NavOpsEnvController : MonoBehaviour
         bool isGameDone = true;
         foreach (var unit in TaskForceBlue.Units)
         {
-            Debug.Log($"{unit.name}.IsDestroyed: {unit.IsDestroyed}");
+            // Debug.Log($"{unit.name}.IsDestroyed: {unit.IsDestroyed}");
             isGameDone &= unit.IsDestroyed;
         }
-        Debug.Log($"TaskForceBlue.isGameDone: {isGameDone}");
+        // Debug.Log($"TaskForceBlue.isGameDone: {isGameDone}");
         if (isGameDone)
         {
-            Debug.Log($"NavOpsEnvController: TaskForceBlue is destroyed.");
+            // Debug.Log($"NavOpsEnvController: TaskForceBlue is destroyed.");
             //m_AgentGroupBlue.GroupEpisodeInterrupted();
             m_AgentGroupBlue.EndGroupEpisode();
             //m_AgentGroupRed.GroupEpisodeInterrupted();
@@ -58,13 +58,13 @@ public class NavOpsEnvController : MonoBehaviour
         isGameDone = true;
         foreach (var unit in TaskForceRed.Units)
         {
-            Debug.Log($"{unit.name}.IsDestroyed: {unit.IsDestroyed}");
+            // Debug.Log($"{unit.name}.IsDestroyed: {unit.IsDestroyed}");
             isGameDone &= unit.IsDestroyed;
         }
-        Debug.Log($"TaskForceRed.isGameDone: {isGameDone}");
+        // Debug.Log($"TaskForceRed.isGameDone: {isGameDone}");
         if (isGameDone)
         {
-            Debug.Log($"NavOpsEnvController: TaskForceRed is destroyed.");
+            // Debug.Log($"NavOpsEnvController: TaskForceRed is destroyed.");
             //m_AgentGroupBlue.GroupEpisodeInterrupted();
             m_AgentGroupBlue.EndGroupEpisode();
             //m_AgentGroupRed.GroupEpisodeInterrupted();

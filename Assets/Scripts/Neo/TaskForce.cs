@@ -6,23 +6,24 @@ using UnityEngine;
 public class TaskForce : MonoBehaviour
 {
     public int TeamId;
-    public Warship[] Units { get => m_Warships; }
+    public Warship[] Units;// { get => m_Warships; }
     public float[] HpValues
     {
-        get => (from warship in m_Warships
+        get => (from warship in Units
                 select warship.CurrentHealth).ToArray();
     }
+    public TaskForce TargetTaskForce;
 
-    private Warship[] m_Warships;
+    // private Warship[] m_Warships;
 
     // Start is called before the first frame update
     void Start()
     {
-        m_Warships = GetComponentsInChildren<Warship>();
+        // m_Warships = GetComponentsInChildren<Warship>();
 
-        for (int i = 0; i < m_Warships.Length; i++)
+        for (int i = 0; i < Units.Length; i++)
         {
-            Debug.Log($"[TaskForce({TeamId})] m_Warships[{i}]: {m_Warships[i]}");
+            Debug.Log($"[TaskForce({TeamId})] m_Warships[{i}]: {Units[i]}");
         }
     }
 

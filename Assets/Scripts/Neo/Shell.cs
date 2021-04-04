@@ -35,13 +35,17 @@ public class Shell : MonoBehaviour
         }
 
         Vector3 position3D = transform.position;
-        Vector3 targetPosition3D = Warship.target.transform.position;
-        Vector2 position = new Vector2(position3D.x, position3D.z);
-        Vector2 targetPosition = new Vector2(targetPosition3D.x, targetPosition3D.z);
-        float distance = Vector2.Distance(position, targetPosition);
-        float encouragement = 1 / (1 + Mathf.Pow(distance, 2f));
-        // Debug.Log($"Shell({tag}): {transform.position} -> {targetPosition} (encouragement: {encouragement:F8})");
-        Warship.AddReward(encouragement);
+        Warship target = Warship.Target;
+        if (target != null)
+        {
+            Vector3 targetPosition3D = Warship.Target.transform.position;
+            Vector2 position = new Vector2(position3D.x, position3D.z);
+            Vector2 targetPosition = new Vector2(targetPosition3D.x, targetPosition3D.z);
+            float distance = Vector2.Distance(position, targetPosition);
+            float encouragement = 1 / (1 + Mathf.Pow(distance, 2f));
+            // Debug.Log($"Shell({tag}): {transform.position} -> {targetPosition} (encouragement: {encouragement:F8})");
+            Warship.AddReward(encouragement);
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
