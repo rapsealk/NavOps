@@ -479,7 +479,7 @@ public class Warship : Agent, DamagableObject
 
         ///
         const float radius = 100f;
-        const float attackRange = 200f;
+        const float attackRange = 250f;
         const float attackRangeShort = 100f;
 
         Vector3 position = transform.position;
