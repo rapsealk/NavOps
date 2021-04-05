@@ -46,12 +46,13 @@ public class NavOpsEnvController : MonoBehaviour
         if (isGameDone)
         {
             // Debug.Log($"NavOpsEnvController: TaskForceBlue is destroyed.");
+            m_AgentGroupBlue.SetGroupReward(-1.0f);
+            m_AgentGroupRed.SetGroupReward(1.0f);
             //m_AgentGroupBlue.GroupEpisodeInterrupted();
             m_AgentGroupBlue.EndGroupEpisode();
             //m_AgentGroupRed.GroupEpisodeInterrupted();
             m_AgentGroupRed.EndGroupEpisode();
 
-            Reset();
             return;
         }
 
@@ -65,12 +66,13 @@ public class NavOpsEnvController : MonoBehaviour
         if (isGameDone)
         {
             // Debug.Log($"NavOpsEnvController: TaskForceRed is destroyed.");
+            m_AgentGroupBlue.SetGroupReward(1.0f);
+            m_AgentGroupRed.SetGroupReward(-1.0f);
             //m_AgentGroupBlue.GroupEpisodeInterrupted();
             m_AgentGroupBlue.EndGroupEpisode();
             //m_AgentGroupRed.GroupEpisodeInterrupted();
             m_AgentGroupRed.EndGroupEpisode();
 
-            Reset();
             return;
         }
 
