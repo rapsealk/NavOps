@@ -9,7 +9,10 @@ public class Warship : Agent, DamagableObject
     public Transform StartingPoint;
     public Color RendererColor;
     public ParticleSystem explosion;
-    public Warship Target { get => m_Target; }
+    public Warship Target {
+        get => m_Target;
+        private set { m_Target = value; }
+    }
     [HideInInspector] public Rigidbody rb;
     public int PlayerId;
     public int TeamId;
@@ -126,7 +129,7 @@ public class Warship : Agent, DamagableObject
     private void Init()
     {
         m_TaskForce = GetComponentInParent<TaskForce>();
-        Debug.Log($"[Warship({PlayerId})] TaskForce: {m_TaskForce}");
+        // Debug.Log($"[Warship({PlayerId})] TaskForce: {m_TaskForce}");
 
         weaponSystemsOfficer = GetComponent<WeaponSystemsOfficer>();
         weaponSystemsOfficer.Assign(TeamId, PlayerId);
@@ -170,7 +173,7 @@ public class Warship : Agent, DamagableObject
             }
         }
 
-        m_Target = newTarget;
+        Target = newTarget;
 
         // Debug.Log($"{name}.SetsTargetTo({newTarget.name})");
     }
@@ -448,7 +451,7 @@ public class Warship : Agent, DamagableObject
         actionsOut[0] = 0f; // Movement (5)
         actionsOut[1] = 0f; // Attack (4)
 
-        Warship target = m_Target;
+        Warship target = Target;
 
         // FIXME
         if (target == null)
@@ -479,8 +482,8 @@ public class Warship : Agent, DamagableObject
 
         ///
         const float radius = 100f;
-        const float attackRange = 250f;
-        const float attackRangeShort = 100f;
+        const float attackRange = 450f;
+        const float attackRangeShort = 200f;
 
         Vector3 position = transform.position;
         Vector3 targetPosition = target.transform.position;

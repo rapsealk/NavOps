@@ -12,3 +12,6 @@
 ## Documentation
 * [Defining Multi-Agent Scenarios](https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Learning-Environment-Design-Agents.md#defining-multi-agent-scenarios)
 * Implementation: [SimpleMultiAgentGroup.cs](https://github.com/Unity-Technologies/ml-agents/blob/18d51352a716f7c48f27f3341b6a2ce2a7ca0e34/com.unity.ml-agents/Runtime/SimpleMultiAgentGroup.cs)
+
+## Map
+![Islands from World of Warships](https://wiki.gcdn.co/images/thumb/3/3f/Islands.png/320px-Islands.png)

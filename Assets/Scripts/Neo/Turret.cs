@@ -43,7 +43,7 @@ public class Turret : MonoBehaviour, DamagableObject
     private Warship m_Warship;
     private TurretType m_TurretType;
     private float m_InitialEulerRotation;
-    private Vector2 m_FirePower = new Vector2(12000f, 400f);
+    private Vector2 m_FirePower = new Vector2(18000f, 400f);    // 12000
     //private float offsetX = 3f;
     //private float offsetY = 5f;
     private bool m_Initialized = false;
