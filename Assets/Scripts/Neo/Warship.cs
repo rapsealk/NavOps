@@ -166,11 +166,12 @@ public class Warship : Agent, DamagableObject
                 newTarget = warship;
                 distanceToTarget = distance;
             }
-
+            /*
             if (name == "Blue1")
             {
                 Debug.Log($"[Blue1] -> {warship.name}({warship.IsDestroyed}): {distance}");
             }
+            */
         }
 
         Target = newTarget;
@@ -190,96 +191,40 @@ public class Warship : Agent, DamagableObject
         Reset();
     }
 
-    public override void CollectObservations(VectorSensor sensor)   // 54
+    public override void CollectObservations(VectorSensor sensor)
     {
         UpdateTarget();
 
-        // Player
-        Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
-                                             transform.position.z / BattleField.transform.localScale.z);
-        if (TeamId == 1)
+        AddWarshipObservation(sensor, this);
+
+        foreach (var warship in m_TaskForce.Units)
         {
-            sensor.AddObservation(playerPosition);
-        }
-        else
-        {
-            sensor.AddObservation(-playerPosition);
+            if (warship == this)
+            {
+                continue;
+            }
+
+            AddWarshipObservation(sensor, warship);
         }
 
-        float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
-        if (TeamId == 1)
+        int targetIndex = 0;
+        Warship[] targetWarships = m_TaskForce.TargetTaskForce.Units;
+        for (int i = 0; i < targetWarships.Length; i++)
         {
-            sensor.AddObservation(Mathf.Cos(radian));
-            sensor.AddObservation(Mathf.Sin(radian));
-        }
-        else
-        {
-            sensor.AddObservation(-Mathf.Cos(radian));
-            sensor.AddObservation(-Mathf.Sin(radian));
+            Warship warship = targetWarships[i];
+            AddWarshipObservation(sensor, warship);
+
+            if (warship == m_Target)
+            {
+                targetIndex = i;
+            }
         }
 
-        // FIXME: Opponent
-        Warship target = m_Target;
-        Vector2 opponentPosition = Vector2.zero;
-        if (target != null)
-        {
-            opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
-                                           target.transform.position.z / BattleField.transform.localScale.z);
-        }
-        /*
-        if (TeamId == 1)
-        {
-            sensor.AddObservation(opponentPosition);
-        }
-        else
-        {
-            sensor.AddObservation(-opponentPosition);
-        }
-        */
-        Vector2 relativePosition = playerPosition - opponentPosition;
-        if (TeamId == 1)
-        {
-            sensor.AddObservation(relativePosition);
-        }
-        else
-        {
-            sensor.AddObservation(-relativePosition);
-        }
+        sensor.AddOneHotObservation(targetIndex, targetWarships.Length);    // Target Field (3) / 45
 
-        // FIXME
-        Vector3 targetRotation = Vector3.zero;
-        if (target != null)
-        {
-            targetRotation = target.transform.rotation.eulerAngles;
-        }
-        float targetRadian = (targetRotation.y % 360) * Mathf.Deg2Rad;
-        if (TeamId == 1)
-        {
-            sensor.AddObservation(Mathf.Cos(targetRadian));
-            sensor.AddObservation(Mathf.Sin(targetRadian));
-        }
-        else
-        {
-            sensor.AddObservation(-Mathf.Cos(targetRadian));
-            sensor.AddObservation(-Mathf.Sin(targetRadian));
-        }
+        // ======
 
-        /* Torpedo
-        bool isEnemyTorpedoLaunched = false;
-        Vector3 enemyTorpedoPosition = Vector3.zero;
-        GameObject torpedo = target.weaponSystemsOfficer.torpedoInstance;
-        if (torpedo != null)
-        {
-            isEnemyTorpedoLaunched = true;
-            enemyTorpedoPosition = torpedo.transform.position;
-        }*/
-        //sensor.AddObservation(isEnemyTorpedoLaunched);
-        //sensor.AddObservation(enemyTorpedoPosition.x / (BattleField.transform.localScale.x / 2) - 1f);
-        //sensor.AddObservation(enemyTorpedoPosition.z / (BattleField.transform.localScale.z / 2) - 1f);
-        //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
-        //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
-
-        // Weapon
+        // Weapon (42)
         WeaponSystemsOfficer.BatterySummary[] batterySummary = weaponSystemsOfficer.Summary();
         for (int i = 0; i < batterySummary.Length; i++)
         {
@@ -293,21 +238,16 @@ public class Warship : Agent, DamagableObject
             sensor.AddObservation(battery.repairProgress);
         }
 
+        // Aiminig (6)
         Vector2 aimingPoint = new Vector2(m_AimingPoint.x, m_AimingPoint.y);
         sensor.AddOneHotObservation((int) (aimingPoint.x - k_AimingPointVerticalMin), (int) (k_AimingPointVerticalMax - k_AimingPointVerticalMin) + 1);
         sensor.AddObservation(Mathf.Cos(aimingPoint.y * Mathf.Deg2Rad));
         sensor.AddObservation(Mathf.Sin(aimingPoint.y * Mathf.Deg2Rad));
 
         sensor.AddObservation(weaponSystemsOfficer.Ammo / (float) WeaponSystemsOfficer.maxAmmo);
-        sensor.AddObservation(Engine.Fuel / Engine.maxFuel);
 
         sensor.AddOneHotObservation(Engine.SpeedLevel + 2, 5);
         sensor.AddOneHotObservation(Engine.SteerLevel + 2, 5);
-
-        sensor.AddObservation(CurrentHealth / (float) k_MaxHealth);
-        // FIXME
-        float targetCurrentHealth = (target != null) ? target.CurrentHealth / (float) k_MaxHealth : 0f;
-        sensor.AddObservation(targetCurrentHealth);
 
         ObservationCount += 1;
     }
@@ -648,5 +588,40 @@ public class Warship : Agent, DamagableObject
     public void OnDamageTaken()
     {
         AccumulatedDamage += 1f;
+    }
+
+    private void AddWarshipObservation(VectorSensor sensor, Warship warship, int teamId = 1)    // (7)
+    {
+        sensor.AddObservation(warship.CurrentHealth / (float) k_MaxHealth);
+        sensor.AddObservation(warship.IsDestroyed);
+
+        // Relative Position
+        Vector2 position = new Vector2(warship.transform.position.x / BattleField.transform.localScale.x,
+                                       warship.transform.position.z / BattleField.transform.localScale.z);
+        sensor.AddObservation(position);
+
+        float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
+        sensor.AddObservation(Mathf.Cos(radian));
+        sensor.AddObservation(Mathf.Sin(radian));
+
+        sensor.AddObservation(warship.Engine.Fuel / Engine.maxFuel);
+    }
+
+    private void AddTorpedoObservation(VectorSensor sensor)
+    {
+        /* Torpedo
+        bool isEnemyTorpedoLaunched = false;
+        Vector3 enemyTorpedoPosition = Vector3.zero;
+        GameObject torpedo = target.weaponSystemsOfficer.torpedoInstance;
+        if (torpedo != null)
+        {
+            isEnemyTorpedoLaunched = true;
+            enemyTorpedoPosition = torpedo.transform.position;
+        }*/
+        //sensor.AddObservation(isEnemyTorpedoLaunched);
+        //sensor.AddObservation(enemyTorpedoPosition.x / (BattleField.transform.localScale.x / 2) - 1f);
+        //sensor.AddObservation(enemyTorpedoPosition.z / (BattleField.transform.localScale.z / 2) - 1f);
+        //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
+        //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
     }
 }
