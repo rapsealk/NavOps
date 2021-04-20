@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 51108453}
   m_Layer: 0
   m_Name: WrappedTerrainLarge (5)
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -666,7 +666,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 166947319}
   m_LocalRotation: {x: 0, y: 0.92387956, z: -0.38268343, w: 0}
-  m_LocalPosition: {x: 0, y: 200, z: 360}
+  m_LocalPosition: {x: 0, y: 270.6, z: 430.6}
   m_LocalScale: {x: 8, y: 8, z: 8}
   m_Children: []
   m_Father: {fileID: 0}
@@ -699,9 +699,9 @@ Transform:
   m_LocalPosition: {x: 160, y: 2, z: 160}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1222549980}
-  - {fileID: 2119204618}
   - {fileID: 891656772}
+  - {fileID: 2119204618}
+  - {fileID: 1222549980}
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1029,7 +1029,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 104
+      value: 118
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -1290,7 +1290,7 @@ PrefabInstance:
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 100
+      value: 125
       objectReference: {fileID: 0}
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -1805,7 +1805,7 @@ GameObject:
   - component: {fileID: 265211660}
   m_Layer: 0
   m_Name: WrappedTerrainLarge (3)
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2552,7 +2552,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 104
+      value: 118
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -2813,7 +2813,7 @@ PrefabInstance:
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -100
+      value: -125
       objectReference: {fileID: 0}
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -3912,7 +3912,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 725573961}
   m_LocalRotation: {x: -0, y: 0.38268343, z: -0, w: 0.92387956}
-  m_LocalPosition: {x: -50, y: 0.1, z: 0}
+  m_LocalPosition: {x: -75, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1821912687}
@@ -4202,7 +4202,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 104
+      value: 118
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -5421,6 +5421,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
+        type: 3}
+      propertyPath: m_BrainParameters.VectorObservationSize
+      value: 118
+      objectReference: {fileID: 0}
     - target: {fileID: 2957803498651142145, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: ShellPrefab
@@ -5817,7 +5822,7 @@ GameObject:
   m_Component:
   - component: {fileID: 891656772}
   m_Layer: 0
-  m_Name: StartingPoint3
+  m_Name: StartingPoint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5835,7 +5840,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 175538502}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -135, z: 0}
 --- !u!1 &894997231
 GameObject:
@@ -6019,7 +6024,7 @@ GameObject:
   - component: {fileID: 898988001}
   m_Layer: 0
   m_Name: WrappedTerrainLarge (4)
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6439,7 +6444,7 @@ GameObject:
   - component: {fileID: 1042894928}
   m_Layer: 0
   m_Name: WrappedTerrainLarge (2)
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7095,7 +7100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1222549980}
   m_Layer: 0
-  m_Name: StartingPoint1
+  m_Name: StartingPoint3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7109,11 +7114,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1222549979}
   m_LocalRotation: {x: -0, y: -0.92387956, z: -0, w: 0.38268343}
-  m_LocalPosition: {x: 0, y: 0.1, z: 50}
+  m_LocalPosition: {x: 0, y: 0.1, z: 75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 175538502}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: -135, z: 0}
 --- !u!1 &1227482484
 GameObject:
@@ -9049,11 +9054,6 @@ MonoBehaviour:
   - {fileID: 1227482486}
   - {fileID: 982665922}
   - {fileID: 2016216453}
-  EpisodeText: {fileID: 479690477}
-  ObservationText: {fileID: 1896224911}
-  ActionText: {fileID: 148747027}
-  FrameText: {fileID: 1890234750}
-  TimeText: {fileID: 580394921}
 --- !u!4 &1694288282
 Transform:
   m_ObjectHideFlags: 0
@@ -9202,7 +9202,7 @@ GameObject:
   - component: {fileID: 1716898162}
   m_Layer: 0
   m_Name: WrappedTerrainLarge (1)
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9215,7 +9215,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1716898161}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 45, y: 0, z: -45}
+  m_LocalPosition: {x: 60, y: 0, z: -150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 499263307}
@@ -9344,7 +9344,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1814234115}
   m_Layer: 0
-  m_Name: StartingPoint3
+  m_Name: StartingPoint1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9362,7 +9362,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1821912687}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
 --- !u!1 &1819843987
 GameObject:
@@ -9466,9 +9466,9 @@ Transform:
   m_LocalPosition: {x: -160, y: 2, z: -160}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 2144353974}
-  - {fileID: 725573962}
   - {fileID: 1814234115}
+  - {fileID: 725573962}
+  - {fileID: 2144353974}
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10246,7 +10246,7 @@ GameObject:
   - component: {fileID: 2012940085}
   m_Layer: 0
   m_Name: WrappedTerrainLarge
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10259,7 +10259,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2012940084}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -45, y: 0, z: 45}
+  m_LocalPosition: {x: -60, y: 0, z: 150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1954571804}
@@ -10488,7 +10488,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 104
+      value: 118
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -10739,7 +10739,7 @@ PrefabInstance:
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -100
+      value: -125
       objectReference: {fileID: 0}
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -11145,7 +11145,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2119204617}
   m_LocalRotation: {x: -0, y: -0.92387956, z: -0, w: 0.38268343}
-  m_LocalPosition: {x: 50, y: 0.1, z: 0}
+  m_LocalPosition: {x: 75, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 175538502}
@@ -11161,7 +11161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2144353974}
   m_Layer: 0
-  m_Name: StartingPoint1
+  m_Name: StartingPoint3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11175,11 +11175,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2144353973}
   m_LocalRotation: {x: -0, y: 0.38268343, z: -0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0.1, z: -50}
+  m_LocalPosition: {x: 0, y: 0.1, z: -75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1821912687}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
 --- !u!4 &4412614062407900 stripped
 Transform:
@@ -11217,7 +11217,7 @@ PrefabInstance:
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_BrainParameters.VectorObservationSize
-      value: 104
+      value: 118
       objectReference: {fileID: 0}
     - target: {fileID: 2813156938200509319, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
@@ -11488,7 +11488,7 @@ PrefabInstance:
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 100
+      value: 125
       objectReference: {fileID: 0}
     - target: {fileID: 8771740689538203462, guid: 170cb6a7e72e1d64c9ff8d2543824285,
         type: 3}

@@ -26,11 +26,6 @@ public class GameManager : MonoBehaviour
     // Steer Level
     public Text[] steerLevelTexts;
     */
-    public Text EpisodeText;
-    public Text ObservationText;
-    public Text ActionText;
-    public Text FrameText;
-    public Text TimeText;
 
     // Start is called before the first frame update
     void Start()
@@ -79,14 +74,6 @@ public class GameManager : MonoBehaviour
         steerLevelTexts[player1.Engine.SteerLevel+2].color = Color.green;
 
         speedKnotText.text = string.Format("{0:F1} kts", (player1.Engine.IsBackward ? -1 : 1) * player1.rb.velocity.magnitude);
-        */
-
-        /*
-        EpisodeText.text = $"Episode: {player1.EpisodeCount}";
-        ObservationText.text = $"Observation: {player1.ObservationCount}";
-        ActionText.text = $"Action: {player1.ActionCount}";
-        FrameText.text = string.Format("Frame: {0} ({1:F2})", player1.FrameCount, 1 / Time.deltaTime);
-        TimeText.text = string.Format("Time: {0:F2}", player1.TimeCount);
         */
     }
 }

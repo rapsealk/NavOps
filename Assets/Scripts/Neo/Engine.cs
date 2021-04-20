@@ -54,6 +54,7 @@ public class Engine : MonoBehaviour
         if (Fuel > 0)
         {
             float horsePower = (SpeedLevel > 0) ? 30f : 15f;
+            horsePower *= 2;
             m_Rigidbody.AddForce(transform.forward * horsePower * SpeedLevel, ForceMode.Acceleration);
         }
         m_Rigidbody.transform.Rotate(Vector3.up, SteerLevel * 0.1f);

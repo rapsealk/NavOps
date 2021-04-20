@@ -5,6 +5,35 @@ using Unity.MLAgents.Sensors;
 
 public class Warship : Agent, DamagableObject
 {
+    public enum MoveCommand
+    {
+        IDLE = 0,
+        FORWARD = 1,
+        BACKWARD = 2,
+        LEFT = 3,
+        RIGHT = 4
+    }
+
+    public enum AttackCommand
+    {
+        IDLE = 0,
+        FIRE = 1,
+        PITCH_UP = 2,
+        PITCH_DOWN = 3
+    }
+
+    public enum Direction
+    {
+        FORWARD = 0,
+        FORWARD_RIGHT = 1,
+        RIGHT = 2,
+        BACKWARD_RIGHT = 3,
+        BACKWARD = 4,
+        BACKWARD_LEFT = 5,
+        LEFT = 6,
+        FORWARD_LEFT = 7
+    }
+
     public const float k_MaxHealth = 10f;
     public Transform StartingPoint;
     public Color RendererColor;
@@ -32,20 +61,17 @@ public class Warship : Agent, DamagableObject
     public Transform BattleField;
     public bool IsDestroyed { get => CurrentHealth <= 0f + Mathf.Epsilon; }
     [HideInInspector] public Engine Engine { get; private set; }
-    [HideInInspector] public int EpisodeCount = 0;
-    [HideInInspector] public int ObservationCount;
-    [HideInInspector] public int ActionCount;
-    [HideInInspector] public int FrameCount;
-    [HideInInspector] public float TimeCount;
 
     private TaskForce m_TaskForce;
     private Warship m_Target;
+    private float[] m_RaycastHitDistances;
+    private const int k_RaycastHitDirections = 8;
 
     private float _currentHealth = k_MaxHealth;
     private float _accumulatedDamage = 0;
     private bool m_IsCollisionWithWarship = false;
-    private float m_PreviousHealth = k_MaxHealth;
-    private float m_PreviousOpponentHealth = k_MaxHealth;
+    //private float m_PreviousHealth = k_MaxHealth;
+    //private float m_PreviousOpponentHealth = k_MaxHealth;
 
     private Vector3 m_AimingPoint;
     private const float k_AimingPointVerticalMin = -2f;
@@ -61,20 +87,19 @@ public class Warship : Agent, DamagableObject
         transform.rotation = StartingPoint.rotation;
 
         CurrentHealth = k_MaxHealth;
-        m_PreviousHealth = k_MaxHealth;
-        m_PreviousOpponentHealth = k_MaxHealth;
+        //m_PreviousHealth = k_MaxHealth;
+        //m_PreviousOpponentHealth = k_MaxHealth;
         AccumulatedDamage = 0;
         m_IsCollisionWithWarship = false;
 
         m_AimingPoint = Vector3.zero;   // new Vector3(0f, transform.rotation.eulerAngles.y, 0f);
         weaponSystemsOfficer.Reset();
         Engine.Reset();
-        
-        EpisodeCount += 1;
-        ObservationCount = 0;
-        ActionCount = 0;
-        FrameCount = 0;
-        TimeCount = 0f;
+
+        for (int i = 0; i < k_RaycastHitDirections; i++)
+        {
+            m_RaycastHitDistances[i] = 1.0f;
+        }
 
         UpdateTarget();
     }
@@ -88,9 +113,6 @@ public class Warship : Agent, DamagableObject
     // Update is called once per frame
     void Update()
     {
-        FrameCount += 1;
-        TimeCount += Time.deltaTime;
-
         // Drawn
         if (IsDestroyed)
         {
@@ -144,6 +166,8 @@ public class Warship : Agent, DamagableObject
         {
             meshRenderers[i].material.color = RendererColor;
         }
+
+        m_RaycastHitDistances = new float[k_RaycastHitDirections];
 
         Reset();
     }
@@ -224,6 +248,12 @@ public class Warship : Agent, DamagableObject
 
         // ======
 
+        // Surrounding Detections (8)
+        for (int i = 0; i < k_RaycastHitDirections; i++)
+        {
+            sensor.AddObservation(m_RaycastHitDistances[i] < 1.0f);
+        }
+
         // Weapon (42)
         WeaponSystemsOfficer.BatterySummary[] batterySummary = weaponSystemsOfficer.Summary();
         for (int i = 0; i < batterySummary.Length; i++)
@@ -248,8 +278,6 @@ public class Warship : Agent, DamagableObject
 
         sensor.AddOneHotObservation(Engine.SpeedLevel + 2, 5);
         sensor.AddOneHotObservation(Engine.SteerLevel + 2, 5);
-
-        ObservationCount += 1;
     }
 
     public override void OnActionReceived(float[] vectorAction)
@@ -261,34 +289,89 @@ public class Warship : Agent, DamagableObject
             return;
         }
 
-        float movementAction = vectorAction[0];
-        float attackAction = vectorAction[1];
+        int movementAction = (int) vectorAction[0];
+        int attackAction = (int) vectorAction[1];
+
+        // TODO: Force Avoidance
+        if (TeamId == 1)
+        {
+            bool forwardBlocked = m_RaycastHitDistances[(int) Direction.FORWARD] < 1.0f;
+            bool forwardLeftBlocked = m_RaycastHitDistances[(int) Direction.FORWARD_LEFT] < 1.0f;
+            bool forwardRightBlocked = m_RaycastHitDistances[(int) Direction.FORWARD_RIGHT] < 1.0f;
+            bool backwardBlocked = m_RaycastHitDistances[(int) Direction.BACKWARD] < 1.0f;
+            bool backwardLeftBlocked = m_RaycastHitDistances[(int) Direction.BACKWARD_LEFT] < 1.0f;
+            bool backwardRightBlocked = m_RaycastHitDistances[(int) Direction.BACKWARD_RIGHT] < 1.0f;
+            bool leftBlocked = m_RaycastHitDistances[(int) Direction.LEFT] < 1.0f;
+            bool rightBlocked = m_RaycastHitDistances[(int) Direction.RIGHT] < 1.0f;
+            if (forwardBlocked /*&& Engine.SpeedLevel > 0 && Engine.SteerLevel == 0*/)
+            {
+                Engine.SetSpeedLevel(Engine.SpeedLevel-1);
+                if (Engine.SteerLevel == 0)
+                    Engine.SetSteerLevel(Engine.SteerLevel+1);
+                return;
+            }
+            else if (forwardLeftBlocked || backwardLeftBlocked /*&& Engine.SpeedLevel > 0 && Engine.SteerLevel < 0*/)
+            {
+                if (Engine.SteerLevel < 0)
+                    Engine.SetSteerLevel(Engine.SteerLevel+1);
+                return;
+            }
+            else if (forwardRightBlocked || backwardRightBlocked /*&& Engine.SpeedLevel > 0 && Engine.SteerLevel > 0*/)
+            {
+                if (Engine.SteerLevel > 0)
+                    Engine.SetSteerLevel(Engine.SteerLevel-1);
+                return;
+            }
+            else if (backwardBlocked /*&& Engine.SpeedLevel < 0 && Engine.SteerLevel == 0*/)
+            {
+                Engine.SetSpeedLevel(Engine.SpeedLevel+1);
+                if (Engine.SteerLevel == 0)
+                    Engine.SetSteerLevel(Engine.SteerLevel+1);
+                return;
+            }
+            else if (leftBlocked)
+            {
+                if (Engine.SpeedLevel == 0)
+                    Engine.SetSpeedLevel(Engine.SpeedLevel+1);
+                if (Engine.SteerLevel <= 0)
+                    Engine.SetSteerLevel(Engine.SteerLevel+1);
+                return;
+            }
+            else if (rightBlocked)
+            {
+                if (Engine.SpeedLevel == 0)
+                    Engine.SetSpeedLevel(Engine.SpeedLevel+1);
+                if (Engine.SteerLevel >= 0)
+                    Engine.SetSteerLevel(Engine.SteerLevel-1);
+                return;
+            }
+        }
 
         // Movement Actions
-        switch ((int) movementAction)
+        switch (movementAction)
         {
-            case 0:
+            case (int) MoveCommand.IDLE:
                 break;
-            case 1:
+            case (int) MoveCommand.FORWARD:
                 Engine.SetSpeedLevel(Engine.SpeedLevel + 1);
                 break;
-            case 2:
+            case (int) MoveCommand.BACKWARD:
                 Engine.SetSpeedLevel(Engine.SpeedLevel - 1);
                 break;
-            case 3:
+            case (int) MoveCommand.LEFT:
                 Engine.SetSteerLevel(Engine.SteerLevel - 1);
                 break;
-            case 4:
+            case (int) MoveCommand.RIGHT:
                 Engine.SetSteerLevel(Engine.SteerLevel + 1);
                 break;
         }
 
         // Attack Actions
-        switch ((int) attackAction)
+        switch (attackAction)
         {
-            case 0:
+            case (int) AttackCommand.IDLE:
                 break;
-            case 1:
+            case (int) AttackCommand.FIRE:
                 uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
                 AddReward(-usedAmmos / 10000f);
                 break;
@@ -300,10 +383,10 @@ public class Warship : Agent, DamagableObject
                 m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
                 break;
             */
-            case 2:
+            case (int) AttackCommand.PITCH_UP:
                 m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 1f, k_AimingPointVerticalMin);
                 break;
-            case 3:
+            case (int) AttackCommand.PITCH_DOWN:
                 m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 1f, k_AimingPointVerticalMax);
                 break;
         }
@@ -339,57 +422,13 @@ public class Warship : Agent, DamagableObject
             //EndEpisode();
             //target.EndEpisode();
         }
-        /* FIXME: Group
-        else if (Engine.Fuel <= 0f + Mathf.Epsilon
-                 || weaponSystemsOfficer.Ammo == 0)
-        {
-            // Time-out
-            if (CurrentHealth > target.CurrentHealth)
-            {
-                SetReward(1f);
-                target.SetReward(-1f);
-                //EndEpisode();
-                //target.EndEpisode();
-            }
-            else if (CurrentHealth < target.CurrentHealth)
-            {
-                SetReward(-1f);
-                target.SetReward(1f);
-                //EndEpisode();
-                //target.EndEpisode();
-            }
-            else
-            {
-                SetReward(0f);
-                target.SetReward(0f);
-                //EndEpisode();
-                //target.EndEpisode();
-            }
-        }
-        else if (CurrentHealth <= 0f + Mathf.Epsilon)
-        {
-            SetReward(-1f);
-            target.SetReward(1f);
-            //EndEpisode();
-            //target.EndEpisode();
-        }
-        else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
-        {
-            SetReward(1f);
-            target.SetReward(-1f);
-            //EndEpisode();
-            //target.EndEpisode();
-        }
-        */
-
-        ActionCount += 1;
     }
 
     // [Obsolete]
     public override void Heuristic(float[] actionsOut)
     {
-        actionsOut[0] = 0f; // Movement (5)
-        actionsOut[1] = 0f; // Attack (4)
+        actionsOut[0] = (float) MoveCommand.IDLE;
+        actionsOut[1] = (float) AttackCommand.IDLE;
 
         Warship target = Target;
 
@@ -398,19 +437,19 @@ public class Warship : Agent, DamagableObject
         {
             if (Engine.SteerLevel < 0)
             {
-                actionsOut[0] = 4f;
+                actionsOut[0] = (float) MoveCommand.RIGHT;
             }
             else if (Engine.SteerLevel > 0)
             {
-                actionsOut[0] = 3f;
+                actionsOut[0] = (float) MoveCommand.LEFT;
             }
             else if (Engine.SpeedLevel > 0)
             {
-                actionsOut[0] = 2f;
+                actionsOut[0] = (float) MoveCommand.BACKWARD;
             }
             else if (Engine.SpeedLevel < 0)
             {
-                actionsOut[0] = 1f;
+                actionsOut[0] = (float) MoveCommand.FORWARD;
             }
             return;
         }
@@ -438,21 +477,31 @@ public class Warship : Agent, DamagableObject
         Vector3 nextReachDirection = nextReachPosition - position;
         Debug.DrawRay(position, nextReachDirection, Color.green);
 
+        // Raycast Detection
         RaycastHit hit;
         Vector3 forceRepulsive = Vector3.zero;
+        Color[] raysColor = { Color.yellow, Color.yellow, Color.red, Color.red, Color.cyan, Color.cyan, Color.magenta, Color.magenta };
         for (int i = 0; i < 8; i++)
         {
-            float rad = (45f * i) / 180f * Mathf.PI;
-            Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
+            m_RaycastHitDistances[i] = 1.0f;
+
+            float rad = (45f * i + transform.rotation.eulerAngles.y) * Mathf.Deg2Rad;
+            Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));  // + transform.forward
+            Debug.DrawRay(position, dir * 100, raysColor[i]);
             if (Physics.Raycast(position, dir, out hit, maxDistance: 160f))
             {
+                //float weight = 1f;
+                //if (hit.collider.tag == "Terrain") weight = 2f;// * Mathf.Pow(40 / hit.distance, 2.0f);
+                //else if (hit.collider.tag == "Player") weight = 4f;
                 float weight = (hit.collider.tag == "Player") ? 4f : 1f;    // FIXME
                 forceRepulsive += (position - hit.point) * weight;
                 // Vector3 force = position - hit.point;
                 // nextReachDirection = (nextReachDirection.normalized + force.normalized) * nextReachDirection.magnitude;
                 // nextReachPosition = position + nextReachDirection;
 
-                Debug.DrawRay(position, hit.point, Color.yellow);
+                // Debug.DrawRay(position, hit.point, Color.yellow);
+
+                m_RaycastHitDistances[i] = hit.distance / (BattleField.localScale.x * 2);
             }
         }
 
@@ -463,7 +512,7 @@ public class Warship : Agent, DamagableObject
 
         if (Engine.SpeedLevel < 2)
         {
-            actionsOut[0] = 1f;
+            actionsOut[0] = (float) MoveCommand.FORWARD;
             return;
         }
 
@@ -471,11 +520,11 @@ public class Warship : Agent, DamagableObject
         float ydir = (transform.rotation.eulerAngles.y - y + 180f) % 360f - 180f;
         if (ydir > 3f)
         {
-            actionsOut[0] = 3f; // Left
+            actionsOut[0] = (float) MoveCommand.LEFT;
         }
         else if (ydir < -3f)
         {
-            actionsOut[0] = 4f; // Right
+            actionsOut[0] = (float) MoveCommand.RIGHT;
         }
 
         /*
@@ -491,15 +540,15 @@ public class Warship : Agent, DamagableObject
             {
                 if (m_AimingPoint.x < 1f)
                 {
-                    actionsOut[1] = 3f; // Down
+                    actionsOut[1] = (float) AttackCommand.PITCH_DOWN;
                 }
                 else if (m_AimingPoint.x > 1f)
                 {
-                    actionsOut[1] = 2f; // Up
+                    actionsOut[1] = (float) AttackCommand.PITCH_UP;
                 }
                 else
                 {
-                    actionsOut[1] = 1f;
+                    actionsOut[1] = (float) AttackCommand.FIRE;
                 }
 
                 return;
@@ -507,18 +556,17 @@ public class Warship : Agent, DamagableObject
 
             if (m_AimingPoint.x > 0f)
             {
-                actionsOut[1] = 2f;
+                actionsOut[1] = (float) AttackCommand.PITCH_UP;
             }
             else if (m_AimingPoint.x < 0f)
             {
-                actionsOut[1] = 3f;
+                actionsOut[1] = (float) AttackCommand.PITCH_DOWN;
             }
             else
             {
-                actionsOut[1] = 1f;
+                actionsOut[1] = (float) AttackCommand.FIRE;
             }
         }
-        // Debug.Log($"Distance: {distance} / attackRange: {attackRange} / AimingPoint: {m_AimingPoint.x}");
     }
     #endregion  // MLAgent
 // #endif
@@ -529,8 +577,6 @@ public class Warship : Agent, DamagableObject
         {
             return;
         }
-
-        //Debug.Log($"Warship.OnCollisionEnter(collision: {collision.collider.tag}, {collision.collider.tag.StartsWith("Bullet")})");
 
         explosion.transform.position = collision.transform.position;
         explosion.transform.rotation = collision.transform.rotation;
@@ -593,9 +639,10 @@ public class Warship : Agent, DamagableObject
     private void AddWarshipObservation(VectorSensor sensor, Warship warship, int teamId = 1)    // (7)
     {
         sensor.AddObservation(warship.CurrentHealth / (float) k_MaxHealth);
+        sensor.AddObservation(warship.TeamId == this.TeamId);
         sensor.AddObservation(warship.IsDestroyed);
 
-        // Relative Position
+        // TODO: Relative Position
         Vector2 position = new Vector2(warship.transform.position.x / BattleField.transform.localScale.x,
                                        warship.transform.position.z / BattleField.transform.localScale.z);
         sensor.AddObservation(position);
@@ -623,5 +670,51 @@ public class Warship : Agent, DamagableObject
         //sensor.AddObservation(enemyTorpedoPosition.z / (BattleField.transform.localScale.z / 2) - 1f);
         //sensor.AddObservation(weaponSystemsOfficer.isTorpedoReady);
         //sensor.AddObservation(weaponSystemsOfficer.torpedoCooldown / WeaponSystemsOfficer.m_TorpedoReloadTime);
+    }
+
+    private void ShapeReward()
+    {
+        /* FIXME: Group
+        else if (Engine.Fuel <= 0f + Mathf.Epsilon
+                 || weaponSystemsOfficer.Ammo == 0)
+        {
+            // Time-out
+            if (CurrentHealth > target.CurrentHealth)
+            {
+                SetReward(1f);
+                target.SetReward(-1f);
+                //EndEpisode();
+                //target.EndEpisode();
+            }
+            else if (CurrentHealth < target.CurrentHealth)
+            {
+                SetReward(-1f);
+                target.SetReward(1f);
+                //EndEpisode();
+                //target.EndEpisode();
+            }
+            else
+            {
+                SetReward(0f);
+                target.SetReward(0f);
+                //EndEpisode();
+                //target.EndEpisode();
+            }
+        }
+        else if (CurrentHealth <= 0f + Mathf.Epsilon)
+        {
+            SetReward(-1f);
+            target.SetReward(1f);
+            //EndEpisode();
+            //target.EndEpisode();
+        }
+        else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
+        {
+            SetReward(1f);
+            target.SetReward(-1f);
+            //EndEpisode();
+            //target.EndEpisode();
+        }
+        */
     }
 }
