@@ -315,7 +315,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShellPrefab: {fileID: 0}
+  ShellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
+    type: 3}
   muzzle: {fileID: 3389645990330441364}
   muzzleFlash: {fileID: 5113589405927876365}
   PlayerId: 0
@@ -541,7 +542,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8768868798923213396}
   m_LocalRotation: {x: -0.00000003090862, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 11.61, z: 28.1}
+  m_LocalPosition: {x: 0, y: 14, z: 28.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8771867244888339646}
@@ -623,7 +624,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShellPrefab: {fileID: 0}
+  ShellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
+    type: 3}
   muzzle: {fileID: 7279004818194950533}
   muzzleFlash: {fileID: 4326471398924531944}
   PlayerId: 0
@@ -1061,7 +1063,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShellPrefab: {fileID: 0}
+  ShellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
+    type: 3}
   muzzle: {fileID: 6946408783533097452}
   muzzleFlash: {fileID: 4697427901299551054}
   PlayerId: 0
@@ -1274,7 +1277,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShellPrefab: {fileID: 0}
+  ShellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
+    type: 3}
   muzzle: {fileID: 6502262637646839465}
   muzzleFlash: {fileID: 1702443285242911901}
   PlayerId: 0
@@ -1392,7 +1396,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShellPrefab: {fileID: 0}
+  ShellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
+    type: 3}
   muzzle: {fileID: 6530759934103057187}
   muzzleFlash: {fileID: 2094771177814017959}
   PlayerId: 0
@@ -1750,7 +1755,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f55749b66d4ea489cbb375bd5d1549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShellPrefab: {fileID: 0}
+  ShellPrefab: {fileID: 8767120018942817592, guid: eb978559e6aff5a4f8e14256635a7e6e,
+    type: 3}
   muzzle: {fileID: 6308531739989902113}
   muzzleFlash: {fileID: 2570583651749003384}
   PlayerId: 0
@@ -1935,11 +1941,6 @@ MonoBehaviour:
   TeamId: 0
   weaponSystemsOfficer: {fileID: 0}
   BattleField: {fileID: 0}
-  EpisodeCount: 0
-  ObservationCount: 0
-  ActionCount: 0
-  FrameCount: 0
-  TimeCount: 0
 --- !u!114 &3835267860656973181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1984,20 +1985,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 104
+    VectorObservationSize: 118
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 0500000004000000
-    VectorActionSize: 0500000004000000
+      BranchSizes: 0500000002000000
+    VectorActionSize: 0500000002000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: RimpacBehavior
-  TeamId: 1
+  TeamId: 2
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0

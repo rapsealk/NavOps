@@ -4,14 +4,13 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Bullet1
-  - Bullet2
   - RadarBlip
   - Torpedo
   - Terrain
   - Wall
   - Turret
   - Citadel
+  - Bullet
   layers:
   - Default
   - TransparentFX

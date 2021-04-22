@@ -36,14 +36,14 @@ public class Turret : MonoBehaviour, DamagableObject
         get => _enabled;
         private set { _enabled = value; }
     }
-    public const float AttackRange = 1000f;
+    public const float AttackRange = 300f;  // 9240
     public const float k_VerticalMax = 15f;
     public const float k_VerticalMin = -60f;
 
     private Warship m_Warship;
     private TurretType m_TurretType;
     private float m_InitialEulerRotation;
-    private Vector2 m_FirePower = new Vector2(18000f, 400f);    // 12000
+    private Vector2 m_FirePower = new Vector2(12000f, 400f);    // Vector2(9140f, 800f);    // 12000
     //private float offsetX = 3f;
     //private float offsetY = 5f;
     private bool m_Initialized = false;
@@ -155,7 +155,7 @@ public class Turret : MonoBehaviour, DamagableObject
         muzzleFlash.Play();
 
         GameObject projectile = Instantiate(ShellPrefab, firePosition, muzzle.rotation);
-        projectile.tag = $"Bullet{TeamId}";
+        projectile.tag = "Bullet";
         projectile.GetComponent<Shell>().Warship = m_Warship;
 
         Vector3 velocity = muzzle.transform.forward * m_FirePower.x + muzzle.transform.up * m_FirePower.y;
@@ -254,12 +254,13 @@ public class Turret : MonoBehaviour, DamagableObject
 
     private void OnCollisionEnter(Collision collision)
     {
+        //Debug.Log($"Turret({name}/{TeamId}-{PlayerId}).OnCollisionEnter(collision: {collision.collider.name}/{collision.collider.tag})");
         OnDamageTaken();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Debug.Log($"Turret({name}).OnTriggerEnter(other: {other})");
+        //Debug.Log($"Turret({name}/{TeamId}-{PlayerId}).OnTriggerEnter(other: {other.name}/{other.tag})");
         OnDamageTaken();
     }
 

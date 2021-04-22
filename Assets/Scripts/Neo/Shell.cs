@@ -50,18 +50,27 @@ public class Shell : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.tag} ({collision.collider.name})");
+        //Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.tag} ({collision.collider.name})");
         if (collision.collider.tag.Equals("Player"))
         {
             m_Hit = true;
+            /*
             //(collision.collider as Warship).TakeDamage();
+            GameObject obj = GameObject.Find(collision.collider.name); // collision.collider as Warship;
+            Warship warship = obj.GetComponent<Warship>();
+            Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.name}(TeamId={warship.TeamId})");
+            if (!tag.EndsWith(warship.TeamId.ToString()))
+            {
+                warship.OnDamageTaken();
+            }
+            */
         }
         Destroy(gameObject);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Debug.Log($"Shell.OnTriggerEnter: {tag} -> {other.tag} ({other.name})");
+        //Debug.Log($"Shell.OnTriggerEnter: {tag} -> {other.tag} ({other.name})");
         if (other.tag.StartsWith("Bullet") || other.name.StartsWith("Dominion"))
         {
             return;

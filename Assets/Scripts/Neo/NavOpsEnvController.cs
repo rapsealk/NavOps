@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Unity.MLAgents;
 
@@ -36,44 +37,29 @@ public class NavOpsEnvController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool isGameDone = true;
-        foreach (var unit in TaskForceBlue.Units)
+        bool isBlueAllDestroyed = TaskForceBlue.Units.All(unit => unit.IsDestroyed);
+        bool isRedAllDestroyed = TaskForceRed.Units.All(unit => unit.IsDestroyed);
+
+        if (isBlueAllDestroyed && isRedAllDestroyed)
         {
-            // Debug.Log($"{unit.name}.IsDestroyed: {unit.IsDestroyed}");
-            isGameDone &= unit.IsDestroyed;
+            m_AgentGroupBlue.SetGroupReward(0.0f);
+            m_AgentGroupRed.SetGroupReward(0.0f);
+            m_AgentGroupBlue.EndGroupEpisode();
+            m_AgentGroupRed.EndGroupEpisode();
         }
-        // Debug.Log($"TaskForceBlue.isGameDone: {isGameDone}");
-        if (isGameDone)
+        else if (isBlueAllDestroyed)
         {
-            // Debug.Log($"NavOpsEnvController: TaskForceBlue is destroyed.");
             m_AgentGroupBlue.SetGroupReward(-1.0f);
             m_AgentGroupRed.SetGroupReward(1.0f);
-            //m_AgentGroupBlue.GroupEpisodeInterrupted();
             m_AgentGroupBlue.EndGroupEpisode();
-            //m_AgentGroupRed.GroupEpisodeInterrupted();
             m_AgentGroupRed.EndGroupEpisode();
-
-            return;
         }
-
-        isGameDone = true;
-        foreach (var unit in TaskForceRed.Units)
+        else if (isRedAllDestroyed)
         {
-            // Debug.Log($"{unit.name}.IsDestroyed: {unit.IsDestroyed}");
-            isGameDone &= unit.IsDestroyed;
-        }
-        // Debug.Log($"TaskForceRed.isGameDone: {isGameDone}");
-        if (isGameDone)
-        {
-            // Debug.Log($"NavOpsEnvController: TaskForceRed is destroyed.");
             m_AgentGroupBlue.SetGroupReward(1.0f);
             m_AgentGroupRed.SetGroupReward(-1.0f);
-            //m_AgentGroupBlue.GroupEpisodeInterrupted();
             m_AgentGroupBlue.EndGroupEpisode();
-            //m_AgentGroupRed.GroupEpisodeInterrupted();
             m_AgentGroupRed.EndGroupEpisode();
-
-            return;
         }
 
         /*

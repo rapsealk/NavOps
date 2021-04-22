@@ -15,8 +15,8 @@ public static class BuildOption
     public static void SetBuildVersionContinuous()
     {
         BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
-        behaviorParameters.BrainParameters.VectorObservationSize = 48;
-        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(numContinuousActions: 8);
+        behaviorParameters.BrainParameters.VectorObservationSize = 118;
+        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(numContinuousActions: 6);
     }
 
     [MenuItem(MENUITEM_DIST_CONTINUOUS, isValidateFunction: true)]
@@ -29,8 +29,8 @@ public static class BuildOption
     public static void SetBuildVersionDiscrete()
     {
         BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
-        behaviorParameters.BrainParameters.VectorObservationSize = 70;
-        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 8 });
+        behaviorParameters.BrainParameters.VectorObservationSize = 118;
+        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 6 });
     }
 
     [MenuItem(MENUITEM_DIST_DISCRETE, isValidateFunction: true)]
@@ -43,8 +43,8 @@ public static class BuildOption
     public static void SetBuildVersionMultiDiscrete()
     {
         BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
-        behaviorParameters.BrainParameters.VectorObservationSize = 70;
-        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 5, 4 });
+        behaviorParameters.BrainParameters.VectorObservationSize = 118;
+        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 5, 2 });
     }
 
     [MenuItem(MENUITEM_DIST_MULTIDISCRETE, isValidateFunction: true)]
