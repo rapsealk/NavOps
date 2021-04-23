@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
@@ -177,30 +178,17 @@ public class Warship : Agent, DamagableObject
         Warship newTarget = null;
         Vector3 position = transform.position;
         float distanceToTarget = Mathf.Infinity;
-        foreach (var warship in m_TaskForce.TargetTaskForce.Units)
+        foreach (var warship in m_TaskForce.TargetTaskForce.Units.Where(unit => !unit.IsDestroyed))
         {
-            if (warship.IsDestroyed)
-            {
-                continue;
-            }
-
             float distance = Vector3.Distance(position, warship.transform.position);
             if (distance < distanceToTarget)
             {
                 newTarget = warship;
                 distanceToTarget = distance;
             }
-            /*
-            if (name == "Blue1")
-            {
-                Debug.Log($"[Blue1] -> {warship.name}({warship.IsDestroyed}): {distance}");
-            }
-            */
         }
 
         Target = newTarget;
-
-        // Debug.Log($"{name}.SetsTargetTo({newTarget.name})");
     }
 
 // #if !UNITY_EDITOR

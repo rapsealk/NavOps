@@ -46,10 +46,12 @@ public class Engine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         if (SpeedLevel != 0)
         {
             Fuel -= 1.0f;
         }
+        */
 
         if (Fuel > 0)
         {
