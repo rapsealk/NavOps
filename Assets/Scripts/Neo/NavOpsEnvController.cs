@@ -37,31 +37,6 @@ public class NavOpsEnvController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool isBlueAllDestroyed = TaskForceBlue.Units.All(unit => unit.IsDestroyed);
-        bool isRedAllDestroyed = TaskForceRed.Units.All(unit => unit.IsDestroyed);
-
-        if (isBlueAllDestroyed && isRedAllDestroyed)
-        {
-            m_AgentGroupBlue.SetGroupReward(0.0f);
-            m_AgentGroupRed.SetGroupReward(0.0f);
-            m_AgentGroupBlue.EndGroupEpisode();
-            m_AgentGroupRed.EndGroupEpisode();
-        }
-        else if (isBlueAllDestroyed)
-        {
-            m_AgentGroupBlue.SetGroupReward(-1.0f);
-            m_AgentGroupRed.SetGroupReward(1.0f);
-            m_AgentGroupBlue.EndGroupEpisode();
-            m_AgentGroupRed.EndGroupEpisode();
-        }
-        else if (isRedAllDestroyed)
-        {
-            m_AgentGroupBlue.SetGroupReward(1.0f);
-            m_AgentGroupRed.SetGroupReward(-1.0f);
-            m_AgentGroupBlue.EndGroupEpisode();
-            m_AgentGroupRed.EndGroupEpisode();
-        }
-
         /*
         if (false)
         {
@@ -95,6 +70,35 @@ public class NavOpsEnvController : MonoBehaviour
         foreach (var unit in TaskForceRed.Units)
         {
             unit.Reset();
+        }
+    }
+
+    public void NotifyAgentDestroyed()
+    {
+        bool isBlueAllDestroyed = TaskForceBlue.Units.All(unit => unit.IsDestroyed);
+        bool isRedAllDestroyed = TaskForceRed.Units.All(unit => unit.IsDestroyed);
+
+        if (isBlueAllDestroyed && isRedAllDestroyed)
+        {
+            m_AgentGroupBlue.SetGroupReward(0.0f);
+            m_AgentGroupRed.SetGroupReward(0.0f);
+        }
+        else if (isBlueAllDestroyed)
+        {
+            m_AgentGroupBlue.SetGroupReward(-1.0f);
+            m_AgentGroupRed.SetGroupReward(1.0f);
+        }
+        else if (isRedAllDestroyed)
+        {
+            m_AgentGroupBlue.SetGroupReward(1.0f);
+            m_AgentGroupRed.SetGroupReward(-1.0f);
+        }
+
+        if (isBlueAllDestroyed || isRedAllDestroyed)
+        {
+            Debug.Log($"NavOpsEnvController(Blue={isBlueAllDestroyed}, Red={isRedAllDestroyed})");
+            m_AgentGroupBlue.EndGroupEpisode();
+            m_AgentGroupRed.EndGroupEpisode();
         }
     }
 }

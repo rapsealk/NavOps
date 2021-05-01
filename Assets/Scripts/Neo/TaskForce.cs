@@ -13,6 +13,7 @@ public class TaskForce : MonoBehaviour
                 select warship.CurrentHealth).ToArray();
     }
     public TaskForce TargetTaskForce;
+    public NavOpsEnvController EnvController;
 
     // private Warship[] m_Warships;
 

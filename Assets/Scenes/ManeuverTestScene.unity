@@ -718,7 +718,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 1100
   field of view: 60
   orthographic: 0
   orthographic size: 800
@@ -745,7 +745,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 166947319}
   m_LocalRotation: {x: 0, y: 0.8660254, z: -0.5, w: 0}
-  m_LocalPosition: {x: 0, y: 492, z: 407}
+  m_LocalPosition: {x: 0, y: 750, z: 420}
   m_LocalScale: {x: 8, y: 8, z: 8}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1851,7 +1851,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e15b0a5fac1ffd5448f4daa1397d561c, type: 2}
+  - {fileID: 2100000, guid: eae0e7ed67ff9c54d999d0b2c2c4a8bc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2460,7 +2460,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e15b0a5fac1ffd5448f4daa1397d561c, type: 2}
+  - {fileID: 2100000, guid: eae0e7ed67ff9c54d999d0b2c2c4a8bc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3742,7 +3742,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e15b0a5fac1ffd5448f4daa1397d561c, type: 2}
+  - {fileID: 2100000, guid: eae0e7ed67ff9c54d999d0b2c2c4a8bc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5237,7 +5237,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e15b0a5fac1ffd5448f4daa1397d561c, type: 2}
+  - {fileID: 2100000, guid: eae0e7ed67ff9c54d999d0b2c2c4a8bc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6690,6 +6690,7 @@ MonoBehaviour:
   - {fileID: 2091797256}
   - {fileID: 376399234}
   TargetTaskForce: {fileID: 1360265614}
+  EnvController: {fileID: 356447647}
 --- !u!1 &1029850844
 GameObject:
   m_ObjectHideFlags: 0
@@ -8133,6 +8134,7 @@ MonoBehaviour:
   - {fileID: 209851210}
   - {fileID: 8769870294542925724}
   TargetTaskForce: {fileID: 1001541177}
+  EnvController: {fileID: 356447647}
 --- !u!1001 &1363950961
 PrefabInstance:
   m_ObjectHideFlags: 0

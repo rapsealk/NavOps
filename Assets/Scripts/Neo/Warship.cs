@@ -80,7 +80,6 @@ public class Warship : Agent, DamagableObject
 
     public void Reset()
     {
-        SimpleMultiAgentGroup x = new SimpleMultiAgentGroup();
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -414,6 +413,8 @@ public class Warship : Agent, DamagableObject
             //EndEpisode();
             //target.EndEpisode();
         }
+
+        m_TaskForce.EnvController.NotifyAgentDestroyed();
     }
 
     // [Obsolete]
