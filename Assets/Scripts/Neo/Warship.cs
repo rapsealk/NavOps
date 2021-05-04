@@ -77,6 +77,8 @@ public class Warship : Agent, DamagableObject
     private Vector3 m_AimingPoint;
     private const float k_AimingPointVerticalMin = -2f;
     private const float k_AimingPointVerticalMax = 1f;
+    private float[] m_AllyHitpoints;
+    private float[] m_EnemyHitpoints;
 
     public void Reset()
     {
@@ -100,6 +102,9 @@ public class Warship : Agent, DamagableObject
         {
             m_RaycastHitDistances[i] = 1.0f;
         }
+
+        m_AllyHitpoints = new float[3] { k_MaxHealth, k_MaxHealth, k_MaxHealth };
+        m_EnemyHitpoints = new float[3] { k_MaxHealth, k_MaxHealth, k_MaxHealth };
 
         UpdateTarget();
     }
@@ -231,7 +236,7 @@ public class Warship : Agent, DamagableObject
             }
         }
 
-        sensor.AddOneHotObservation(targetIndex, targetWarships.Length);    // Target Field (3) / 45
+        sensor.AddOneHotObservation(targetIndex, targetWarships.Length);    // Target Field (3) / 51
 
         // ======
 
@@ -384,6 +389,31 @@ public class Warship : Agent, DamagableObject
 
         // Default Time Penalty
         // FIXME:
+        var allyHitpointsQuery = (from unit in m_TaskForce.Units
+                                     select unit.CurrentHealth).ToArray();
+        var enemyHitpointsQuery = (from unit in m_TaskForce.TargetTaskForce.Units
+                                      select unit.CurrentHealth).ToArray();
+
+        float attackReward = 0f;
+        for (int i = 0; i < 3; i++)
+        {
+            attackReward -= m_AllyHitpoints[i] - allyHitpointsQuery[i];
+            attackReward += m_EnemyHitpoints[i] - enemyHitpointsQuery[i];
+
+            if (m_AllyHitpoints[i] >= 0f + Mathf.Epsilon && allyHitpointsQuery[i] <= 0f + Mathf.Epsilon)
+            {
+                attackReward -= 5f;
+            }
+            if (m_EnemyHitpoints[i] >= 0f + Mathf.Epsilon && enemyHitpointsQuery[i] <= 0f + Mathf.Epsilon)
+            {
+                attackReward += 5f;
+            }
+
+            m_AllyHitpoints[i] = allyHitpointsQuery[i];
+            m_EnemyHitpoints[i] = enemyHitpointsQuery[i];
+        }
+        AddReward(attackReward / 10f);
+        /*
         Warship target = m_Target;
         if (target != null)
         {
@@ -395,6 +425,7 @@ public class Warship : Agent, DamagableObject
             float penalty = -4 * Mathf.Pow(distance, 2f) / 10000;
             AddReward(penalty);
         }
+        */
 
         CurrentHealth -= AccumulatedDamage;
         /* FIXME: GroupReward
@@ -642,7 +673,7 @@ public class Warship : Agent, DamagableObject
         AccumulatedDamage += 1f;
     }
 
-    private void AddWarshipObservation(VectorSensor sensor, Warship warship, int teamId = 1)    // (7)
+    private void AddWarshipObservation(VectorSensor sensor, Warship warship, int teamId = 1)    // (8)
     {
         sensor.AddObservation(warship.CurrentHealth / (float) k_MaxHealth);
         sensor.AddObservation(warship.TeamId == this.TeamId);
