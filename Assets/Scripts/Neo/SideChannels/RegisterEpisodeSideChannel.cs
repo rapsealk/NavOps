@@ -9,13 +9,14 @@ public class RegisterEpisodeSideChannel : MonoBehaviour
     public void Awake()
     {
         sideChannel = new EpisodeSideChannel();
-        //Application.logMessageReceived += sideChannel.SendDebugStatementToPython;
+        sideChannel.NavOpsEnvController = GetComponent<NavOpsEnvController>();
+        sideChannel.NavOpsEnvController.OnEpisodeStatusChanged += sideChannel.SendEpisodeDoneToPython;
         SideChannelManager.RegisterSideChannel(sideChannel);
     }
 
     public void OnDestroy()
     {
-        Application.logMessageReceived -= sideChannel.SendDebugStatementToPython;
+        sideChannel.NavOpsEnvController.OnEpisodeStatusChanged -= sideChannel.SendEpisodeDoneToPython;
         if (Academy.IsInitialized)
         {
             SideChannelManager.UnregisterSideChannel(sideChannel);

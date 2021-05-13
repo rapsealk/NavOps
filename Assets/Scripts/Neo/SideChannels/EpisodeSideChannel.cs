@@ -6,6 +6,8 @@ using Unity.MLAgents.SideChannels;
 
 public class EpisodeSideChannel : SideChannel
 {
+    public NavOpsEnvController NavOpsEnvController;
+
     /**
      * https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Custom-SideChannels.md
      */
@@ -20,16 +22,13 @@ public class EpisodeSideChannel : SideChannel
         Debug.Log($"From Python: {receivedString}");
     }
 
-    public void SendDebugStatementToPython(string logString, string stackTrace, LogType type)
+    public void SendEpisodeDoneToPython(bool blueWins)
     {
-        if (type == LogType.Error)
+        Debug.Log($"[EpisodeSideChannel] SendEpisodeDoneToPython: {blueWins}");
+        using (var msgOut = new OutgoingMessage())
         {
-            var stringToSend = type.ToString() + ": " + logString + "\n" + stackTrace;
-            using (var msgOut = new OutgoingMessage())
-            {
-                msgOut.WriteString(stringToSend);
-                QueueMessageToSend(msgOut);
-            }
+            msgOut.WriteBoolean(blueWins);
+            QueueMessageToSend(msgOut);
         }
     }
 }

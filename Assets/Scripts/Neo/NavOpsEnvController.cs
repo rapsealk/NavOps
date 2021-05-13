@@ -8,6 +8,7 @@ public class NavOpsEnvController : MonoBehaviour
 {
     public TaskForce TaskForceBlue;
     public TaskForce TaskForceRed;
+    public BooleanCallback OnEpisodeStatusChanged = EmptyCallback;
 
     ///
     /// https://github.com/Unity-Technologies/ml-agents/blob/18d51352a716f7c48f27f3341b6a2ce2a7ca0e34/com.unity.ml-agents/Runtime/SimpleMultiAgentGroup.cs
@@ -99,6 +100,15 @@ public class NavOpsEnvController : MonoBehaviour
             Debug.Log($"NavOpsEnvController(Blue={isBlueAllDestroyed}, Red={isRedAllDestroyed})");
             m_AgentGroupBlue.EndGroupEpisode();
             m_AgentGroupRed.EndGroupEpisode();
+
+            OnEpisodeStatusChanged(isRedAllDestroyed);
         }
+    }
+
+    public delegate void BooleanCallback(bool booleanValue);
+
+    private static void EmptyCallback(bool booleanValue)
+    {
+        Debug.Log($"[NavOpsEnvController] EmptyCallback: {booleanValue}");
     }
 }
