@@ -24,6 +24,7 @@ public class Engine : MonoBehaviour
     public bool IsBackward { get => SpeedLevel < 0; }
 
     private Rigidbody m_Rigidbody;
+    private float m_HorsePower = 60f;
 
     private float _fuel = 10000f;
     private int _speedLevel = 0;
@@ -33,6 +34,11 @@ public class Engine : MonoBehaviour
     void Start()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+
+        if (Application.platform == RuntimePlatform.OSXEditor)
+        {
+            m_HorsePower = 120f;
+        }
     }
 
     public void Reset()
@@ -55,8 +61,7 @@ public class Engine : MonoBehaviour
 
         if (Fuel > 0)
         {
-            float horsePower = (SpeedLevel > 0) ? 30f : 15f;
-            horsePower *= 2;
+            float horsePower = m_HorsePower * ((SpeedLevel > 0) ? 1f : 0.5f);
             m_Rigidbody.AddForce(transform.forward * horsePower * SpeedLevel, ForceMode.Acceleration);
         }
         m_Rigidbody.transform.Rotate(Vector3.up, SteerLevel * 0.1f);

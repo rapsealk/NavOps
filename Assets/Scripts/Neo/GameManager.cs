@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
+
+        Setup();
     }
 
     // Update is called once per frame
@@ -39,6 +41,31 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < TaskForceRed.Units.Length; i++)
         {
             TaskForceRedTargetIndicators[i].text = $"H{i+1} -> C{TaskForceRed.Units[i].Target?.PlayerId}";
+        }
+    }
+
+    void Setup()
+    {
+        for (int i = 0; i < TaskForceBlueHpSliders.Length; i++)
+        {
+            TaskForceBlueHpSliders[i].gameObject.SetActive(false);
+            TaskForceBlueTargetIndicators[i].gameObject.SetActive(false);
+        }
+        for (int i = 0; i < TaskForceBlue.Units.Length; i++)
+        {
+            TaskForceBlueHpSliders[i].gameObject.SetActive(true);
+            TaskForceBlueTargetIndicators[i].gameObject.SetActive(true);
+        }
+
+        for (int i = 0; i < TaskForceRedHpSliders.Length; i++)
+        {
+            TaskForceRedHpSliders[i].gameObject.SetActive(false);
+            TaskForceRedTargetIndicators[i].gameObject.SetActive(false);
+        }
+        for (int i = 0; i < TaskForceRed.Units.Length; i++)
+        {
+            TaskForceRedHpSliders[i].gameObject.SetActive(true);
+            TaskForceRedTargetIndicators[i].gameObject.SetActive(true);
         }
     }
 }

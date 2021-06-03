@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 
-public class Warship : Agent, DamagableObject
+public class Warship : Agent, IDamagableObject
 {
     public enum MoveCommand
     {
@@ -395,7 +395,7 @@ public class Warship : Agent, DamagableObject
                                       select unit.CurrentHealth).ToArray();
 
         float attackReward = 0f;
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < m_TaskForce.TargetTaskForce.Units.Length; i++)
         {
             attackReward -= m_AllyHitpoints[i] - allyHitpointsQuery[i];
             attackReward += m_EnemyHitpoints[i] - enemyHitpointsQuery[i];
@@ -508,13 +508,23 @@ public class Warship : Agent, DamagableObject
 
             float rad = (45f * i + transform.rotation.eulerAngles.y) * Mathf.Deg2Rad;
             Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
-            if (Physics.Raycast(position, dir, out hit, maxDistance: 160f))
+            if (Physics.Raycast(position, dir, out hit, maxDistance: 400f))
             {
-                float weight = 1f;
-                if (hit.collider.tag == "Terrain") weight = 4f;// * Mathf.Pow(40 / hit.distance, 2.0f);
+                if (hit.collider.tag == "Terrain" && hit.distance < 20f)
+                {
+                    forceRepulsive += (position - hit.point) * 2f;
+                }
+                else if (hit.collider.tag == "Player")
+                {
+                    // forceRepulsive += (position - hit.point) * 8f;
+                    forceRepulsive += (position - hit.point) * Mathf.Pow(800f / (position - hit.point).magnitude, 2f);
+                }
+                /*
+                if (hit.collider.tag == "Terrain") weight = 1f;// * Mathf.Pow(40 / hit.distance, 2.0f);
                 else if (hit.collider.tag == "Player") weight = 8f;
                 //float weight = (hit.collider.tag == "Player") ? 8f : 1f;    // FIXME
                 forceRepulsive += (position - hit.point) * weight;
+                */
 
                 m_RaycastHitDistances[i] = hit.distance / (BattleField.localScale.x * 2);
             }

@@ -6,6 +6,7 @@ using UnityEditor.Build.Reporting;
 
 public static class BuildScript
 {
+    /*
     static void BuildWindows()
     {
         Console.Out.WriteLine("[LOG] BuildWindows Start!");
@@ -36,4 +37,5 @@ public static class BuildScript
         BuildReport buildReport = BuildPipeline.BuildPlayer(enabledScenePath.ToArray(), binaryFilePath, buildTarget, buildOptions);
         Console.Out.WriteLine($"[LOG] Build Result: {buildReport.summary}");
     }
+    */
 }

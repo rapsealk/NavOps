@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface DamagableObject /*: MonoBehaviour*/
+public interface IDamagableObject
 {
     void OnDamageTaken();
 }

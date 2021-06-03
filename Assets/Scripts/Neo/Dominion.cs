@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class Dominion : MonoBehaviour
 {
+    // [Range(-1, 1)]
+    public int Dominant { get; private set; } = 0;
+
+    private SpriteRenderer m_SpriteRenderer;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        m_SpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -16,23 +21,20 @@ public class Dominion : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter(Collider collider)
+    public void SetDominant(int dominantId)
     {
-        Debug.Log($"OnTriggerEnter(collider: {collider.tag} / {collider.name})");
+        Dominant = dominantId;
 
-        if (collider.tag.Equals("Player"))
+        Color spriteColor = Color.gray;
+        if (dominantId == -1)
         {
-            Debug.Log($"OnTriggerEnter: {collider.GetComponent<Warship>().PlayerId}");
+            spriteColor = Color.red;
         }
-    }
-
-    private void OnTriggerExit(Collider collider)
-    {
-        Debug.Log($"OnTriggerExit(collider: {collider.tag})");
-
-        if (collider.tag.Equals("Player"))
+        else if (dominantId == 1)
         {
-            Debug.Log($"OnTriggerEnter: {collider.GetComponent<Warship>().PlayerId}");
+            spriteColor = Color.green;
         }
+
+        m_SpriteRenderer.color = spriteColor;
     }
 }

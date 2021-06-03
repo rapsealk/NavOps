@@ -9,7 +9,7 @@ public enum TurretType
     LEFT = 3
 }
 
-public class Turret : MonoBehaviour, DamagableObject
+public class Turret : MonoBehaviour, IDamagableObject
 {
     public GameObject ShellPrefab;
     public Transform muzzle;
