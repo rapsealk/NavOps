@@ -36,6 +36,9 @@ public class TaskForce : MonoBehaviour
 
     public void Reset()
     {
-        //
+        foreach (var unit in Units)
+        {
+            unit.Reset();
+        }
     }
 }

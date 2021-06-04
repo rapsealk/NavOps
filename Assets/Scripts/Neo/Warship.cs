@@ -61,6 +61,7 @@ public class Warship : Agent, IDamagableObject
     }
     public Transform BattleField;
     public bool IsDestroyed { get => CurrentHealth <= 0f + Mathf.Epsilon; }
+    public bool IsDetected = false;
     [HideInInspector] public Engine Engine { get; private set; }
 
     private TaskForce m_TaskForce;
@@ -71,14 +72,12 @@ public class Warship : Agent, IDamagableObject
     private float _currentHealth = k_MaxHealth;
     private float _accumulatedDamage = 0;
     private bool m_IsCollisionWithWarship = false;
-    //private float m_PreviousHealth = k_MaxHealth;
-    //private float m_PreviousOpponentHealth = k_MaxHealth;
 
     private Vector3 m_AimingPoint;
     private const float k_AimingPointVerticalMin = -2f;
     private const float k_AimingPointVerticalMax = 1f;
-    private float[] m_AllyHitpoints;
-    private float[] m_EnemyHitpoints;
+    private WarshipModel[] m_AllyWarshipModels;
+    private WarshipModel[] m_EnemyWarshipModels;
 
     public void Reset()
     {
@@ -89,8 +88,6 @@ public class Warship : Agent, IDamagableObject
         transform.rotation = StartingPoint.rotation;
 
         CurrentHealth = k_MaxHealth;
-        //m_PreviousHealth = k_MaxHealth;
-        //m_PreviousOpponentHealth = k_MaxHealth;
         AccumulatedDamage = 0;
         m_IsCollisionWithWarship = false;
 
@@ -103,8 +100,18 @@ public class Warship : Agent, IDamagableObject
             m_RaycastHitDistances[i] = 1.0f;
         }
 
-        m_AllyHitpoints = new float[3] { k_MaxHealth, k_MaxHealth, k_MaxHealth };
-        m_EnemyHitpoints = new float[3] { k_MaxHealth, k_MaxHealth, k_MaxHealth };
+        IsDetected = false;
+
+        m_AllyWarshipModels = new WarshipModel[m_TaskForce.Units.Length];
+        for (int i = 0; i < m_AllyWarshipModels.Length; i++)
+        {
+            m_AllyWarshipModels[i] = m_TaskForce.Units[i].GenerateWarshipModel();
+        }
+        m_EnemyWarshipModels = new WarshipModel[m_TaskForce.TargetTaskForce.Units.Length];
+        for (int i = 0; i < m_EnemyWarshipModels.Length; i++)
+        {
+            m_EnemyWarshipModels[i] = m_TaskForce.TargetTaskForce.Units[i].GenerateWarshipModel();
+        }
 
         UpdateTarget();
     }
@@ -211,24 +218,18 @@ public class Warship : Agent, IDamagableObject
     {
         UpdateTarget();
 
-        AddWarshipObservation(sensor, this);
-
-        foreach (var warship in m_TaskForce.Units)
+        for (int i = 0; i < m_AllyWarshipModels.Length; i++)
         {
-            if (warship == this)
-            {
-                continue;
-            }
-
-            AddWarshipObservation(sensor, warship);
+            AddWarshipObservation(sensor, m_AllyWarshipModels[i]);
         }
 
+        // FIXME
         int targetIndex = 0;
         Warship[] targetWarships = m_TaskForce.TargetTaskForce.Units;
         for (int i = 0; i < targetWarships.Length; i++)
         {
             Warship warship = targetWarships[i];
-            AddWarshipObservation(sensor, warship);
+            AddWarshipObservation(sensor, m_EnemyWarshipModels[i]);
 
             if (warship == m_Target)
             {
@@ -284,63 +285,6 @@ public class Warship : Agent, IDamagableObject
         int movementAction = (int) vectorAction[0];
         int attackAction = (int) vectorAction[1];
 
-        /*
-        // TODO: Force Avoidance
-        if (TeamId == 1)
-        {
-            bool forwardBlocked = m_RaycastHitDistances[(int) Direction.FORWARD] < 1.0f;
-            bool forwardLeftBlocked = m_RaycastHitDistances[(int) Direction.FORWARD_LEFT] < 1.0f;
-            bool forwardRightBlocked = m_RaycastHitDistances[(int) Direction.FORWARD_RIGHT] < 1.0f;
-            bool backwardBlocked = m_RaycastHitDistances[(int) Direction.BACKWARD] < 1.0f;
-            bool backwardLeftBlocked = m_RaycastHitDistances[(int) Direction.BACKWARD_LEFT] < 1.0f;
-            bool backwardRightBlocked = m_RaycastHitDistances[(int) Direction.BACKWARD_RIGHT] < 1.0f;
-            bool leftBlocked = m_RaycastHitDistances[(int) Direction.LEFT] < 1.0f;
-            bool rightBlocked = m_RaycastHitDistances[(int) Direction.RIGHT] < 1.0f;
-            if (forwardBlocked //&& Engine.SpeedLevel > 0 && Engine.SteerLevel == 0)
-            {
-                Engine.SetSpeedLevel(Engine.SpeedLevel-1);
-                if (Engine.SteerLevel == 0)
-                    Engine.SetSteerLevel(Engine.SteerLevel+1);
-                return;
-            }
-            else if (forwardLeftBlocked || backwardLeftBlocked && Engine.SpeedLevel > 0 && Engine.SteerLevel < 0)
-            {
-                if (Engine.SteerLevel < 0)
-                    Engine.SetSteerLevel(Engine.SteerLevel+1);
-                return;
-            }
-            else if (forwardRightBlocked || backwardRightBlocked && Engine.SpeedLevel > 0 && Engine.SteerLevel > 0)
-            {
-                if (Engine.SteerLevel > 0)
-                    Engine.SetSteerLevel(Engine.SteerLevel-1);
-                return;
-            }
-            else if (backwardBlocked //&& Engine.SpeedLevel < 0 && Engine.SteerLevel == 0)
-            {
-                Engine.SetSpeedLevel(Engine.SpeedLevel+1);
-                if (Engine.SteerLevel == 0)
-                    Engine.SetSteerLevel(Engine.SteerLevel+1);
-                return;
-            }
-            else if (leftBlocked)
-            {
-                if (Engine.SpeedLevel == 0)
-                    Engine.SetSpeedLevel(Engine.SpeedLevel+1);
-                if (Engine.SteerLevel <= 0)
-                    Engine.SetSteerLevel(Engine.SteerLevel+1);
-                return;
-            }
-            else if (rightBlocked)
-            {
-                if (Engine.SpeedLevel == 0)
-                    Engine.SetSpeedLevel(Engine.SpeedLevel+1);
-                if (Engine.SteerLevel >= 0)
-                    Engine.SetSteerLevel(Engine.SteerLevel-1);
-                return;
-            }
-        }
-        */
-
         // Movement Actions
         switch (movementAction)
         {
@@ -369,63 +313,45 @@ public class Warship : Agent, IDamagableObject
                 uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
                 AddReward(-usedAmmos / 10000f);
                 break;
-            /*
-            case 2:
-                m_AimingPoint.y = (m_AimingPoint.y - 5f) % 360f;
-                break;
-            case 3:
-                m_AimingPoint.y = (m_AimingPoint.y + 5f) % 360f;
-                break;
-            */
-            /*
-            case (int) AttackCommand.PITCH_UP:
-                m_AimingPoint.x = Mathf.Max(m_AimingPoint.x - 1f, k_AimingPointVerticalMin);
-                break;
-            case (int) AttackCommand.PITCH_DOWN:
-                m_AimingPoint.x = Mathf.Min(m_AimingPoint.x + 1f, k_AimingPointVerticalMax);
-                break;
-            */
         }
 
         // Default Time Penalty
         // FIXME:
-        var allyHitpointsQuery = (from unit in m_TaskForce.Units
-                                     select unit.CurrentHealth).ToArray();
-        var enemyHitpointsQuery = (from unit in m_TaskForce.TargetTaskForce.Units
-                                      select unit.CurrentHealth).ToArray();
+        float[] allyHitpoints_t = new float[m_TaskForce.Units.Length];
+        for (int i = 0; i < m_TaskForce.Units.Length; i++)
+        {
+            allyHitpoints_t[i] = m_AllyWarshipModels[i].CurrentHealth;
+            m_AllyWarshipModels[i] = m_TaskForce.Units[i].GenerateWarshipModel();
+        }
+
+        float[] enemyHitpoint_t = new float[m_TaskForce.TargetTaskForce.Units.Length];
+        for (int i = 0; i < m_TaskForce.TargetTaskForce.Units.Length; i++)
+        {
+            enemyHitpoint_t[i] = m_EnemyWarshipModels[i].CurrentHealth;
+
+            Warship warship = m_TaskForce.TargetTaskForce.Units[i];
+            if (warship.IsDetected)
+            {
+                m_EnemyWarshipModels[i] = warship.GenerateWarshipModel();
+            }
+        }
 
         float attackReward = 0f;
         for (int i = 0; i < m_TaskForce.TargetTaskForce.Units.Length; i++)
         {
-            attackReward -= m_AllyHitpoints[i] - allyHitpointsQuery[i];
-            attackReward += m_EnemyHitpoints[i] - enemyHitpointsQuery[i];
+            attackReward -= allyHitpoints_t[i] - m_AllyWarshipModels[i].CurrentHealth;
+            attackReward += enemyHitpoint_t[i] - m_EnemyWarshipModels[i].CurrentHealth;
 
-            if (m_AllyHitpoints[i] >= 0f + Mathf.Epsilon && allyHitpointsQuery[i] <= 0f + Mathf.Epsilon)
+            if (allyHitpoints_t[i] >= 0f + Mathf.Epsilon && m_AllyWarshipModels[i].CurrentHealth <= 0f + Mathf.Epsilon)
             {
                 attackReward -= 5f;
             }
-            if (m_EnemyHitpoints[i] >= 0f + Mathf.Epsilon && enemyHitpointsQuery[i] <= 0f + Mathf.Epsilon)
+            if (enemyHitpoint_t[i] >= 0f + Mathf.Epsilon && m_EnemyWarshipModels[i].CurrentHealth <= 0f + Mathf.Epsilon)
             {
                 attackReward += 5f;
             }
-
-            m_AllyHitpoints[i] = allyHitpointsQuery[i];
-            m_EnemyHitpoints[i] = enemyHitpointsQuery[i];
         }
         AddReward(attackReward / 10f);
-        /*
-        Warship target = m_Target;
-        if (target != null)
-        {
-            Vector2 playerPosition = new Vector2(transform.position.x / BattleField.transform.localScale.x,
-                                                 transform.position.z / BattleField.transform.localScale.z);
-            Vector2 opponentPosition = new Vector2(target.transform.position.x / BattleField.transform.localScale.x,
-                                                   target.transform.position.z / BattleField.transform.localScale.z);
-            float distance = Vector2.Distance(playerPosition, opponentPosition);
-            float penalty = -4 * Mathf.Pow(distance, 2f) / 10000;
-            AddReward(penalty);
-        }
-        */
 
         CurrentHealth -= AccumulatedDamage;
         /* FIXME: GroupReward
@@ -497,7 +423,6 @@ public class Warship : Agent, IDamagableObject
         float distanceNegative = Geometry.GetDistance(position, targetPosition - new Vector3(x, 0f, z));
         Vector3 nextReachPosition = targetPosition - Mathf.Sign(distancePositive - distanceNegative) * new Vector3(x, 0f, z);
         Vector3 nextReachDirection = nextReachPosition - position;
-        Debug.DrawRay(position, nextReachDirection, (TeamId == 1) ? Color.green : Color.red);
 
         // Raycast Detection
         RaycastHit hit;
@@ -516,15 +441,8 @@ public class Warship : Agent, IDamagableObject
                 }
                 else if (hit.collider.tag == "Player")
                 {
-                    // forceRepulsive += (position - hit.point) * 8f;
                     forceRepulsive += (position - hit.point) * Mathf.Pow(800f / (position - hit.point).magnitude, 2f);
                 }
-                /*
-                if (hit.collider.tag == "Terrain") weight = 1f;// * Mathf.Pow(40 / hit.distance, 2.0f);
-                else if (hit.collider.tag == "Player") weight = 8f;
-                //float weight = (hit.collider.tag == "Player") ? 8f : 1f;    // FIXME
-                forceRepulsive += (position - hit.point) * weight;
-                */
 
                 m_RaycastHitDistances[i] = hit.distance / (BattleField.localScale.x * 2);
             }
@@ -532,8 +450,6 @@ public class Warship : Agent, IDamagableObject
 
         nextReachDirection = (nextReachDirection.normalized + forceRepulsive.normalized) * nextReachDirection.magnitude;
         nextReachPosition = position + nextReachDirection;
-
-        Debug.DrawRay(position, nextReachPosition, Color.white);
 
         if (Engine.SpeedLevel < 2)
         {
@@ -683,22 +599,42 @@ public class Warship : Agent, IDamagableObject
         AccumulatedDamage += 1f;
     }
 
-    private void AddWarshipObservation(VectorSensor sensor, Warship warship, int teamId = 1)    // (8)
+    public WarshipModel GenerateWarshipModel()
+    {
+        return new WarshipModel()
+        {
+            TeamId = this.TeamId,
+            CurrentHealth = this.CurrentHealth,
+            IsDestroyed = this.IsDestroyed,
+            IsDetected = this.IsDetected,
+            Position = this.transform.position,
+            Rotation = this.transform.rotation,
+            Fuel = this.Engine.Fuel
+        };
+    }
+
+    private void AddWarshipObservation(VectorSensor sensor, WarshipModel warship, int teamId = 1)    // (9)
     {
         sensor.AddObservation(warship.CurrentHealth / (float) k_MaxHealth);
         sensor.AddObservation(warship.TeamId == this.TeamId);
         sensor.AddObservation(warship.IsDestroyed);
+        sensor.AddObservation(warship.IsDetected); // FIXME: Last Observation Model
 
         // TODO: Relative Position
-        Vector2 position = new Vector2(warship.transform.position.x / BattleField.transform.localScale.x,
-                                       warship.transform.position.z / BattleField.transform.localScale.z);
+        Vector2 position = new Vector2(warship.Position.x / BattleField.transform.localScale.x,
+                                       warship.Position.z / BattleField.transform.localScale.z);
         sensor.AddObservation(position);
 
-        float radian = (transform.rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
+        float radian = (warship.Rotation.eulerAngles.y % 360) * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(radian));
         sensor.AddObservation(Mathf.Sin(radian));
 
-        sensor.AddObservation(warship.Engine.Fuel / Engine.maxFuel);
+        sensor.AddObservation(warship.Fuel / Engine.maxFuel);
+    }
+
+    private void AddDominantObservation(VectorSensor sensor)
+    {
+        // TODO
     }
 
     private void AddTorpedoObservation(VectorSensor sensor)
@@ -764,4 +700,16 @@ public class Warship : Agent, IDamagableObject
         }
         */
     }
+}
+
+public class WarshipModel
+{
+    public int TeamId;
+    // public int PlayerId;
+    public float CurrentHealth;
+    public bool IsDestroyed;
+    public bool IsDetected;
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public float Fuel;
 }

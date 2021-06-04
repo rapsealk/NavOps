@@ -84,8 +84,8 @@ public class NavOpsEnvController : MonoBehaviour
             Vector3 position = TaskForceBlue.Units[i].transform.position;
             for (int j = 0; j < TaskForceRed.Units.Length; j++)
             {
-                bool raycastDetected = false;
-                string targetName = "";
+                Warship taskForceRedWarship = TaskForceRed.Units[j];
+                taskForceRedWarship.IsDetected = false;
 
                 Vector3 targetPosition = TaskForceRed.Units[j].transform.position;
                 Vector3 direction = targetPosition - position;
@@ -96,11 +96,8 @@ public class NavOpsEnvController : MonoBehaviour
                         continue;
                     }
 
-                    raycastDetected = true;
-                    targetName = hit.collider.name;
+                    taskForceRedWarship.IsDetected = true;
                 }
-
-                Debug.Log($"TaskForceBlue[{i}] -> TaskForceRed[{j}]: {raycastDetected} ({targetName})");
             }
         }
 
@@ -109,8 +106,8 @@ public class NavOpsEnvController : MonoBehaviour
             Vector3 position = TaskForceRed.Units[i].transform.position;
             for (int j = 0; j < TaskForceBlue.Units.Length; j++)
             {
-                bool raycastDetected = false;
-                string targetName = "";
+                Warship taskForceBlueWarship = TaskForceBlue.Units[j];
+                taskForceBlueWarship.IsDetected = false;
 
                 Vector3 targetPosition = TaskForceBlue.Units[j].transform.position;
                 Vector3 direction = targetPosition - position;
@@ -121,12 +118,18 @@ public class NavOpsEnvController : MonoBehaviour
                         continue;
                     }
 
-                    raycastDetected = true;
-                    targetName = hit.collider.name;
+                    taskForceBlueWarship.IsDetected = true;
                 }
-
-                Debug.Log($"TaskForceRed[{i}] -> TaskForceBlue[{j}]: {raycastDetected} ({targetName})");
             }
+        }
+
+        for (int i = 0; i < TaskForceBlue.Units.Length; i++)
+        {
+            Debug.Log($"NavOpsEnvController.TaskForceBlue[{i}].IsDetected = {TaskForceBlue.Units[i].IsDetected}");
+        }
+        for (int i = 0; i < TaskForceRed.Units.Length; i++)
+        {
+            Debug.Log($"NavOpsEnvController.TaskForceRed[{i}].IsDetected = {TaskForceRed.Units[i].IsDetected}");
         }
 
         /*
@@ -154,15 +157,8 @@ public class NavOpsEnvController : MonoBehaviour
 
     public void Reset()
     {
-        foreach (var unit in TaskForceBlue.Units)
-        {
-            unit.Reset();
-        }
-
-        foreach (var unit in TaskForceRed.Units)
-        {
-            unit.Reset();
-        }
+        TaskForceBlue.Reset();
+        TaskForceRed.Reset();
 
         for (int i = 0; i < Dominations.Length; i++)
         {

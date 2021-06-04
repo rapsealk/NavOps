@@ -19,7 +19,7 @@ public class Turret : MonoBehaviour, IDamagableObject
     [HideInInspector] public const float m_Traverse = 120f;
     [HideInInspector] public const float m_SideTraverse = 60f;
     [HideInInspector] public const float m_TraverseSpeed = 15f;
-    [HideInInspector] public const float m_ReloadTime = 3f; // 6
+    [HideInInspector] public const float m_ReloadTime = 6f; // 6
     [HideInInspector] public const float m_RepairTime = 30f;
     [HideInInspector] public float cooldownTimer = 0f;
     [HideInInspector] public bool isReloaded = true;
