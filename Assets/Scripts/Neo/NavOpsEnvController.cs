@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+/*
 using Unity.MLAgents;
 
 public class NavOpsEnvController : MonoBehaviour
@@ -132,27 +133,23 @@ public class NavOpsEnvController : MonoBehaviour
             Debug.Log($"NavOpsEnvController.TaskForceRed[{i}].IsDetected = {TaskForceRed.Units[i].IsDetected}");
         }
 
-        /*
-        if (false)
-        {
-            m_AgentGroupBlue.GroupEpisodeInterrupted();
-            m_AgentGroupRed.GroupEpisodeInterrupted();
-            Reset();
-        }
-        */
+        // if (false)
+        // {
+        //     m_AgentGroupBlue.GroupEpisodeInterrupted();
+        //     m_AgentGroupRed.GroupEpisodeInterrupted();
+        //     Reset();
+        // }
 
-        /*
-        if (false)
-        {
-            m_AgentGroupBlue.AddGroupReward(1.0f);
-            m_AgentGroupRed.AddGroupReward(-1.0f);
-            // m_AgentGroupBlue.SetGroupReward(1.0f);
-            // m_AgentGroupRed.SetGroupReward(-1.0f);
+        // if (false)
+        // {
+        //     m_AgentGroupBlue.AddGroupReward(1.0f);
+        //     m_AgentGroupRed.AddGroupReward(-1.0f);
+        //     // m_AgentGroupBlue.SetGroupReward(1.0f);
+        //     // m_AgentGroupRed.SetGroupReward(-1.0f);
 
-            m_AgentGroupBlue.EndGroupEpisode();
-            m_AgentGroupRed.EndGroupEpisode();
-        }
-        */
+        //     m_AgentGroupBlue.EndGroupEpisode();
+        //     m_AgentGroupRed.EndGroupEpisode();
+        // }
     }
 
     public void Reset()
@@ -209,3 +206,4 @@ public class NavOpsEnvController : MonoBehaviour
         Debug.Log($"[NavOpsEnvController] EmptyCallback: {booleanValue}");
     }
 }
+*/

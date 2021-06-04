@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+/*
 public class CameraController : MonoBehaviour
 {
     public Warship TargetObject;
@@ -40,3 +41,4 @@ public class CameraController : MonoBehaviour
         }
     }
 }
+*/

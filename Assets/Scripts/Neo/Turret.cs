@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+/*
 public enum TurretType
 {
     FRONTAL = 0,
@@ -273,3 +274,4 @@ public class Turret : MonoBehaviour, IDamagableObject
         m_Warship.OnDamageTaken();
     }
 }
+*/

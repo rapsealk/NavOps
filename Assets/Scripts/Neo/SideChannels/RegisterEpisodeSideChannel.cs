@@ -1,4 +1,5 @@
 using UnityEngine;
+/*
 using Unity.MLAgents;
 using Unity.MLAgents.SideChannels;
 
@@ -23,3 +24,4 @@ public class RegisterEpisodeSideChannel : MonoBehaviour
         }
     }
 }
+*/

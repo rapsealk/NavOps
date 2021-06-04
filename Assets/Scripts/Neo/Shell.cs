@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+/*
 public class Shell : MonoBehaviour
 {
     public ParticleSystem TrailParticleSystem;
@@ -54,16 +55,14 @@ public class Shell : MonoBehaviour
         if (collision.collider.tag.Equals("Player"))
         {
             m_Hit = true;
-            /*
-            //(collision.collider as Warship).TakeDamage();
-            GameObject obj = GameObject.Find(collision.collider.name); // collision.collider as Warship;
-            Warship warship = obj.GetComponent<Warship>();
-            Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.name}(TeamId={warship.TeamId})");
-            if (!tag.EndsWith(warship.TeamId.ToString()))
-            {
-                warship.OnDamageTaken();
-            }
-            */
+            // //(collision.collider as Warship).TakeDamage();
+            // GameObject obj = GameObject.Find(collision.collider.name); // collision.collider as Warship;
+            // Warship warship = obj.GetComponent<Warship>();
+            // Debug.Log($"Shell.OnCollisionEnter: {tag} -> {collision.collider.name}(TeamId={warship.TeamId})");
+            // if (!tag.EndsWith(warship.TeamId.ToString()))
+            // {
+            //     warship.OnDamageTaken();
+            // }
         }
         Destroy(gameObject);
     }
@@ -84,3 +83,4 @@ public class Shell : MonoBehaviour
         Destroy(gameObject);
     }
 }
+*/

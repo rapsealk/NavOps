@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/*
 public class TaskForce : MonoBehaviour
 {
     public int TeamId;
@@ -42,3 +43,4 @@ public class TaskForce : MonoBehaviour
         }
     }
 }
+*/

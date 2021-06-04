@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+/*
 using Unity.MLAgents;
 
 public class RimpacSceneBehavior : MonoBehaviour
@@ -17,3 +18,4 @@ public class RimpacSceneBehavior : MonoBehaviour
         Debug.Log($"[RimpacSceneBehavior] Academy.OnEnvironmentReset");
     }
 }
+*/

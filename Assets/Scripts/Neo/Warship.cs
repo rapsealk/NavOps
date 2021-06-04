@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+/*
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 
@@ -145,16 +146,15 @@ public class Warship : Agent, IDamagableObject
         Vector3 rotation = Vector3.zero;
         rotation.y = Geometry.GetAngleBetween(transform.position, target.transform.position);
 
-        /* Auto-Targeting
-        Vector3 projectilexz = transform.position;
-        projectilexz.y = 0f;
-        Vector3 targetxz = target.transform.position;
-        targetxz.y = 0f;
-        float r = Vector3.Distance(projectilexz, targetxz);
-        float G = Physics.gravity.y;
-        float vz = 8000f;
-        rotation.x = Mathf.Atan((G * r) / (vz * 2f)) * Mathf.Rad2Deg;   // max: 140
-        */
+        // Auto-Targeting
+        // Vector3 projectilexz = transform.position;
+        // projectilexz.y = 0f;
+        // Vector3 targetxz = target.transform.position;
+        // targetxz.y = 0f;
+        // float r = Vector3.Distance(projectilexz, targetxz);
+        // float G = Physics.gravity.y;
+        // float vz = 8000f;
+        // rotation.x = Mathf.Atan((G * r) / (vz * 2f)) * Mathf.Rad2Deg;   // max: 140
         rotation.x = m_AimingPoint.x;
 
         weaponSystemsOfficer.Aim(Quaternion.Euler(rotation));
@@ -354,12 +354,11 @@ public class Warship : Agent, IDamagableObject
         AddReward(attackReward / 10f);
 
         CurrentHealth -= AccumulatedDamage;
-        /* FIXME: GroupReward
-        float hitpointReward = (CurrentHealth - m_PreviousHealth) - (target.CurrentHealth - m_PreviousOpponentHealth);
-        AddReward(hitpointReward / k_MaxHealth);
-        m_PreviousHealth = CurrentHealth;
-        m_PreviousOpponentHealth = target.CurrentHealth;
-        */
+        // FIXME: GroupReward
+        // float hitpointReward = (CurrentHealth - m_PreviousHealth) - (target.CurrentHealth - m_PreviousOpponentHealth);
+        // AddReward(hitpointReward / k_MaxHealth);
+        // m_PreviousHealth = CurrentHealth;
+        // m_PreviousOpponentHealth = target.CurrentHealth;
 
         // EndEpisode
         if (m_IsCollisionWithWarship)
@@ -468,52 +467,49 @@ public class Warship : Agent, IDamagableObject
             actionsOut[0] = (float) MoveCommand.RIGHT;
         }
 
-        /*
-        if (m_AimingPoint.x < 1f)
-        {
-            actionsOut[1] = 3f;
-        }
-        else*/
+        // if (m_AimingPoint.x < 1f)
+        // {
+        //     actionsOut[1] = 3f;
+        // }
+        // else
         float distance = Vector3.Distance(position, targetPosition);
         if (distance < Turret.AttackRange)
         {
             actionsOut[1] = (float) AttackCommand.FIRE;
         }
-        /*
-        if (distance < Turret.AttackRange)
-        {
-            if (distance < Turret.AttackRange / 2)
-            {
-                if (m_AimingPoint.x < 1f)
-                {
-                    actionsOut[1] = (float) AttackCommand.PITCH_DOWN;
-                }
-                else if (m_AimingPoint.x > 1f)
-                {
-                    actionsOut[1] = (float) AttackCommand.PITCH_UP;
-                }
-                else
-                {
-                    actionsOut[1] = (float) AttackCommand.FIRE;
-                }
+        // if (distance < Turret.AttackRange)
+        // {
+        //     if (distance < Turret.AttackRange / 2)
+        //     {
+        //         if (m_AimingPoint.x < 1f)
+        //         {
+        //             actionsOut[1] = (float) AttackCommand.PITCH_DOWN;
+        //         }
+        //         else if (m_AimingPoint.x > 1f)
+        //         {
+        //             actionsOut[1] = (float) AttackCommand.PITCH_UP;
+        //         }
+        //         else
+        //         {
+        //             actionsOut[1] = (float) AttackCommand.FIRE;
+        //         }
 
-                return;
-            }
+        //         return;
+        //     }
 
-            if (m_AimingPoint.x > 0f)
-            {
-                actionsOut[1] = (float) AttackCommand.PITCH_UP;
-            }
-            else if (m_AimingPoint.x < 0f)
-            {
-                actionsOut[1] = (float) AttackCommand.PITCH_DOWN;
-            }
-            else
-            {
-                actionsOut[1] = (float) AttackCommand.FIRE;
-            }
-        }
-        */
+        //     if (m_AimingPoint.x > 0f)
+        //     {
+        //         actionsOut[1] = (float) AttackCommand.PITCH_UP;
+        //     }
+        //     else if (m_AimingPoint.x < 0f)
+        //     {
+        //         actionsOut[1] = (float) AttackCommand.PITCH_DOWN;
+        //     }
+        //     else
+        //     {
+        //         actionsOut[1] = (float) AttackCommand.FIRE;
+        //     }
+        // }
     }
     #endregion  // MLAgent
 // #endif
@@ -550,23 +546,21 @@ public class Warship : Agent, IDamagableObject
             }
             //
         }
-        /*
-        else if (collision.collider.tag.StartsWith("Bullet")
-                 && !collision.collider.tag.EndsWith(TeamId.ToString()))
-        {
-            //float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
-            //CurrentHealth -= damage;
-            OnDamageTaken();
-        }
-        */
-        /*
-        else if (collision.collider.tag == "Terrain")
-        {
-            //float damage = rb.velocity.magnitude * rb.mass;
-            //CurrentHealth -= damage;
-            CurrentHealth = 0;
-        }
-        */
+
+        // else if (collision.collider.tag.StartsWith("Bullet")
+        //          && !collision.collider.tag.EndsWith(TeamId.ToString()))
+        // {
+        //     //float damage = collision.rigidbody?.velocity.magnitude ?? 20f;
+        //     //CurrentHealth -= damage;
+        //     OnDamageTaken();
+        // }
+
+        // else if (collision.collider.tag == "Terrain")
+        // {
+        //     //float damage = rb.velocity.magnitude * rb.mass;
+        //     //CurrentHealth -= damage;
+        //     CurrentHealth = 0;
+        // }
     }
 
     public void OnTriggerEnter(Collider other)
@@ -579,20 +573,18 @@ public class Warship : Agent, IDamagableObject
         //StartCoroutine(DisplayExplosionEffect(other));
     }
 
-    /*
-    private IEnumerator DisplayExplosionEffect(Collider other)
-    {
-        explosion.transform.position = other.transform.position;
-        explosion.transform.rotation = other.transform.rotation;
-        explosion.Play();
+    // private IEnumerator DisplayExplosionEffect(Collider other)
+    // {
+    //     explosion.transform.position = other.transform.position;
+    //     explosion.transform.rotation = other.transform.rotation;
+    //     explosion.Play();
 
-        yield return new WaitForSeconds(2f);
+    //     yield return new WaitForSeconds(2f);
 
-        explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+    //     explosion.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
-        yield break;
-    }
-    */
+    //     yield break;
+    // }
 
     public void OnDamageTaken()
     {
@@ -639,15 +631,15 @@ public class Warship : Agent, IDamagableObject
 
     private void AddTorpedoObservation(VectorSensor sensor)
     {
-        /* Torpedo
-        bool isEnemyTorpedoLaunched = false;
-        Vector3 enemyTorpedoPosition = Vector3.zero;
-        GameObject torpedo = target.weaponSystemsOfficer.torpedoInstance;
-        if (torpedo != null)
-        {
-            isEnemyTorpedoLaunched = true;
-            enemyTorpedoPosition = torpedo.transform.position;
-        }*/
+        // Torpedo
+        // bool isEnemyTorpedoLaunched = false;
+        // Vector3 enemyTorpedoPosition = Vector3.zero;
+        // GameObject torpedo = target.weaponSystemsOfficer.torpedoInstance;
+        // if (torpedo != null)
+        // {
+        //     isEnemyTorpedoLaunched = true;
+        //     enemyTorpedoPosition = torpedo.transform.position;
+        // }
         //sensor.AddObservation(isEnemyTorpedoLaunched);
         //sensor.AddObservation(enemyTorpedoPosition.x / (BattleField.transform.localScale.x / 2) - 1f);
         //sensor.AddObservation(enemyTorpedoPosition.z / (BattleField.transform.localScale.z / 2) - 1f);
@@ -657,48 +649,47 @@ public class Warship : Agent, IDamagableObject
 
     private void ShapeReward()
     {
-        /* FIXME: Group
-        else if (Engine.Fuel <= 0f + Mathf.Epsilon
-                 || weaponSystemsOfficer.Ammo == 0)
-        {
-            // Time-out
-            if (CurrentHealth > target.CurrentHealth)
-            {
-                SetReward(1f);
-                target.SetReward(-1f);
-                //EndEpisode();
-                //target.EndEpisode();
-            }
-            else if (CurrentHealth < target.CurrentHealth)
-            {
-                SetReward(-1f);
-                target.SetReward(1f);
-                //EndEpisode();
-                //target.EndEpisode();
-            }
-            else
-            {
-                SetReward(0f);
-                target.SetReward(0f);
-                //EndEpisode();
-                //target.EndEpisode();
-            }
-        }
-        else if (CurrentHealth <= 0f + Mathf.Epsilon)
-        {
-            SetReward(-1f);
-            target.SetReward(1f);
-            //EndEpisode();
-            //target.EndEpisode();
-        }
-        else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
-        {
-            SetReward(1f);
-            target.SetReward(-1f);
-            //EndEpisode();
-            //target.EndEpisode();
-        }
-        */
+        // FIXME: Group
+        // else if (Engine.Fuel <= 0f + Mathf.Epsilon
+        //          || weaponSystemsOfficer.Ammo == 0)
+        // {
+        //     // Time-out
+        //     if (CurrentHealth > target.CurrentHealth)
+        //     {
+        //         SetReward(1f);
+        //         target.SetReward(-1f);
+        //         //EndEpisode();
+        //         //target.EndEpisode();
+        //     }
+        //     else if (CurrentHealth < target.CurrentHealth)
+        //     {
+        //         SetReward(-1f);
+        //         target.SetReward(1f);
+        //         //EndEpisode();
+        //         //target.EndEpisode();
+        //     }
+        //     else
+        //     {
+        //         SetReward(0f);
+        //         target.SetReward(0f);
+        //         //EndEpisode();
+        //         //target.EndEpisode();
+        //     }
+        // }
+        // else if (CurrentHealth <= 0f + Mathf.Epsilon)
+        // {
+        //     SetReward(-1f);
+        //     target.SetReward(1f);
+        //     //EndEpisode();
+        //     //target.EndEpisode();
+        // }
+        // else if (target.CurrentHealth <= 0f + Mathf.Epsilon)
+        // {
+        //     SetReward(1f);
+        //     target.SetReward(-1f);
+        //     //EndEpisode();
+        //     //target.EndEpisode();
+        // }
     }
 }
 
@@ -713,3 +704,4 @@ public class WarshipModel
     public Quaternion Rotation;
     public float Fuel;
 }
+*/

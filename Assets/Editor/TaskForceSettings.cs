@@ -1,5 +1,6 @@
 using System;
 using UnityEditor;
+/*
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 
@@ -45,33 +46,32 @@ public static class TaskForceSettings
         return Selection.activeGameObject.GetComponent<TaskForce>() != null;
     }
 
-    /*
-    [MenuItem(MENUITEM_DIST_DISCRETE)]
-    public static void SetBuildVersionDiscrete()
-    {
-        BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
-        behaviorParameters.BrainParameters.VectorObservationSize = 118;
-        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 6 });
-    }
+    // [MenuItem(MENUITEM_DIST_DISCRETE)]
+    // public static void SetBuildVersionDiscrete()
+    // {
+    //     BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
+    //     behaviorParameters.BrainParameters.VectorObservationSize = 118;
+    //     behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 6 });
+    // }
 
-    [MenuItem(MENUITEM_DIST_DISCRETE, isValidateFunction: true)]
-    public static bool ValidateSetBuildVersionDiscrete()
-    {
-        return Selection.activeGameObject.GetComponent<BehaviorParameters>() != null;
-    }
+    // [MenuItem(MENUITEM_DIST_DISCRETE, isValidateFunction: true)]
+    // public static bool ValidateSetBuildVersionDiscrete()
+    // {
+    //     return Selection.activeGameObject.GetComponent<BehaviorParameters>() != null;
+    // }
 
-    [MenuItem(MENUITEM_DIST_MULTIDISCRETE)]
-    public static void SetBuildVersionMultiDiscrete()
-    {
-        BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
-        behaviorParameters.BrainParameters.VectorObservationSize = 118;
-        behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 5, 2 });
-    }
+    // [MenuItem(MENUITEM_DIST_MULTIDISCRETE)]
+    // public static void SetBuildVersionMultiDiscrete()
+    // {
+    //     BehaviorParameters behaviorParameters = Selection.activeGameObject.GetComponent<BehaviorParameters>();
+    //     behaviorParameters.BrainParameters.VectorObservationSize = 118;
+    //     behaviorParameters.BrainParameters.ActionSpec = new ActionSpec(discreteBranchSizes: new int[] { 5, 2 });
+    // }
 
-    [MenuItem(MENUITEM_DIST_MULTIDISCRETE, isValidateFunction: true)]
-    public static bool ValidateSetBuildVersionMultiDiscrete()
-    {
-        return Selection.activeGameObject.GetComponent<BehaviorParameters>() != null;
-    }
-    */
+    // [MenuItem(MENUITEM_DIST_MULTIDISCRETE, isValidateFunction: true)]
+    // public static bool ValidateSetBuildVersionMultiDiscrete()
+    // {
+    //     return Selection.activeGameObject.GetComponent<BehaviorParameters>() != null;
+    // }
 }
+*/

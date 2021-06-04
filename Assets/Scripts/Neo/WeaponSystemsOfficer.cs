@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+/*
 public class WeaponSystemsOfficer : MonoBehaviour
 {
     [HideInInspector] public int PlayerId;
@@ -59,12 +60,10 @@ public class WeaponSystemsOfficer : MonoBehaviour
             }
         }
 
-        /*
-        if (torpedoInstance != null)
-        {
-            Debug.Log($"WSO: Torpedo: {torpedoInstance.transform.position}");
-        }
-        */
+        // if (torpedoInstance != null)
+        // {
+        //     Debug.Log($"WSO: Torpedo: {torpedoInstance.transform.position}");
+        // }
     }
 
     public void Assign(int teamId, int playerId)
@@ -158,3 +157,4 @@ public class WeaponSystemsOfficer : MonoBehaviour
         return summary;
     }
 }
+*/
