@@ -12,10 +12,18 @@ public class GameManager : MonoBehaviour
     // public Text[] TaskForceBlueTargetIndicators;
     // public Text[] TaskForceRedTargetIndicators;
 
+    private NavOps.Grpc.GrpcServer m_GrpcServer;
+
     // Start is called before the first frame update
     void Start()
     {
         Application.targetFrameRate = 60;
+
+        m_GrpcServer = new NavOps.Grpc.GrpcServer
+        {
+            GameManager = this
+        };
+        m_GrpcServer.StartGrpcServer(grpcPort: 9090);
 
         //Setup();
     }
