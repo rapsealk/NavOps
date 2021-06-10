@@ -78,16 +78,24 @@ public class Engine : MonoBehaviour
         }
         */
 
+        /*
         if (Fuel > 0)
         {
             float horsePower = m_HorsePower * ((SpeedLevel > 0) ? 1f : 0.5f);
             m_Rigidbody.AddForce(transform.forward * horsePower * SpeedLevel, ForceMode.Acceleration);
         }
         m_Rigidbody.transform.Rotate(Vector3.up, SteerLevel * 0.1f);
+        */
     }
 
     void FixedUpdate()
     {
         // Fuel -= HorsePower / 20f;
+        if (Fuel > 0)
+        {
+            float horsePower = m_HorsePower * ((SpeedLevel > 0) ? 1f : 0.5f);
+            m_Rigidbody.AddForce(transform.forward * horsePower * SpeedLevel, ForceMode.Acceleration);
+        }
+        m_Rigidbody.transform.Rotate(Vector3.up, SteerLevel * 0.1f);
     }
 }

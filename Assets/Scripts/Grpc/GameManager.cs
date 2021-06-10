@@ -13,8 +13,16 @@ public class GameManager : MonoBehaviour
     public Slider[] TaskForceRedHpSliders;
     // public Text[] TaskForceBlueTargetIndicators;
     // public Text[] TaskForceRedTargetIndicators;
+    public bool EpisodeDone {
+        get {
+            bool value = _done;
+            _done = false;
+            return value;
+        }
+    }
 
     private NavOps.Grpc.GrpcServer m_GrpcServer;
+    private bool _done;
 
     // Start is called before the first frame update
     void Start()
@@ -261,7 +269,11 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"[GameManager] Blue Terminated: {blueTerminated} / Red Terminated: {redTerminated}");
 
+            _done = true;
+
             Reset();
+
+            return;
         }
 
         //
@@ -272,28 +284,14 @@ public class GameManager : MonoBehaviour
         if (blueDominated)
         {
             Debug.Log($"[GameManager] Blue Dominated!");
+            _done = true;
             Reset();
         }
         else if (redDominated)
         {
             Debug.Log($"[GameManager] Red Dominated!");
+            _done = true;
             Reset();
         }
-    }
-}
-
-public class Vector3DistanceComparer : IComparer<Vector3> {
-
-    Vector3 m_Position;
-
-    public Vector3DistanceComparer(Vector3 position)
-        : base()
-    {
-        m_Position = position;
-    }
-
-    public int Compare(Vector3 x, Vector3 y)
-    {
-        return (int) (Vector3.Distance(m_Position, x) * 10000 - Vector3.Distance(m_Position, y) * 10000);
     }
 }

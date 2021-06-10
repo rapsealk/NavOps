@@ -44,6 +44,16 @@ namespace NavOps.Grpc
             }
         }
 
+        public override Task<HeartbeatResponse> RequestHeartbeat(HeartbeatRequest request, ServerCallContext context)
+        {
+            HeartbeatResponse response = new HeartbeatResponse
+            {
+                Succeed = (GameManager != null)
+            };
+
+            return Task.FromResult(response);
+        }
+
         public override Task<EnvironmentStepResponse> CallEnvironmentStep(EnvironmentStepRequest request, ServerCallContext context)
         {
             // 1. OnActionReceived
@@ -109,7 +119,7 @@ namespace NavOps.Grpc
             {
                 Obs = obs,
                 Reward = 0f,
-                Done = false
+                Done = GameManager.EpisodeDone
             };
 
             return Task.FromResult(response);
