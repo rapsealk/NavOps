@@ -3,6 +3,23 @@ using UnityEngine;
 
 public class Engine : MonoBehaviour
 {
+     public enum ManeuverCommandId
+    {
+        IDLE = 0,
+        FORWARD = 1,
+        BACKWARD = 2,
+        LEFT = 3,
+        RIGHT = 4
+    }
+
+    public enum AttackCommandId
+    {
+        IDLE = 0,
+        FIRE = 1,
+        //PITCH_UP = 2,
+        //PITCH_DOWN = 3
+    }
+
     public const float maxFuel = 10000f;
     public float Fuel {
         get => _fuel;
@@ -12,13 +29,13 @@ public class Engine : MonoBehaviour
     public const int MaxSpeedLevel = 2;
     public int SpeedLevel {
         get => _speedLevel;
-        private set { _speedLevel = value; }
+        set { _speedLevel = Math.Min(Math.Max(MinSpeedLevel, value), MaxSpeedLevel); }
     }
     public const int MinSteerLevel = -2;
     public const int MaxSteerLevel = 2;
     public int SteerLevel {
         get => _steerLevel;
-        private set { _steerLevel = value; }
+        set { _steerLevel = Math.Min(Math.Max(MinSteerLevel, value), MaxSteerLevel); }
     }
     public bool IsForward { get => SpeedLevel > 0; }
     public bool IsBackward { get => SpeedLevel < 0; }
@@ -34,10 +51,12 @@ public class Engine : MonoBehaviour
     void Start()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+        m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
-        if (Application.platform == RuntimePlatform.OSXEditor)
+        if (Application.platform == RuntimePlatform.OSXEditor
+            || Application.platform == RuntimePlatform.WindowsEditor)
         {
-            m_HorsePower = 120f;
+            // m_HorsePower *= 2f;
         }
     }
 
@@ -70,15 +89,5 @@ public class Engine : MonoBehaviour
     void FixedUpdate()
     {
         // Fuel -= HorsePower / 20f;
-    }
-
-    public void SetSpeedLevel(int level)
-    {
-        SpeedLevel = Math.Min(Math.Max(MinSpeedLevel, level), MaxSpeedLevel);
-    }
-
-    public void SetSteerLevel(int level)
-    {
-        SteerLevel = Math.Min(Math.Max(MinSteerLevel, level), MaxSteerLevel);
     }
 }

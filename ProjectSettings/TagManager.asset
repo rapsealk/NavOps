@@ -10,7 +10,10 @@ TagManager:
   - Wall
   - Turret
   - Citadel
-  - Bullet
+  - Fire
+  - ControlArea
+  - Bullet1
+  - Bullet2
   layers:
   - Default
   - TransparentFX

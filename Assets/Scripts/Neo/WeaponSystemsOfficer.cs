@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 
-/*
 public class WeaponSystemsOfficer : MonoBehaviour
 {
     [HideInInspector] public int PlayerId;
     [HideInInspector] public int TeamId;
+    /*
+     * Torpedo related..
     public GameObject torpedoPrefab;
     [HideInInspector] public GameObject torpedoInstance = null;
     [HideInInspector] public const float m_TorpedoReloadTime = 40f;
     [HideInInspector] public bool isTorpedoReady { get; private set; } = true;
     [HideInInspector] public float torpedoCooldown { get; private set; } = 0f;
+    */
     [HideInInspector] public const uint maxAmmo = 192;
     [HideInInspector] public uint Ammo {
         get => _ammo;
@@ -21,6 +23,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     public void Reset()
     {
+        /*
         if (torpedoInstance != null)
         {
             Destroy(torpedoInstance);
@@ -29,6 +32,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
         isTorpedoReady = true;
         torpedoCooldown = 0f;
+        */
 
         for (int i = 0; i < m_Turrets.Length; i++)
         {
@@ -49,6 +53,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         if (!isTorpedoReady)
         {
             torpedoCooldown += Time.deltaTime;
@@ -59,6 +64,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
                 torpedoCooldown = 0f;
             }
         }
+        */
 
         // if (torpedoInstance != null)
         // {
@@ -91,6 +97,11 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     public uint FireMainBattery(Vector2 offset = new Vector2())
     {
+        if (Ammo > 0)
+        {
+            Debug.Log($"[Wizzo] Team={TeamId}/Player={PlayerId} Fire!");
+        }
+
         uint previousAmmo = Ammo;
 
         for (int i = 0; i < m_Turrets.Length; i++)
@@ -109,6 +120,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
         return previousAmmo - Ammo;
     }
 
+    /*
     public void FireTorpedoAt(Vector3 position)
     {
         if (!isTorpedoReady)
@@ -126,6 +138,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
         torpedoInstance = Instantiate(torpedoPrefab, releasePoint, Quaternion.Euler(rotation));
     }
+    */
 
     public class BatterySummary
     {
@@ -157,4 +170,3 @@ public class WeaponSystemsOfficer : MonoBehaviour
         return summary;
     }
 }
-*/

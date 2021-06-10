@@ -32,7 +32,7 @@ namespace NavOps.Grpc
             {
                 Server server = new Server
                 {
-                    Services = { NavOpsGrpcService.BindService(new GrpcServer()) },
+                    Services = { NavOpsGrpcService.BindService(this/*new GrpcServer()*/) },
                     Ports = { new ServerPort("127.0.0.1", grpcPort, ServerCredentials.Insecure) }
                 };
                 server.Start();
@@ -46,8 +46,18 @@ namespace NavOps.Grpc
 
         public override Task<EnvironmentStepResponse> CallEnvironmentStep(EnvironmentStepRequest request, ServerCallContext context)
         {
-            Debug.Log($"[GrpcServer] CallEnvironmentStep(request={request}, context={context})");
+            // 1. OnActionReceived
+            float[][] actions = new float[request.Actions.Count][];
+            for (int i = 0; i < request.Actions.Count; i++)
+            {
+                actions[i] = new float[2];
+                actions[i][0] = request.Actions[i].ManeuverActionId;
+                actions[i][1] = request.Actions[i].AttackActionId;
+            }
 
+            GameManager.SendActions(actions);
+
+            // 2. CollectObservations
             Observation obs = new Observation();
             obs.Fleets.Add(new FleetObservation
             {

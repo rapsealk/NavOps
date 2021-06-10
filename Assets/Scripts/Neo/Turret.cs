@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-/*
 public enum TurretType
 {
     FRONTAL = 0,
@@ -10,7 +9,7 @@ public enum TurretType
     LEFT = 3
 }
 
-public class Turret : MonoBehaviour, IDamagableObject
+public class Turret : MonoBehaviour
 {
     public GameObject ShellPrefab;
     public Transform muzzle;
@@ -41,7 +40,7 @@ public class Turret : MonoBehaviour, IDamagableObject
     public const float k_VerticalMax = 15f;
     public const float k_VerticalMin = -60f;
 
-    private Warship m_Warship;
+    private NavOps.Grpc.Warship m_Warship;
     private TurretType m_TurretType;
     private float m_InitialEulerRotation;
     private Vector2 m_FirePower = new Vector2(12000f, 400f);    // Vector2(9140f, 800f);    // 12000
@@ -89,7 +88,7 @@ public class Turret : MonoBehaviour, IDamagableObject
 
     private void Initialize()
     {
-        m_Warship = GetComponentInParent<Warship>();
+        m_Warship = GetComponentInParent<NavOps.Grpc.Warship>();
 
         m_InitialEulerRotation = (transform.localRotation.eulerAngles.y + 360) % 360;
 
@@ -146,17 +145,22 @@ public class Turret : MonoBehaviour, IDamagableObject
 
     public bool Fire(Vector2 offset = new Vector2())
     {
+        //Debug.Log($"[Turret] Team={TeamId}/Player={PlayerId} Fire!");
+
         if (!Enabled || !isReloaded || isDamaged)
         {
+            //Debug.Log($"[Turret] Team={TeamId}/Player={PlayerId} Fire FAILED!");
             return false;
         }
+
+        //Debug.Log($"[Turret] Team={TeamId}/Player={PlayerId} Fire SUCCEED!");
 
         Vector3 firePosition = muzzle.position + muzzle.forward * 3;
         muzzleFlash.transform.position = firePosition;
         muzzleFlash.Play();
 
         GameObject projectile = Instantiate(ShellPrefab, firePosition, muzzle.rotation);
-        projectile.tag = "Bullet";
+        projectile.tag = "Bullet" + TeamId.ToString();
         projectile.GetComponent<Shell>().Warship = m_Warship;
 
         Vector3 velocity = muzzle.transform.forward * m_FirePower.x + muzzle.transform.up * m_FirePower.y;
@@ -255,23 +259,9 @@ public class Turret : MonoBehaviour, IDamagableObject
 
     private void OnCollisionEnter(Collision collision)
     {
-        //Debug.Log($"Turret({name}/{TeamId}-{PlayerId}).OnCollisionEnter(collision: {collision.collider.name}/{collision.collider.tag})");
-        OnDamageTaken();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        //Debug.Log($"Turret({name}/{TeamId}-{PlayerId}).OnTriggerEnter(other: {other.name}/{other.tag})");
-        OnDamageTaken();
-    }
-
-    public void OnDamageTaken()
-    {
+        Debug.Log($"Turret({name}/{TeamId}-{PlayerId}).OnCollisionEnter(collision: {collision.collider.name}/{collision.collider.tag})");
+        
         isDamaged = true;
         repairTimer = 0f;
-
-        // Debug.Log($"Turret({name}).OnDamageTaken()");
-        m_Warship.OnDamageTaken();
     }
 }
-*/

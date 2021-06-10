@@ -2,10 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dominion : MonoBehaviour
+public class ControlArea : MonoBehaviour
 {
-    // [Range(-1, 1)]
-    public int Dominant { get; private set; } = 0;
+    public enum DominantForce
+    {
+        RED     = -1,
+        NEUTRAL = 0,
+        BLUE    = 1
+    }
+
+    public DominantForce InitialDominant = DominantForce.NEUTRAL;
+    public int Dominant { get; private set; } = (int) DominantForce.NEUTRAL;
+    [HideInInspector]
+    public bool Dominated { get => Dominant != (int) DominantForce.NEUTRAL; }
 
     private SpriteRenderer m_SpriteRenderer;
 
@@ -13,6 +22,8 @@ public class Dominion : MonoBehaviour
     void Start()
     {
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
+
+        Reset();
     }
 
     // Update is called once per frame
@@ -21,16 +32,22 @@ public class Dominion : MonoBehaviour
         
     }
 
+    public void Reset()
+    {
+        Dominant = (int) InitialDominant;
+        SetDominant(Dominant);
+    }
+
     public void SetDominant(int dominantId)
     {
         Dominant = dominantId;
 
         Color spriteColor = Color.gray;
-        if (dominantId == -1)
+        if (dominantId == (int) DominantForce.RED)
         {
             spriteColor = Color.red;
         }
-        else if (dominantId == 1)
+        else if (dominantId == (int) DominantForce.BLUE)
         {
             spriteColor = Color.green;
         }

@@ -1,16 +1,15 @@
 ﻿using UnityEngine;
 
-/*
 public class Shell : MonoBehaviour
 {
     public ParticleSystem TrailParticleSystem;
-    [HideInInspector] public Warship Warship
+    [HideInInspector] public NavOps.Grpc.Warship Warship
     {
         get => _warship;
         set { _warship = value; }
     }
 
-    private Warship _warship;
+    private NavOps.Grpc.Warship _warship;
     private bool m_Hit = false;
 
     // Start is called before the first frame update
@@ -36,7 +35,7 @@ public class Shell : MonoBehaviour
         }
 
         Vector3 position3D = transform.position;
-        Warship target = Warship.Target;
+        NavOps.Grpc.Warship target = Warship.Target;
         if (target != null)
         {
             Vector3 targetPosition3D = Warship.Target.transform.position;
@@ -83,4 +82,3 @@ public class Shell : MonoBehaviour
         Destroy(gameObject);
     }
 }
-*/
