@@ -65,7 +65,17 @@ namespace NavOps.Grpc
                 actions[i][1] = request.Actions[i].AttackActionId;
             }
 
-            GameManager.SendActions(actions);
+            Debug.Log($"[GrpcServer] CallEnvironmentStep #2");
+            try
+            {
+                // TODO: Main Thread (Coroutine)
+                GameManager.SendActions(actions);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[GrpcServer] Exception: {e}");
+            }
+            Debug.Log($"[GrpcServer] CallEnvironmentStep #3");
 
             // 2. CollectObservations
             Observation obs = new Observation();

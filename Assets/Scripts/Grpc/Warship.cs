@@ -215,7 +215,7 @@ namespace NavOps.Grpc
             }
         }
 
-        public float OnActionReceived(float[] actions)
+        public void OnActionReceived(float[] actions)
         {
             Debug.Log($"[Warship] OnActionReceived(actions: {actions})");
 
@@ -224,8 +224,6 @@ namespace NavOps.Grpc
 
             int maneuverActionId = (int) actions[0];
             int attackActionId = (int) actions[1];
-
-            float reward = 0f;
 
             /*
             if (IsDestroyed)
@@ -322,8 +320,6 @@ namespace NavOps.Grpc
 
             m_TaskForce.EnvController.NotifyAgentDestroyed();
             */
-
-            return reward;
         }
 
         public void OnCollisionEnter(Collision collision)

@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
     }
 
     private NavOps.Grpc.GrpcServer m_GrpcServer;
+    private float[] _hpValues;
+    private float[] _opponentHpValues;
     private float _reward;
     private bool _done;
 
@@ -43,6 +45,8 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
+
+        ResetHpValues();
 
         m_GrpcServer = new NavOps.Grpc.GrpcServer
         {
@@ -183,6 +187,23 @@ public class GameManager : MonoBehaviour
         {
             unit.Reset();
         }
+
+        ResetHpValues();
+    }
+
+    private void ResetHpValues()
+    {
+        _hpValues = new float[TaskForceBlue.Units.Length];
+        for (int i = 0; i < _hpValues.Length; i++)
+        {
+            _hpValues[i] = NavOps.Grpc.Warship.k_MaxHealth;
+        }
+
+        _opponentHpValues = new float[TaskForceRed.Units.Length];
+        for (int i = 0; i < _opponentHpValues.Length; i++)
+        {
+            _opponentHpValues[i] = NavOps.Grpc.Warship.k_MaxHealth;
+        }
     }
 
     private void UpdateGUI()
@@ -215,27 +236,53 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < actions.Length; i++)
         {
-            Debug.Log($"[GameManager] SendAction.actions[i]: {actions[i]}");
-            //Debug.Log($"[GameManager] SendAction.actions[i]: {actions.GetRow(i)}");
-            float reward = TaskForceBlue.Units[i].OnActionReceived(actions[i]);
+            TaskForceBlue.Units[i].OnActionReceived(actions[i]);
         }
 
         foreach (var unit in TaskForceRed.Units)
         {
             unit.HeuristicStep();
         }
+        // StartCoroutine(RunHeuristicStepOnMainThread());
 
         RewardShapingFunction();
 
         CheckEpisodeStatus();
     }
 
+    // private IEnumerator RunHeuristicStepOnMainThread()
+    // {
+    //     yield return null;
+
+    //     foreach (var unit in TaskForceRed.Units)
+    //     {
+    //         unit.HeuristicStep();
+    //     }
+    // }
+
     private void RewardShapingFunction()
     {
+        // Combat Score
+        float hpDiff = 0f;
+        for (int i = 0; i < TaskForceBlue.Units.Length; i++)
+        {
+            float newHp = TaskForceBlue.Units[i].CurrentHealth;
+            hpDiff -= _hpValues[i] - newHp;
+            _hpValues[i] = newHp;
+        }
+        for (int i = 0; i < TaskForceRed.Units.Length; i++)
+        {
+            float newHp = TaskForceRed.Units[i].CurrentHealth;
+            hpDiff += _opponentHpValues[i] - newHp;
+            _opponentHpValues[i] = newHp;
+        }
+        AddReward(hpDiff * 0.1f);
+
+        // Dominant Score
         int dominationFactor = ControlAreas.Where(area => area.Dominant == (int) ControlArea.DominantForce.BLUE).ToArray().Length
                              - ControlAreas.Where(area => area.Dominant == (int) ControlArea.DominantForce.RED).ToArray().Length;
 
-        AddReward(0.1f * dominationFactor);
+        AddReward(0.01f * dominationFactor);
     }
 
     private void CheckControlAreaStatus()
