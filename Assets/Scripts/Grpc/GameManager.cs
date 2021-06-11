@@ -13,15 +13,30 @@ public class GameManager : MonoBehaviour
     public Slider[] TaskForceRedHpSliders;
     // public Text[] TaskForceBlueTargetIndicators;
     // public Text[] TaskForceRedTargetIndicators;
+    public float Reward {
+        get {
+            float value = _reward;
+            SetReward(0f);
+            return value;
+        }
+    }
     public bool EpisodeDone {
         get {
             bool value = _done;
             _done = false;
             return value;
         }
+        private set {
+            if (value)
+            {
+                Reset();
+            }
+            _done = value;
+        }
     }
 
     private NavOps.Grpc.GrpcServer m_GrpcServer;
+    private float _reward;
     private bool _done;
 
     // Start is called before the first frame update
@@ -128,8 +143,6 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-
-        CheckEpisodeStatus();
     }
 
     void Setup()
@@ -211,6 +224,18 @@ public class GameManager : MonoBehaviour
         {
             unit.HeuristicStep();
         }
+
+        RewardShapingFunction();
+
+        CheckEpisodeStatus();
+    }
+
+    private void RewardShapingFunction()
+    {
+        int dominationFactor = ControlAreas.Where(area => area.Dominant == (int) ControlArea.DominantForce.BLUE).ToArray().Length
+                             - ControlAreas.Where(area => area.Dominant == (int) ControlArea.DominantForce.RED).ToArray().Length;
+
+        AddReward(0.1f * dominationFactor);
     }
 
     private void CheckControlAreaStatus()
@@ -261,15 +286,24 @@ public class GameManager : MonoBehaviour
         // ----------------------------------------------------
         bool blueTerminated = TaskForceBlue.Units.All(unit => unit.IsDestroyed);
         bool redTerminated = TaskForceRed.Units.All(unit => unit.IsDestroyed);
-        /*
-        if (blueTerminated && redTerminated)
-        {}
-        */
-        if (blueTerminated || redTerminated)
-        {
-            Debug.Log($"[GameManager] Blue Terminated: {blueTerminated} / Red Terminated: {redTerminated}");
 
-            _done = true;
+        if (blueTerminated)
+        {
+            Debug.Log($"[GameManager] Blue Terminated: {blueTerminated}!");
+
+            EpisodeDone = true;
+            SetReward(-1.0f);
+
+            Reset();
+
+            return;
+        }
+        else if (redTerminated)
+        {
+            Debug.Log($"[GameManager] Red Terminated: {redTerminated}!");
+
+            EpisodeDone = true;
+            SetReward(1.0f);
 
             Reset();
 
@@ -280,18 +314,31 @@ public class GameManager : MonoBehaviour
         // Control Area
         //
         bool blueDominated = ControlAreas.All(area => area.Dominant == (int) ControlArea.DominantForce.BLUE);
-        bool redDominated = ControlAreas.All(area => area.Dominant == (int) ControlArea.DominantForce.RED);
         if (blueDominated)
         {
             Debug.Log($"[GameManager] Blue Dominated!");
-            _done = true;
+            EpisodeDone = true;
+            SetReward(1.0f);
             Reset();
         }
-        else if (redDominated)
+
+        bool redDominated = ControlAreas.All(area => area.Dominant == (int) ControlArea.DominantForce.RED);
+        if (redDominated)
         {
             Debug.Log($"[GameManager] Red Dominated!");
-            _done = true;
+            EpisodeDone = true;
+            SetReward(-1.0f);
             Reset();
         }
+    }
+
+    private void SetReward(float reward)
+    {
+        _reward = reward;
+    }
+
+    private void AddReward(float reward)
+    {
+        _reward += reward;
     }
 }

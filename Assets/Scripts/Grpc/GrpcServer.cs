@@ -118,7 +118,7 @@ namespace NavOps.Grpc
             EnvironmentStepResponse response = new EnvironmentStepResponse
             {
                 Obs = obs,
-                Reward = 0f,
+                Reward = GameManager.Reward,
                 Done = GameManager.EpisodeDone
             };
 
