@@ -29,11 +29,14 @@ public class GameManager : MonoBehaviour
         private set {
             if (value)
             {
-                Reset();
+                m_EpisodeQueue.Enqueue(true);
             }
             _done = value;
         }
     }
+
+    Queue<bool> m_EpisodeQueue = new Queue<bool>();
+    Queue<bool> m_StepQueue = new Queue<bool>();
 
     private NavOps.Grpc.GrpcServer m_GrpcServer;
     private float[] _hpValues;
@@ -60,6 +63,13 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (m_EpisodeQueue.Count > 0)
+        {
+            bool _ = m_EpisodeQueue.Dequeue();
+            Reset();
+            return;
+        }
+
         UpdateGUI();
 
         CheckControlAreaStatus();
@@ -145,6 +155,15 @@ public class GameManager : MonoBehaviour
                     taskForceBlueWarship.Target = taskForceRedWarship;
                     taskForceRedWarship.Target = taskForceBlueWarship;
                 }
+            }
+        }
+
+        if (m_StepQueue.Count > 0)
+        {
+            bool _ = m_StepQueue.Dequeue();
+            foreach (var unit in TaskForceRed.Units)
+            {
+                unit.HeuristicStep();
             }
         }
     }
@@ -239,26 +258,12 @@ public class GameManager : MonoBehaviour
             TaskForceBlue.Units[i].OnActionReceived(actions[i]);
         }
 
-        foreach (var unit in TaskForceRed.Units)
-        {
-            unit.HeuristicStep();
-        }
-        // StartCoroutine(RunHeuristicStepOnMainThread());
+        m_StepQueue.Enqueue(true);
 
         RewardShapingFunction();
 
         CheckEpisodeStatus();
     }
-
-    // private IEnumerator RunHeuristicStepOnMainThread()
-    // {
-    //     yield return null;
-
-    //     foreach (var unit in TaskForceRed.Units)
-    //     {
-    //         unit.HeuristicStep();
-    //     }
-    // }
 
     private void RewardShapingFunction()
     {
@@ -341,8 +346,6 @@ public class GameManager : MonoBehaviour
             EpisodeDone = true;
             SetReward(-1.0f);
 
-            Reset();
-
             return;
         }
         else if (redTerminated)
@@ -351,8 +354,6 @@ public class GameManager : MonoBehaviour
 
             EpisodeDone = true;
             SetReward(1.0f);
-
-            Reset();
 
             return;
         }
@@ -366,7 +367,6 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[GameManager] Blue Dominated!");
             EpisodeDone = true;
             SetReward(1.0f);
-            Reset();
         }
 
         bool redDominated = ControlAreas.All(area => area.Dominant == (int) ControlArea.DominantForce.RED);
@@ -375,7 +375,6 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[GameManager] Red Dominated!");
             EpisodeDone = true;
             SetReward(-1.0f);
-            Reset();
         }
     }
 
