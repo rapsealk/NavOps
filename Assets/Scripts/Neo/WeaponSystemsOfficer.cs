@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class WeaponSystemsOfficer : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
     [HideInInspector] public Turret[] Turrets;
 
     private uint _ammo;
+    private Queue<bool> _fireCommandQueue = new Queue<bool>();
 
     public void Reset()
     {
@@ -40,6 +42,8 @@ public class WeaponSystemsOfficer : MonoBehaviour
         }
 
         Ammo = maxAmmo;
+
+        _fireCommandQueue.Clear();
     }
 
     // Start is called before the first frame update
@@ -53,6 +57,12 @@ public class WeaponSystemsOfficer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_fireCommandQueue.Count > 0)
+        {
+            bool _ = _fireCommandQueue.Dequeue();
+
+            FireMainBattery();
+        }
         /*
         if (!isTorpedoReady)
         {
@@ -91,6 +101,11 @@ public class WeaponSystemsOfficer : MonoBehaviour
         {
             Turrets[i].Rotate(target);
         }
+    }
+
+    public void SendFireCommand()
+    {
+        _fireCommandQueue.Enqueue(true);
     }
 
     private Vector2 mainBatteryOffset = Vector2.zero;

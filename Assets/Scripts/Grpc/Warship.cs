@@ -260,7 +260,8 @@ namespace NavOps.Grpc
                 case (int) Engine.AttackCommandId.IDLE:
                     break;
                 case (int) Engine.AttackCommandId.FIRE:
-                    //uint usedAmmos = weaponSystemsOfficer.FireMainBattery();
+                    Wizzo.SendFireCommand();
+                    //uint usedAmmos = Wizzo.FireMainBattery();
                     //AddReward(-usedAmmos / 10000f);
                     break;
             }
