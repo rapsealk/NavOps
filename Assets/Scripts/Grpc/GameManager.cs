@@ -77,35 +77,6 @@ public class GameManager : MonoBehaviour
 
         CheckControlAreaStatus();
 
-        // Update Target Location
-        /*
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            ControlArea[] notDominatedAreasb = ControlAreas.Where(area => area.Dominant != (int) ControlArea.DominantForce.BLUE).ToArray();
-            if (notDominatedAreasb.Length > 0)
-            {
-                foreach (var unit in TaskForceBlue.Units)
-                {
-                    unit.TargetControlArea = null;
-
-                    // Debug.Log($"[GameManager] Blue.notDominatedAreas: {string.Join("/", notDominatedAreasb.Select(area => area.name).ToArray())}");
-                    float distance = Mathf.Infinity;
-                    ControlArea targetControlArea = notDominatedAreasb[0];
-                    foreach (var area in notDominatedAreasb)
-                    {
-                        float newDistance = Vector3.Distance(unit.transform.position, area.transform.position);
-                        if (newDistance < distance)
-                        {
-                            distance = newDistance;
-                            targetControlArea = area;
-                        }
-                    }
-                    unit.TargetControlArea = targetControlArea;
-                }
-            }
-        }
-        */
-
         ControlArea[] notDominatedAreas = ControlAreas.Where(area => area.Dominant != (int) ControlArea.DominantForce.RED).ToArray();
         if (notDominatedAreas.Length > 0)
         {
@@ -293,6 +264,10 @@ public class GameManager : MonoBehaviour
                 Timestamp = unit.Timestamp
             });
         }
+        foreach (var area in ControlAreas)
+        {
+            observation.Dominance.Add(area.Dominant);
+        }
         observation.TargetIndexOnehot.Add(1.0f);
         observation.RaycastHits.Add(blueUnit.RaycastHitDistances);
         foreach (var turret in blueUnit.Wizzo.Turrets)
@@ -347,6 +322,11 @@ public class GameManager : MonoBehaviour
                              - ControlAreas.Where(area => area.Dominant == (int) ControlArea.DominantForce.RED).ToArray().Length;
 
         AddReward(0.01f * dominationFactor);
+
+        Vector3 position = TaskForceBlue.Units[0].Position;
+        float distanceReward = -Mathf.Pow(position.magnitude, 2f) / 100_000_000f;
+        Debug.Log($"[GameManager] position={position} (reward={distanceReward})");
+        AddReward(distanceReward);
     }
 
     private void CheckControlAreaStatus()

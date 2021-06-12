@@ -72,13 +72,6 @@ public class Engine : MonoBehaviour
     void Update()
     {
         /*
-        if (SpeedLevel != 0)
-        {
-            Fuel -= 1.0f;
-        }
-        */
-
-        /*
         if (Fuel > 0)
         {
             float horsePower = m_HorsePower * ((SpeedLevel > 0) ? 1f : 0.5f);
@@ -90,6 +83,11 @@ public class Engine : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (SpeedLevel != 0)
+        {
+            Fuel -= 1.0f;
+        }
+
         // Fuel -= HorsePower / 20f;
         if (Fuel > 0)
         {
