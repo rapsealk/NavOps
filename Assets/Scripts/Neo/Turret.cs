@@ -16,20 +16,20 @@ public class Turret : MonoBehaviour
     public ParticleSystem muzzleFlash;
     [HideInInspector] public int PlayerId;
     [HideInInspector] public int TeamId;
-    [HideInInspector] public const float m_Traverse = 120f;
-    [HideInInspector] public const float m_SideTraverse = 60f;
-    [HideInInspector] public const float m_TraverseSpeed = 15f;
-    [HideInInspector] public const float m_ReloadTime = 6f; // 6
-    [HideInInspector] public const float m_RepairTime = 30f;
-    [HideInInspector] public float cooldownTimer = 0f;
-    [HideInInspector] public bool isReloaded = true;
-    [HideInInspector] public float repairTimer = 0f;
-    [HideInInspector] public bool isDamaged {
-        get => _isDamaged;
+    [HideInInspector] public const float k_Traverse = 120f;
+    [HideInInspector] public const float k_SideTraverse = 60f;
+    [HideInInspector] public const float k_TraverseSpeed = 15f;
+    [HideInInspector] public const float k_ReloadTime = 6f; // 6
+    [HideInInspector] public const float k_RepairTime = 30f;
+    [HideInInspector] public float CooldownTimer = 0f;
+    [HideInInspector] public bool Reloaded = true;
+    [HideInInspector] public float RepairTimer = 0f;
+    [HideInInspector] public bool Damaged {
+        get => _damaged;
         private set
         {
             m_MeshRenderer.material.color = value ? Color.cyan : m_MeshRendererColor;
-            _isDamaged = value;
+            _damaged = value;
         }
     }
     [HideInInspector] public bool Enabled {
@@ -39,6 +39,7 @@ public class Turret : MonoBehaviour
     public const float AttackRange = 300f;  // 9240
     public const float k_VerticalMax = 15f;
     public const float k_VerticalMin = -60f;
+    [HideInInspector] public Quaternion Rotation;
 
     private NavOps.Grpc.Warship m_Warship;
     private TurretType m_TurretType;
@@ -49,7 +50,7 @@ public class Turret : MonoBehaviour
     private bool m_Initialized = false;
     private MeshRenderer m_MeshRenderer;
     private Color m_MeshRendererColor;
-    private bool _isDamaged = false;
+    private bool _damaged = false;
     private bool _enabled = false;
 
     public void Reset()
@@ -61,10 +62,10 @@ public class Turret : MonoBehaviour
             Initialize();
         }
 
-        cooldownTimer = 0f;
-        isReloaded = true;
-        repairTimer = 0f;
-        isDamaged = false;
+        CooldownTimer = 0f;
+        Reloaded = true;
+        RepairTimer = 0f;
+        Damaged = false;
 
         Vector3 localRotation = transform.localRotation.eulerAngles;
         if (m_TurretType == TurretType.FRONTAL)
@@ -122,23 +123,25 @@ public class Turret : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isDamaged)
-        {
-            repairTimer += Time.deltaTime;
+        Rotation = transform.rotation;
 
-            if (repairTimer >= m_RepairTime)
+        if (Damaged)
+        {
+            RepairTimer += Time.deltaTime;
+
+            if (RepairTimer >= k_RepairTime)
             {
-                isDamaged = false;
+                Damaged = false;
                 m_MeshRenderer.material.color = m_MeshRendererColor;
             }
         }
-        else if (!isReloaded)
+        else if (!Reloaded)
         {
-            cooldownTimer += Time.deltaTime;
+            CooldownTimer += Time.deltaTime;
 
-            if (cooldownTimer >= m_ReloadTime)
+            if (CooldownTimer >= k_ReloadTime)
             {
-                isReloaded = true;
+                Reloaded = true;
             }
         }
     }
@@ -147,7 +150,7 @@ public class Turret : MonoBehaviour
     {
         //Debug.Log($"[Turret] Team={TeamId}/Player={PlayerId} Fire!");
 
-        if (!Enabled || !isReloaded || isDamaged)
+        if (!Enabled || !Reloaded || Damaged)
         {
             //Debug.Log($"[Turret] Team={TeamId}/Player={PlayerId} Fire FAILED!");
             return false;
@@ -167,8 +170,8 @@ public class Turret : MonoBehaviour
         Rigidbody rigidbody = projectile.GetComponent<Rigidbody>();
         rigidbody.velocity = velocity / rigidbody.mass;
 
-        isReloaded = false;
-        cooldownTimer = 0f;
+        Reloaded = false;
+        CooldownTimer = 0f;
 
         StartCoroutine(StopMuzzleFlashAnimation());
 
@@ -206,7 +209,7 @@ public class Turret : MonoBehaviour
         rotation.x = x; // 0f
         rotation.y = (rotation.y + 360) % 360;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(rotation), m_TraverseSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(rotation), k_TraverseSpeed * Time.deltaTime);
 
         ///
         /// Post-processing (FIXME)
@@ -217,38 +220,38 @@ public class Turret : MonoBehaviour
         switch (m_TurretType)
         {
             case TurretType.FRONTAL:
-                if (Mathf.Abs(localRotation.y) >= m_Traverse + Mathf.Epsilon)
+                if (Mathf.Abs(localRotation.y) >= k_Traverse + Mathf.Epsilon)
                 {
-                    localRotation.y = Mathf.Sign(localRotation.y) * m_Traverse;
+                    localRotation.y = Mathf.Sign(localRotation.y) * k_Traverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
-                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), k_TraverseSpeed * Time.deltaTime);
                     enableTurret = false;
                 }
                 break;
             case TurretType.REAR:
-                if (Mathf.Abs(localRotation.y) <= 180f - (m_Traverse + Mathf.Epsilon))
+                if (Mathf.Abs(localRotation.y) <= 180f - (k_Traverse + Mathf.Epsilon))
                 {
-                    localRotation.y = 180f - Mathf.Sign(localRotation.y) * m_Traverse;
+                    localRotation.y = 180f - Mathf.Sign(localRotation.y) * k_Traverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
-                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), k_TraverseSpeed * Time.deltaTime);
                     enableTurret = false;
                 }
                 break;
             case TurretType.LEFT:
-                if (Mathf.Abs(localRotation.y + 90f) >= m_SideTraverse + Mathf.Epsilon)
+                if (Mathf.Abs(localRotation.y + 90f) >= k_SideTraverse + Mathf.Epsilon)
                 {
-                    localRotation.y = -90f + Mathf.Sign(localRotation.y + 90f) * m_SideTraverse;
+                    localRotation.y = -90f + Mathf.Sign(localRotation.y + 90f) * k_SideTraverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
-                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), k_TraverseSpeed * Time.deltaTime);
                     enableTurret = false;
                 }
                 break;
             case TurretType.RIGHT:
-                if (Mathf.Abs(localRotation.y - 90f) >= m_SideTraverse + Mathf.Epsilon)
+                if (Mathf.Abs(localRotation.y - 90f) >= k_SideTraverse + Mathf.Epsilon)
                 {
-                    localRotation.y = 90f + Mathf.Sign(localRotation.y - 90f) * m_SideTraverse;
+                    localRotation.y = 90f + Mathf.Sign(localRotation.y - 90f) * k_SideTraverse;
                     //transform.localRotation = Quaternion.Euler(localRotation);
-                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), m_TraverseSpeed * Time.deltaTime);
+                    transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(localRotation), k_TraverseSpeed * Time.deltaTime);
                     enableTurret = false;
                 }
                 break;
@@ -261,7 +264,7 @@ public class Turret : MonoBehaviour
     {
         Debug.Log($"Turret({name}/{TeamId}-{PlayerId}).OnCollisionEnter(collision: {collision.collider.name}/{collision.collider.tag})");
         
-        isDamaged = true;
-        repairTimer = 0f;
+        Damaged = true;
+        RepairTimer = 0f;
     }
 }

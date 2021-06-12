@@ -17,8 +17,8 @@ public class WeaponSystemsOfficer : MonoBehaviour
         get => _ammo;
         private set { _ammo = value; }
     }
+    [HideInInspector] public Turret[] Turrets;
 
-    private Turret[] m_Turrets;
     private uint _ammo;
 
     public void Reset()
@@ -34,9 +34,9 @@ public class WeaponSystemsOfficer : MonoBehaviour
         torpedoCooldown = 0f;
         */
 
-        for (int i = 0; i < m_Turrets.Length; i++)
+        for (int i = 0; i < Turrets.Length; i++)
         {
-            m_Turrets[i].Reset();
+            Turrets[i].Reset();
         }
 
         Ammo = maxAmmo;
@@ -45,7 +45,7 @@ public class WeaponSystemsOfficer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_Turrets = GetComponentsInChildren<Turret>();
+        Turrets = GetComponentsInChildren<Turret>();
 
         Reset();
     }
@@ -77,19 +77,19 @@ public class WeaponSystemsOfficer : MonoBehaviour
         TeamId = teamId;
         PlayerId = playerId;
 
-        m_Turrets = GetComponentsInChildren<Turret>();
-        for (int i = 0; i < m_Turrets.Length; i++)
+        Turrets = GetComponentsInChildren<Turret>();
+        for (int i = 0; i < Turrets.Length; i++)
         {
-            m_Turrets[i].PlayerId = PlayerId;
-            m_Turrets[i].TeamId = TeamId;
+            Turrets[i].PlayerId = PlayerId;
+            Turrets[i].TeamId = TeamId;
         }
     }
 
     public void Aim(Quaternion target)
     {
-        for (int i = 0; i < m_Turrets.Length; i++)
+        for (int i = 0; i < Turrets.Length; i++)
         {
-            m_Turrets[i].Rotate(target);
+            Turrets[i].Rotate(target);
         }
     }
 
@@ -104,14 +104,14 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
         uint previousAmmo = Ammo;
 
-        for (int i = 0; i < m_Turrets.Length; i++)
+        for (int i = 0; i < Turrets.Length; i++)
         {
             if (Ammo == 0)
             {
                 return 0;
             }
 
-            if (m_Turrets[i].Fire(offset))
+            if (Turrets[i].Fire(offset))
             {
                 Ammo -= 1;
             }
@@ -152,20 +152,20 @@ public class WeaponSystemsOfficer : MonoBehaviour
         {
             Vector3 batteryRotation = battery.transform.rotation.eulerAngles;
             rotation = new Vector2(batteryRotation.x, batteryRotation.y);
-            isReloaded = battery.isReloaded;
-            cooldown = Mathf.Min(battery.cooldownTimer / Turret.m_ReloadTime, 1.0f);
-            isDamaged = battery.isDamaged;
-            repairProgress = battery.repairTimer / Turret.m_RepairTime;
+            isReloaded = battery.Reloaded;
+            cooldown = Mathf.Min(battery.CooldownTimer / Turret.k_ReloadTime, 1.0f);
+            isDamaged = battery.Damaged;
+            repairProgress = battery.RepairTimer / Turret.k_RepairTime;
         }
     }
 
     public BatterySummary[] Summary()
     {
-        BatterySummary[] summary = new BatterySummary[m_Turrets.Length];
-        for (int i = 0; i < m_Turrets.Length; i++)
+        BatterySummary[] summary = new BatterySummary[Turrets.Length];
+        for (int i = 0; i < Turrets.Length; i++)
         {
             summary[i] = new BatterySummary();
-            summary[i].Copy(m_Turrets[i]);
+            summary[i].Copy(Turrets[i]);
         }
         return summary;
     }

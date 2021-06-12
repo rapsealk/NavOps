@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public Transform BattleField;
+    [HideInInspector]
+    public Vector3 BattleFieldLocalScale;
     public NavOps.TaskForce TaskForceBlue;
     public NavOps.TaskForce TaskForceRed;
     public ControlArea[] ControlAreas;
@@ -57,7 +60,7 @@ public class GameManager : MonoBehaviour
         };
         m_GrpcServer.StartGrpcServer(grpcPort: 9090);
 
-        //Setup();
+        BattleFieldLocalScale = BattleField.localScale;
     }
 
     // Update is called once per frame
@@ -168,31 +171,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void Setup()
-    {
-        // for (int i = 0; i < TaskForceBlueHpSliders.Length; i++)
-        // {
-        //     TaskForceBlueHpSliders[i].gameObject.SetActive(false);
-        //     TaskForceBlueTargetIndicators[i].gameObject.SetActive(false);
-        // }
-        // for (int i = 0; i < TaskForceBlue.Units.Length; i++)
-        // {
-        //     TaskForceBlueHpSliders[i].gameObject.SetActive(true);
-        //     TaskForceBlueTargetIndicators[i].gameObject.SetActive(true);
-        // }
-
-        // for (int i = 0; i < TaskForceRedHpSliders.Length; i++)
-        // {
-        //     TaskForceRedHpSliders[i].gameObject.SetActive(false);
-        //     TaskForceRedTargetIndicators[i].gameObject.SetActive(false);
-        // }
-        // for (int i = 0; i < TaskForceRed.Units.Length; i++)
-        // {
-        //     TaskForceRedHpSliders[i].gameObject.SetActive(true);
-        //     TaskForceRedTargetIndicators[i].gameObject.SetActive(true);
-        // }
-    }
-
     private void Reset()
     {
         Debug.Log($"[GameManager] Reset!");
@@ -249,7 +227,7 @@ public class GameManager : MonoBehaviour
         // }
     }
 
-    public void SendActions(float[][] actions)
+    public NavOps.Grpc.Observation SendActions(float[][] actions)
     {
         Debug.Log($"[GameManager] SendActions: {actions}");
 
@@ -263,6 +241,87 @@ public class GameManager : MonoBehaviour
         RewardShapingFunction();
 
         CheckEpisodeStatus();
+
+        return CollectObservations();
+    }
+
+    private NavOps.Grpc.Observation CollectObservations()
+    {
+        NavOps.Grpc.Observation observation = new NavOps.Grpc.Observation();
+        NavOps.Grpc.Warship blueUnit = TaskForceBlue.Units[0];
+        Vector3 bluePosition = blueUnit.Position;
+        float blueRadian = blueUnit.Rotation.eulerAngles.y % 360 * Mathf.Deg2Rad;
+        observation.Fleets.Add(new NavOps.Grpc.FleetObservation
+        {
+            TeamId      = (uint) 0,
+            Hp          = blueUnit.CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth,
+            Fuel        = blueUnit.Engine.Fuel / Engine.maxFuel,
+            Destroyed   = blueUnit.IsDestroyed,
+            Position    = new NavOps.Grpc.Position
+            {
+                X = bluePosition.x / BattleFieldLocalScale.x,
+                Y = bluePosition.z / BattleFieldLocalScale.z
+            },
+            Rotation    = new NavOps.Grpc.Rotation
+            {
+                Cos = Mathf.Cos(blueRadian),
+                Sin = Mathf.Sin(blueRadian)
+            },
+            Timestamp   = (uint) 0
+        });
+        foreach (var unit in TaskForceBlue.Units.Concat(TaskForceRed.Units))
+        {
+            Vector3 position = unit.Position;
+            float radian = unit.Rotation.eulerAngles.y % 360 * Mathf.Deg2Rad;
+            unit.Timestamp = (unit.IsDetected) ? 0 : unit.Timestamp + 1;
+            observation.Fleets.Add(new NavOps.Grpc.FleetObservation
+            {
+                TeamId      = (uint) unit.TeamId,
+                Hp          = unit.CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth,
+                Fuel        = unit.Engine.Fuel / Engine.maxFuel,
+                Destroyed   = unit.IsDestroyed,
+                Position    = new NavOps.Grpc.Position
+                {
+                    X = position.x / BattleFieldLocalScale.x,
+                    Y = position.z / BattleFieldLocalScale.z,
+                },
+                Rotation    = new NavOps.Grpc.Rotation
+                {
+                    Cos = Mathf.Cos(radian),
+                    Sin = Mathf.Sin(radian)
+                },
+                Timestamp = unit.Timestamp
+            });
+        }
+        observation.TargetIndexOnehot.Add(1.0f);
+        observation.RaycastHits.Add(blueUnit.RaycastHitDistances);
+        foreach (var turret in blueUnit.Wizzo.Turrets)
+        {
+            float radian = turret.Rotation.eulerAngles.y % 360 * Mathf.Deg2Rad;
+            observation.Batteries.Add(new NavOps.Grpc.Battery
+            {
+                Rotation        = new NavOps.Grpc.Rotation
+                {
+                    Cos = Mathf.Cos(radian),
+                    Sin = Mathf.Sin(radian)
+                },
+                Reloaded        = turret.Reloaded,
+                Cooldown        = turret.CooldownTimer / Turret.k_ReloadTime,
+                Damaged         = turret.Damaged,
+                RepairProgress  = turret.RepairTimer / Turret.k_RepairTime
+            });
+        }
+        observation.Ammo = blueUnit.Wizzo.Ammo / (float) WeaponSystemsOfficer.maxAmmo;
+
+        float[] speedLevelOnehot = new float[Engine.MaxSpeedLevel - Engine.MinSpeedLevel + 1];
+        speedLevelOnehot[blueUnit.Engine.SpeedLevel - Engine.MinSpeedLevel] = 1.0f;
+        observation.SpeedLevelOnehot.Add(speedLevelOnehot);
+
+        float[] steerLevelOnehot = new float[Engine.MaxSteerLevel - Engine.MinSteerLevel + 1];
+        steerLevelOnehot[blueUnit.Engine.SteerLevel - Engine.MinSteerLevel] = 1.0f;
+        observation.SteerLevelOnehot.Add(steerLevelOnehot);
+
+        return observation;
     }
 
     private void RewardShapingFunction()

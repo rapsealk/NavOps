@@ -22,6 +22,10 @@ namespace NavOps.Grpc
         public const float k_MaxHealth = 10f;
 
         [HideInInspector]
+        public Vector3 Position;
+        [HideInInspector]
+        public Quaternion Rotation;
+        [HideInInspector]
         public Engine Engine { get; private set; }
         [HideInInspector]
         public WeaponSystemsOfficer Wizzo { get; private set; }
@@ -46,11 +50,13 @@ namespace NavOps.Grpc
         public ControlArea TargetControlArea;
         [HideInInspector]
         public State CurrentState;
-
-        float[] m_RaycastHitDistances;
+        [HideInInspector]
+        public uint Timestamp;
+        public float[] RaycastHitDistances { get => _raycastHitDistances; }
 
         private float _currentHealth = k_MaxHealth;
         private bool _isDetected = false;
+        private float[] _raycastHitDistances;
 
         public void Initialize()
         {
@@ -65,7 +71,7 @@ namespace NavOps.Grpc
                 meshRenderers[i].material.color = RendererColor;
             }
 
-            m_RaycastHitDistances = new float[8];
+            _raycastHitDistances = new float[8];
         }
 
         public void Reset()
@@ -85,13 +91,14 @@ namespace NavOps.Grpc
             Target = null;
 
             IsDetected = false;
+            Timestamp = 0;
 
             Wizzo.Reset();
             Engine.Reset();
 
-            for (int i = 0; i < m_RaycastHitDistances.Length; i++)
+            for (int i = 0; i < _raycastHitDistances.Length; i++)
             {
-                m_RaycastHitDistances[i] = 1.0f;
+                _raycastHitDistances[i] = 1.0f;
             }
         }
 
@@ -106,12 +113,8 @@ namespace NavOps.Grpc
         // Update is called once per frame
         void Update()
         {
-            /*
-            if (Application.platform == RuntimePlatform.WindowsEditor)
-            {
-                HeuristicStep();
-            }
-            */
+            Position = transform.position;
+            Rotation = transform.rotation;
         }
 
         void FixedUpdate()
@@ -175,7 +178,7 @@ namespace NavOps.Grpc
             Vector3 forceRepulsive = Vector3.zero;
             for (int i = 0; i < 8; i++)
             {
-                m_RaycastHitDistances[i] = 1.0f;
+                _raycastHitDistances[i] = 1.0f;
 
                 float rad = (45f * i + transform.rotation.eulerAngles.y) * Mathf.Deg2Rad;
                 Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
@@ -190,7 +193,7 @@ namespace NavOps.Grpc
                         forceRepulsive += (position - hit.point) * Mathf.Pow(800f / (position - hit.point).magnitude, 2f);
                     }
 
-                    m_RaycastHitDistances[i] = hit.distance / (BattleField.localScale.x * 2);
+                    _raycastHitDistances[i] = hit.distance / (BattleField.localScale.x * 2);
                 }
             }
 

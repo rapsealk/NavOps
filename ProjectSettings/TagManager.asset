@@ -12,8 +12,9 @@ TagManager:
   - Citadel
   - Fire
   - ControlArea
+  - Bullet
+  - Bullet0
   - Bullet1
-  - Bullet2
   layers:
   - Default
   - TransparentFX

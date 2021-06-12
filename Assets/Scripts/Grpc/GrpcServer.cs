@@ -66,10 +66,11 @@ namespace NavOps.Grpc
             }
 
             Debug.Log($"[GrpcServer] CallEnvironmentStep #2");
+            NavOps.Grpc.Observation observation = new Observation();
             try
             {
                 // TODO: Main Thread (Coroutine)
-                GameManager.SendActions(actions);
+                observation = GameManager.SendActions(actions);
             }
             catch (System.Exception e)
             {
@@ -77,57 +78,9 @@ namespace NavOps.Grpc
             }
             Debug.Log($"[GrpcServer] CallEnvironmentStep #3");
 
-            // 2. CollectObservations
-            Observation obs = new Observation();
-            obs.Fleets.Add(new FleetObservation
-            {
-                TeamId = 1,
-                Hp = 1.0f,
-                Fuel = 1.0f,
-                Destroyed = false,
-                Detected = false,
-                Position = new Position
-                {
-                    X = 1.0f,
-                    Y = 1.0f,
-                },
-                Rotation = new Rotation
-                {
-                    Cos = Mathf.Cos(0f * Mathf.Deg2Rad),
-                    Sin = Mathf.Sin(0f * Mathf.Deg2Rad)
-                }
-            });
-            obs.Fleets.Add(new FleetObservation
-            {
-                TeamId = 2,
-                Hp = 1.0f,
-                Fuel = 1.0f,
-                Destroyed = false,
-                Detected = false,
-                Position = new Position
-                {
-                    X = -1.0f,
-                    Y = -1.0f,
-                },
-                Rotation = new Rotation
-                {
-                    Cos = Mathf.Cos(180f * Mathf.Deg2Rad),
-                    Sin = Mathf.Sin(180f * Mathf.Deg2Rad)
-                }
-            });
-            obs.TargetIndexOnehot.Add(1.0f);
-            /*
-            repeated float raycast_hits = 3;
-            repeated Battery batteries = 4;
-            AimingPoint aiming_point = 5;
-            float ammo = 6;
-            repeated float speed_level_onehot = 7;
-            repeated float steer_level_onehot = 8;
-            */
-
             EnvironmentStepResponse response = new EnvironmentStepResponse
             {
-                Obs = obs,
+                Obs = observation,
                 Reward = GameManager.Reward,
                 Done = GameManager.EpisodeDone
             };

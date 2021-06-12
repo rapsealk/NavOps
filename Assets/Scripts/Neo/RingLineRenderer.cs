@@ -18,7 +18,7 @@ public class RingLineRenderer : MonoBehaviour
         m_LineRenderer = GetComponent<LineRenderer>();
         
         m_LineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-        Color teamColor = (TeamId == 1) ? Color.green : Color.red;
+        Color teamColor = (TeamId == 0) ? Color.green : Color.red;
         m_LineRenderer.sharedMaterial.SetColor("_Color", teamColor);
 
         // m_LineRenderer.useWorldSpace = false;

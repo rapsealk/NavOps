@@ -5005,7 +5005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerId: 4
-  TeamId: 2
+  TeamId: 1
   BattleField: {fileID: 727483154}
   StartingPoint: {fileID: 1814234115}
   RendererColor: {r: 1, g: 0, b: 0, a: 0}
@@ -9339,6 +9339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e03812ff34aaa9d4abbee53ffb25e6c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BattleField: {fileID: 727483154}
   TaskForceBlue: {fileID: 1360265614}
   TaskForceRed: {fileID: 1001541177}
   ControlAreas:
@@ -14255,7 +14256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerId: 1
-  TeamId: 1
+  TeamId: 0
   BattleField: {fileID: 727483154}
   StartingPoint: {fileID: 891656772}
   RendererColor: {r: 0.1254902, g: 0.2509804, b: 1, a: 0}
