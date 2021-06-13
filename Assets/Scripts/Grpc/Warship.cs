@@ -174,6 +174,7 @@ namespace NavOps.Grpc
             Vector3 nextReachDirection = nextReachPosition - position;
 
             // Raycast Detection
+            float obstacleSafetyDistance = 32.0f;
             RaycastHit hit;
             Vector3 forceRepulsive = Vector3.zero;
             for (int i = 0; i < 8; i++)
@@ -182,6 +183,8 @@ namespace NavOps.Grpc
 
                 float rad = (45f * i + transform.rotation.eulerAngles.y) * Mathf.Deg2Rad;
                 Vector3 dir = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
+                if (i == 0)
+                    Debug.DrawRay(position, dir * obstacleSafetyDistance, Color.red);
                 if (Physics.Raycast(position, dir, out hit, maxDistance: 400f))
                 {
                     if (hit.collider.tag == "Terrain" && hit.distance < 40f)
@@ -201,7 +204,13 @@ namespace NavOps.Grpc
             nextReachDirection = (nextReachDirection.normalized + forceRepulsive.normalized) * nextReachDirection.magnitude;
             nextReachPosition = position + nextReachDirection;
 
-            if (Engine.SpeedLevel < 2)
+            float frontalDistance = _raycastHitDistances[0] * BattleField.localScale.x * 2;
+            if (_raycastHitDistances[0] < 1.0f && frontalDistance < obstacleSafetyDistance)
+            {
+                Debug.Log($"[Warship] frontalDistance: {frontalDistance}");
+                Engine.SpeedLevel -= 1;
+            }
+            else if (Engine.SpeedLevel < 2)
             {
                 Engine.SpeedLevel += 1;
                 return;
@@ -221,11 +230,6 @@ namespace NavOps.Grpc
 
         public void OnActionReceived(float[] actions)
         {
-            Debug.Log($"[Warship] OnActionReceived(actions: {actions})");
-
-            Debug.Log($"[Warship] ManeuverActionId: {(int) actions[0]}");
-            Debug.Log($"[Warship] AttackActionId: {(int) actions[1]}");
-
             int maneuverActionId = (int) actions[0];
             int attackActionId = (int) actions[1];
 
