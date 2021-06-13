@@ -71,6 +71,9 @@ public class Engine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Vector3 position = m_Rigidbody.transform.position;
+        position.y = 1.34f;
+        m_Rigidbody.transform.position = position;
         /*
         if (Fuel > 0)
         {

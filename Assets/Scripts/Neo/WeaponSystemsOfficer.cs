@@ -112,11 +112,6 @@ public class WeaponSystemsOfficer : MonoBehaviour
 
     public uint FireMainBattery(Vector2 offset = new Vector2())
     {
-        if (Ammo > 0)
-        {
-            Debug.Log($"[Wizzo] Team={TeamId}/Player={PlayerId} Fire!");
-        }
-
         uint previousAmmo = Ammo;
 
         for (int i = 0; i < Turrets.Length; i++)

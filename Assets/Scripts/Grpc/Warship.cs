@@ -197,6 +197,7 @@ namespace NavOps.Grpc
                 }
             }
 
+            //nextReachDirection = (nextReachDirection + forceRepulsive).normalized * nextReachDirection.magnitude;
             nextReachDirection = (nextReachDirection.normalized + forceRepulsive.normalized) * nextReachDirection.magnitude;
             nextReachPosition = position + nextReachDirection;
 

@@ -15,6 +15,8 @@ public class ControlArea : MonoBehaviour
     public int Dominant { get; private set; } = (int) DominantForce.NEUTRAL;
     [HideInInspector]
     public bool Dominated { get => Dominant != (int) DominantForce.NEUTRAL; }
+    [HideInInspector]
+    public Vector3 Position;
 
     private SpriteRenderer m_SpriteRenderer;
 
@@ -22,6 +24,8 @@ public class ControlArea : MonoBehaviour
     void Start()
     {
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
+
+        Position = transform.position;
 
         Reset();
     }

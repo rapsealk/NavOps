@@ -13,7 +13,9 @@ public class GameManager : MonoBehaviour
     public NavOps.TaskForce TaskForceRed;
     public ControlArea[] ControlAreas;
     public Slider[] TaskForceBlueHpSliders;
+    public Slider[] TaskForceBlueFuelSliders;
     public Slider[] TaskForceRedHpSliders;
+    public Slider[] TaskForceRedFuelSliders;
     // public Text[] TaskForceBlueTargetIndicators;
     // public Text[] TaskForceRedTargetIndicators;
     public float Reward {
@@ -180,12 +182,14 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < blueUnits.Length; i++)
         {
             TaskForceBlueHpSliders[i].value = blueUnits[i].CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth;
+            TaskForceBlueFuelSliders[i].value = blueUnits[i].Engine.Fuel / Engine.maxFuel;
         }
 
         NavOps.Grpc.Warship[] redUnits = TaskForceRed.Units;
         for (int i = 0; i < redUnits.Length; i++)
         {
             TaskForceRedHpSliders[i].value = redUnits[i].CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth;
+            TaskForceRedFuelSliders[i].value = redUnits[i].Engine.Fuel / Engine.maxFuel;
         }
 
         // for (int i = 0; i < TaskForceBlue.Units.Length; i++)
@@ -200,7 +204,7 @@ public class GameManager : MonoBehaviour
 
     public NavOps.Grpc.Observation SendActions(float[][] actions)
     {
-        Debug.Log($"[GameManager] SendActions: {actions}");
+        // Debug.Log($"[GameManager] SendActions: {actions}");
 
         for (int i = 0; i < actions.Length; i++)
         {
@@ -266,7 +270,15 @@ public class GameManager : MonoBehaviour
         }
         foreach (var area in ControlAreas)
         {
-            observation.Dominance.Add(area.Dominant);
+            observation.Locations.Add(new NavOps.Grpc.Location
+            {
+                Dominance   = area.Dominant,
+                Position    = new NavOps.Grpc.Position
+                {
+                    X = area.Position.x / BattleFieldLocalScale.x,
+                    Y = area.Position.z / BattleFieldLocalScale.z
+                }
+            });
         }
         observation.TargetIndexOnehot.Add(1.0f);
         observation.RaycastHits.Add(blueUnit.RaycastHitDistances);
@@ -325,7 +337,7 @@ public class GameManager : MonoBehaviour
 
         Vector3 position = TaskForceBlue.Units[0].Position;
         float distanceReward = -Mathf.Pow(position.magnitude, 2f) / 100_000_000f;
-        Debug.Log($"[GameManager] position={position} (reward={distanceReward})");
+        // Debug.Log($"[GameManager] position={position} (reward={distanceReward})");
         AddReward(distanceReward);
     }
 
@@ -415,6 +427,10 @@ public class GameManager : MonoBehaviour
             EpisodeDone = true;
             SetReward(-1.0f);
         }
+
+        //
+        // Resource status
+        //
     }
 
     private void SetReward(float reward)

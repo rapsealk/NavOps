@@ -65,7 +65,6 @@ namespace NavOps.Grpc
                 actions[i][1] = request.Actions[i].AttackActionId;
             }
 
-            Debug.Log($"[GrpcServer] CallEnvironmentStep #2");
             NavOps.Grpc.Observation observation = new Observation();
             try
             {
@@ -76,7 +75,6 @@ namespace NavOps.Grpc
             {
                 Debug.LogError($"[GrpcServer] Exception: {e}");
             }
-            Debug.Log($"[GrpcServer] CallEnvironmentStep #3");
 
             EnvironmentStepResponse response = new EnvironmentStepResponse
             {
