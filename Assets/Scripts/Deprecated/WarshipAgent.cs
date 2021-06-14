@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using Unity.MLAgents;
-using Unity.MLAgents.Sensors;
+// using Unity.MLAgents;
+// using Unity.MLAgents.Sensors;
 
 /*
 public class WarshipAgent : Agent, IWarshipController

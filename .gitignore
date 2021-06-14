@@ -1,8 +1,15 @@
+.DS_Store
+Assets/Plugins/
+Assets/Plugins.meta
+Assets/Scripts/Grpc/NavopsService*.cs
+Assets/Scripts/Grpc/NavopsService*.cs.meta
+
 # Unity Build
 Build/
 
 # Unity ML-Agents
-#Assets/ML-Agents/Timers
+Assets/ML-Agents/Timers
+ml-agents/
 
 /[Ll]ibrary/
 /[Tt]emp/

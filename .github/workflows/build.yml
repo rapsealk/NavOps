@@ -32,9 +32,9 @@ jobs:
         uses: game-ci/unity-builder@v2.0-alpha-6
         with:
           # Version of unity to use for building the project. Use "auto" to get from your ProjectSettings/ProjectVersion.txt
-          unityVersion: 2019.4.20f1
+          unityVersion: 2020.3.11f1
           # Platform that the build should target.
           targetPlatform: StandaloneWindows64
           # Name of the build.
-          buildName: Rimpac
+          buildName: NavOps
           buildsPath: Builds

@@ -11,7 +11,7 @@ public class Grid : MonoBehaviour
     private Node[,] WorldGrid;
     private float NodeDiameter;
     private Vector2Int GridSize;
-    private bool IsGizmosInitialized = false;
+    // private bool IsGizmosInitialized = false;
 
     // Start is called before the first frame update
     void Start()

@@ -8,6 +8,7 @@ public class Geometry
     {
         Vector3 diff = b - a;
         float radian = Mathf.Atan2(diff.x, diff.z);
+        //return radian * Mathf.Rad2Deg;
         return radian / Mathf.PI * 180;
     }
 
