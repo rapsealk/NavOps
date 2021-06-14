@@ -418,6 +418,7 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[GameManager] Blue Dominated!");
             EpisodeDone = true;
             SetReward(1.0f);
+            return;
         }
 
         bool redDominated = ControlAreas.All(area => area.Dominant == (int) ControlArea.DominantForce.RED);
@@ -426,11 +427,24 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[GameManager] Red Dominated!");
             EpisodeDone = true;
             SetReward(-1.0f);
+            return;
         }
 
         //
         // Resource status
         //
+        if (TaskForceBlue.Units.All(unit => unit.Engine.Fuel <= Mathf.Epsilon))
+        {
+            Debug.Log($"[GameManager] Blue resource exhausted!");
+            EpisodeDone = true;
+            SetReward(-1.0f);
+        }
+        else if (TaskForceRed.Units.All(unit => unit.Engine.Fuel <= Mathf.Epsilon))
+        {
+            Debug.Log($"[GameManager] Red resource exhausted!");
+            EpisodeDone = true;
+            SetReward(1.0f);
+        }
     }
 
     private void SetReward(float reward)

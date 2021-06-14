@@ -115,6 +115,11 @@ namespace NavOps.Grpc
         {
             Position = transform.position;
             Rotation = transform.rotation;
+
+            // if (Application.platform == RuntimePlatform.WindowsEditor)
+            // {
+            //     HeuristicStep();
+            // }
         }
 
         void FixedUpdate()
@@ -190,6 +195,7 @@ namespace NavOps.Grpc
                     if (hit.collider.tag == "Terrain" && hit.distance < 40f)
                     {
                         forceRepulsive += (position - hit.point) * 16f;
+                        // forceRepulsive += (position - hit.point) * Mathf.Pow(400f / (position - hit.point).magnitude, 2f);
                     }
                     else if (hit.collider.tag == "Player")
                     {
@@ -204,28 +210,75 @@ namespace NavOps.Grpc
             nextReachDirection = (nextReachDirection.normalized + forceRepulsive.normalized) * nextReachDirection.magnitude;
             nextReachPosition = position + nextReachDirection;
 
+            Debug.DrawRay(position, nextReachDirection, Color.red);
+
             float frontalDistance = _raycastHitDistances[0] * BattleField.localScale.x * 2;
+            float rightDistance = _raycastHitDistances[1] * BattleField.localScale.x * 2;
+            float leftDistance = _raycastHitDistances[7] * BattleField.localScale.x * 2;
+
+            bool frontalDetected = frontalDistance < obstacleSafetyDistance;
+            bool rightDetected = rightDistance < obstacleSafetyDistance;
+            bool leftDetected = leftDistance < obstacleSafetyDistance;
+
+            if (!frontalDetected)
+            {
+                if (Engine.SpeedLevel < 2)
+                {
+                    Engine.SpeedLevel += 1;
+                    return;
+                }
+
+                float y = Geometry.GetAngleBetween(transform.position, nextReachPosition);
+                float ydir = (transform.rotation.eulerAngles.y - y + 180f) % 360f - 180f;
+                if (ydir > 3f)
+                {
+                    Engine.SteerLevel -= 1;
+                }
+                else if (ydir < -3f)
+                {
+                    Engine.SteerLevel += 1;
+                }
+            }
+            else if (!leftDetected && rightDetected)
+            {
+                Engine.SteerLevel -= 1;
+            }
+            else if (rightDetected && !rightDetected)
+            {
+                Engine.SteerLevel += 1;
+            }
+            /*
             if (_raycastHitDistances[0] < 1.0f && frontalDistance < obstacleSafetyDistance)
             {
-                Debug.Log($"[Warship] frontalDistance: {frontalDistance}");
+                //if (TeamId == 1)
+                //   Debug.Log($"[Warship] frontalDistance: {frontalDistance}");
                 Engine.SpeedLevel -= 1;
+                Engine.SteerLevel = 0;
             }
             else if (Engine.SpeedLevel < 2)
             {
                 Engine.SpeedLevel += 1;
                 return;
             }
-
-            float y = Geometry.GetAngleBetween(transform.position, nextReachPosition);
-            float ydir = (transform.rotation.eulerAngles.y - y + 180f) % 360f - 180f;
-            if (ydir > 3f)
+            else
             {
-                Engine.SteerLevel -= 1;
+                float y = Geometry.GetAngleBetween(transform.position, nextReachPosition);
+                float yx = Vector2.Angle(new Vector2(transform.position.x, transform.position.z), new Vector3(nextReachPosition.x, nextReachPosition.z));
+                float ydir = (transform.rotation.eulerAngles.y - y + 180f) % 360f - 180f;
+                if (ydir > 3f && _raycastHitDistances[7] < 1.0f && leftDistance > obstacleSafetyDistance)
+                {
+                    if (TeamId == 1)
+                        Debug.Log($"[Warship] ydir={ydir} LEFT (y={transform.rotation.eulerAngles.y}, yx={yx})");
+                    Engine.SteerLevel -= 1;
+                }
+                else if (ydir < -3f && _raycastHitDistances[1] < 1.0f && rightDistance > obstacleSafetyDistance)
+                {
+                    if (TeamId == 1)
+                        Debug.Log($"[Warship] ydir={ydir} RIGHT (y={transform.rotation.eulerAngles.y}, yx={yx})");
+                    Engine.SteerLevel += 1;
+                }
             }
-            else if (ydir < -3f)
-            {
-                Engine.SteerLevel += 1;
-            }
+            */
         }
 
         public void OnActionReceived(float[] actions)
