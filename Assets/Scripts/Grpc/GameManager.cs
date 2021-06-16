@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public class GameManager : MonoBehaviour
     public NavOps.TaskForce TaskForceBlue;
     public NavOps.TaskForce TaskForceRed;
     public ControlArea[] ControlAreas;
+    public GameObject[] Obstacles;
     public Slider[] TaskForceBlueHpSliders;
     public Slider[] TaskForceBlueFuelSliders;
     public Slider[] TaskForceRedHpSliders;
@@ -43,7 +45,9 @@ public class GameManager : MonoBehaviour
     Queue<bool> m_EpisodeQueue = new Queue<bool>();
     Queue<bool> m_StepQueue = new Queue<bool>();
 
-    private NavOps.Grpc.GrpcServer m_GrpcServer;
+    NavOps.Grpc.GrpcServer m_GrpcServer;
+    int m_GrpcPort = 9090;
+    
     private float[] _hpValues;
     private float[] _opponentHpValues;
     private float _reward;
@@ -52,6 +56,16 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        string[] args = System.Environment.GetCommandLineArgs();
+        if (args.Length > 1)
+        {
+            string portArg = args[1];
+            if (portArg.StartsWith("--port"))
+            {
+                m_GrpcPort = int.Parse(portArg.Split('=')[1]);
+            }
+        }
+
         Application.targetFrameRate = 60;
 
         ResetHpValues();
@@ -60,7 +74,7 @@ public class GameManager : MonoBehaviour
         {
             GameManager = this
         };
-        m_GrpcServer.StartGrpcServer(grpcPort: 9090);
+        m_GrpcServer.StartGrpcServer(grpcPort: m_GrpcPort);
 
         BattleFieldLocalScale = BattleField.localScale;
     }
@@ -307,6 +321,16 @@ public class GameManager : MonoBehaviour
         float[] steerLevelOnehot = new float[Engine.MaxSteerLevel - Engine.MinSteerLevel + 1];
         steerLevelOnehot[blueUnit.Engine.SteerLevel - Engine.MinSteerLevel] = 1.0f;
         observation.SteerLevelOnehot.Add(steerLevelOnehot);
+
+        for (int i = 0; i < Obstacles.Length; i++)
+        {
+            Vector3 obstaclePosition = Obstacles[i].transform.position;
+            observation.ObstaclePositions.Add(new NavOps.Grpc.Position
+            {
+                X = obstaclePosition.x / BattleFieldLocalScale.x,
+                Y = obstaclePosition.z / BattleFieldLocalScale.z
+            });
+        }
 
         return observation;
     }
