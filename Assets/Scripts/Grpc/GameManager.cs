@@ -246,6 +246,7 @@ public class GameManager : MonoBehaviour
             Hp          = blueUnit.CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth,
             Fuel        = blueUnit.Engine.Fuel / Engine.maxFuel,
             Destroyed   = blueUnit.IsDestroyed,
+            Detected    = blueUnit.IsDetected,
             Position    = new NavOps.Grpc.Position
             {
                 X = bluePosition.x / BattleFieldLocalScale.x,
@@ -269,6 +270,7 @@ public class GameManager : MonoBehaviour
                 Hp          = unit.CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth,
                 Fuel        = unit.Engine.Fuel / Engine.maxFuel,
                 Destroyed   = unit.IsDestroyed,
+                Detected    = unit.IsDetected,
                 Position    = new NavOps.Grpc.Position
                 {
                     X = position.x / BattleFieldLocalScale.x,
