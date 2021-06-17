@@ -18,8 +18,6 @@ public class GameManager : MonoBehaviour
     public Slider[] TaskForceBlueFuelSliders;
     public Slider[] TaskForceRedHpSliders;
     public Slider[] TaskForceRedFuelSliders;
-    // public Text[] TaskForceBlueTargetIndicators;
-    // public Text[] TaskForceRedTargetIndicators;
     public float Reward {
         get {
             float value = _reward;
@@ -237,33 +235,11 @@ public class GameManager : MonoBehaviour
     private NavOps.Grpc.Observation CollectObservations()
     {
         NavOps.Grpc.Observation observation = new NavOps.Grpc.Observation();
-        NavOps.Grpc.Warship blueUnit = TaskForceBlue.Units[0];
-        Vector3 bluePosition = blueUnit.Position;
-        float blueRadian = blueUnit.Rotation.eulerAngles.y % 360 * Mathf.Deg2Rad;
-        observation.Fleets.Add(new NavOps.Grpc.FleetObservation
-        {
-            TeamId      = (uint) 0,
-            Hp          = blueUnit.CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth,
-            Fuel        = blueUnit.Engine.Fuel / Engine.maxFuel,
-            Destroyed   = blueUnit.IsDestroyed,
-            Detected    = blueUnit.IsDetected,
-            Position    = new NavOps.Grpc.Position
-            {
-                X = bluePosition.x / BattleFieldLocalScale.x,
-                Y = bluePosition.z / BattleFieldLocalScale.z
-            },
-            Rotation    = new NavOps.Grpc.Rotation
-            {
-                Cos = Mathf.Cos(blueRadian),
-                Sin = Mathf.Sin(blueRadian)
-            },
-            Timestamp   = (uint) 0
-        });
         foreach (var unit in TaskForceBlue.Units.Concat(TaskForceRed.Units))
         {
             Vector3 position = unit.Position;
             float radian = unit.Rotation.eulerAngles.y % 360 * Mathf.Deg2Rad;
-            unit.Timestamp = (unit.IsDetected) ? 0 : unit.Timestamp + 1;
+            unit.Timestamp = (unit.PlayerId == 0 || unit.IsDetected) ? 0 : unit.Timestamp + 1;
             observation.Fleets.Add(new NavOps.Grpc.FleetObservation
             {
                 TeamId      = (uint) unit.TeamId,
