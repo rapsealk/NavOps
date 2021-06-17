@@ -235,6 +235,8 @@ public class GameManager : MonoBehaviour
     private NavOps.Grpc.Observation CollectObservations()
     {
         NavOps.Grpc.Observation observation = new NavOps.Grpc.Observation();
+        NavOps.Grpc.Warship blueUnit = TaskForceBlue.Units[0];
+
         foreach (var unit in TaskForceBlue.Units.Concat(TaskForceRed.Units))
         {
             Vector3 position = unit.Position;
