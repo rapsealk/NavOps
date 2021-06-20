@@ -437,17 +437,26 @@ public class GameManager : MonoBehaviour
         //
         // Resource status
         //
-        if (TaskForceBlue.Units.All(unit => unit.Engine.Fuel <= Mathf.Epsilon))
+        if (TaskForceBlue.Units.All(unit => unit.Engine.Fuel <= Mathf.Epsilon)
+            || TaskForceRed.Units.All(unit => unit.Engine.Fuel <= Mathf.Epsilon))
         {
-            Debug.Log($"[GameManager] Blue resource exhausted!");
+            Debug.Log($"[GameManager] Resource:fuel exhausted!");
             EpisodeDone = true;
-            SetReward(-1.0f);
-        }
-        else if (TaskForceRed.Units.All(unit => unit.Engine.Fuel <= Mathf.Epsilon))
-        {
-            Debug.Log($"[GameManager] Red resource exhausted!");
-            EpisodeDone = true;
-            SetReward(1.0f);
+
+            int blueDominants = ControlAreas.Select(area => area.Dominant == (int) ControlArea.DominantForce.BLUE).Count;
+            int redDominants = ControlAreas.Select(area => area.Dominant == (int) ControlArea.DominantForce.RED).Count;
+            if (blueDominants > redDominants)
+            {
+                SetReward(1.0f);
+            }
+            else if (blueDominants < redDominants)
+            {
+                SetReward(-1.0f);
+            }
+            else
+            {
+                SetReward(0.0f);
+            }
         }
     }
 
