@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public Slider[] TaskForceBlueFuelSliders;
     public Slider[] TaskForceRedHpSliders;
     public Slider[] TaskForceRedFuelSliders;
+    public Text GrpcPortText;
     public float Reward {
         get {
             float value = _reward;
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour
                 m_GrpcPort = int.Parse(portArg.Split('=')[1]);
             }
         }
+        GrpcPortText.text = $"Port: {m_GrpcPort}";
 
         Application.targetFrameRate = 60;
 
