@@ -443,8 +443,35 @@ public class GameManager : MonoBehaviour
             Debug.Log($"[GameManager] Resource:fuel exhausted!");
             EpisodeDone = true;
 
-            int blueDominants = ControlAreas.Select(area => area.Dominant == (int) ControlArea.DominantForce.BLUE).Count;
-            int redDominants = ControlAreas.Select(area => area.Dominant == (int) ControlArea.DominantForce.RED).Count;
+            int dominantScore = 0;
+            foreach (var area in ControlAreas)
+            {
+                if (area.Dominant == (int) ControlArea.DominantForce.BLUE)
+                {
+                    dominantScore += 1;
+                }
+                else if (area.Dominant == (int) ControlArea.DominantForce.RED)
+                {
+                    dominantScore -= 1;
+                }
+            }
+
+            if (dominantScore > 0)
+            {
+                SetReward(1.0f);
+            }
+            else if (dominantScore < 0)
+            {
+                SetReward(-1.0f);
+            }
+            else
+            {
+                SetReward(0.0f);
+            }
+
+            /*
+            int blueDominants = ControlAreas.Select(area => area.Dominant == (int) ControlArea.DominantForce.BLUE).Length;
+            int redDominants = ControlAreas.Select(area => area.Dominant == (int) ControlArea.DominantForce.RED).Length;
             if (blueDominants > redDominants)
             {
                 SetReward(1.0f);
@@ -457,6 +484,7 @@ public class GameManager : MonoBehaviour
             {
                 SetReward(0.0f);
             }
+            */
         }
     }
 
