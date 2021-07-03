@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviour
 
     NavOps.Grpc.GrpcServer m_GrpcServer;
     int m_GrpcPort = 9090;
+
+    private CameraManager cameraManager;
     
     private float[] _hpValues;
     private float[] _opponentHpValues;
@@ -67,6 +69,8 @@ public class GameManager : MonoBehaviour
         GrpcPortText.text = $"Port: {m_GrpcPort}";
 
         Application.targetFrameRate = 60;
+
+        cameraManager = GetComponent<CameraManager>();
 
         ResetHpValues();
 
@@ -232,6 +236,17 @@ public class GameManager : MonoBehaviour
         CheckEpisodeStatus();
 
         return CollectObservations();
+    }
+
+    public byte[] GetCameraImageBytes(uint cameraId)
+    {
+        /*
+        Debug.Log($"[GameManager] GetCameraImageBytes(cameraId: {cameraId})");
+        // return cameraManager.GetCameraImageBytes(cameraId);
+        UnityMainThreadDispatcher.Instance().Enqueue(cameraManager.GetCameraImageBytesWork(0));
+        return cameraManager.GetPngImage();
+        */
+        return null;
     }
 
     private NavOps.Grpc.Observation CollectObservations()

@@ -4,7 +4,7 @@ using UnityEngine;
 using System.IO;
 using System;
 
-public class ScreenShot : MonoBehaviour
+public class CameraManager : MonoBehaviour
 {
     public Camera MainCamera;
 
@@ -23,6 +23,12 @@ public class ScreenShot : MonoBehaviour
 
         m_ImagePath = Application.dataPath + "/Screenshots/";
         Debug.Log($"[ScreenShot] Path: {m_ImagePath}");
+
+        DirectoryInfo dirInfo = new DirectoryInfo(m_ImagePath);
+        if (!dirInfo.Exists)
+        {
+            Directory.CreateDirectory(m_ImagePath);
+        }
     }
 
     // Update is called once per frame
@@ -30,7 +36,7 @@ public class ScreenShot : MonoBehaviour
     {
         timestep += 1;
 
-        if (timestep == 300)
+        if (timestep < 512)
         {
             CaptureCameraFrame();
         }
@@ -38,20 +44,17 @@ public class ScreenShot : MonoBehaviour
 
     public byte[] CaptureCameraFrame()
     {
-        long now = DateTime.Now.Millisecond;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        long unixTimeMilliseconds = now.ToUnixTimeMilliseconds();
+        //long now = DateTime.Now.Millisecond;
 
-        DirectoryInfo dirInfo = new DirectoryInfo(m_ImagePath);
-        if (!dirInfo.Exists)
-        {
-            Directory.CreateDirectory(m_ImagePath);
-        }
-
-        string name = $"{m_ImagePath}{System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.png";
+        // string name = $"{m_ImagePath}{now}.png";
+        string name = $"{m_ImagePath}{System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-ffff")}.png";
         RenderTexture renderTexture = new RenderTexture(resolutionWidth, resolutionHeight, 24);
 
         MainCamera.targetTexture = renderTexture;
         Texture2D screenShot = new Texture2D(resolutionWidth, resolutionHeight, TextureFormat.RGB24, false);
-        Rect rec = new Rect(0, 0, screenShot.width, screenShot.height);
+        //Rect rec = new Rect(0, 0, screenShot.width, screenShot.height);
         MainCamera.Render();
         RenderTexture.active = renderTexture;
         screenShot.ReadPixels(new Rect(0, 0, resolutionWidth, resolutionHeight), 0, 0);
@@ -60,7 +63,8 @@ public class ScreenShot : MonoBehaviour
         byte[] bytes = screenShot.EncodeToPNG();
         File.WriteAllBytes(name, bytes);
 
-        Debug.Log($"[Capture] {DateTime.Now.Millisecond - now}ms");
+        // Debug.Log($"[Capture:{timestep}] {DateTime.Now.Millisecond - now}ms");
+        Debug.Log($"[Capture:{timestep}] {DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - unixTimeMilliseconds}ms");
 
         return bytes;
     }

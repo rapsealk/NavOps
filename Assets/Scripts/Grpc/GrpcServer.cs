@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ namespace NavOps.Grpc
     public class GrpcServer : NavOpsGrpcService.NavOpsGrpcServiceBase
     {
         public GameManager GameManager;
+
+        private int grpcPort;
 
         // Start is called before the first frame update
         void Start()
@@ -24,6 +27,8 @@ namespace NavOps.Grpc
 
         public void StartGrpcServer(int grpcPort)
         {
+            this.grpcPort = grpcPort;
+
             Debug.Log($"[GrpcServer] GameManager: {GameManager}");
             Debug.Log($"[GrpcServer] GameManager.TaskForceBlue: {GameManager.TaskForceBlue.Units[0]}");
             Debug.Log($"[GrpcServer] GameManager.TaskForceRed: {GameManager.TaskForceRed.Units[0]}");
@@ -32,7 +37,7 @@ namespace NavOps.Grpc
             {
                 Server server = new Server
                 {
-                    Services = { NavOpsGrpcService.BindService(this/*new GrpcServer()*/) },
+                    Services = { NavOpsGrpcService.BindService(this) },
                     Ports = { new ServerPort("127.0.0.1", grpcPort, ServerCredentials.Insecure) }
                 };
                 server.Start();
@@ -81,6 +86,28 @@ namespace NavOps.Grpc
                 Obs = observation,
                 Reward = GameManager.Reward,
                 Done = GameManager.EpisodeDone
+            };
+
+            return Task.FromResult(response);
+        }
+
+        public override Task<ImageResponse> GetImage(ImageRequest request, ServerCallContext context)
+        {
+            Debug.Log($"[GrpcServer] GetImage(request={request})");
+
+            byte[] imageBytes = GameManager.GetCameraImageBytes(request.CameraId);
+
+            Debug.Log($"[GrpcServer] imageBytes: {imageBytes.Length}");
+
+            ImageResponse response = new ImageResponse
+            {
+                Frame = new ImageFrame
+                {
+                    Timestamp = (ulong) DateTime.Now.Millisecond,
+                    Session = grpcPort.ToString(),
+                    Episode = 0,
+                    Data = Google.Protobuf.ByteString.CopyFrom(imageBytes)
+                }
             };
 
             return Task.FromResult(response);
