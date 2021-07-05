@@ -91,6 +91,7 @@ namespace NavOps.Grpc
             return Task.FromResult(response);
         }
 
+        /*
         public override Task<ImageResponse> GetImage(ImageRequest request, ServerCallContext context)
         {
             Debug.Log($"[GrpcServer] GetImage(request={request})");
@@ -112,5 +113,6 @@ namespace NavOps.Grpc
 
             return Task.FromResult(response);
         }
+        */
     }
 }

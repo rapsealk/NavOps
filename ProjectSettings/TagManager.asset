@@ -15,6 +15,7 @@ TagManager:
   - Bullet
   - Bullet0
   - Bullet1
+  - SubCamera
   layers:
   - Default
   - TransparentFX

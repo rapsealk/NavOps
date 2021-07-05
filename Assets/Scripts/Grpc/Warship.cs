@@ -116,11 +116,14 @@ namespace NavOps.Grpc
             Position = transform.position;
             Rotation = transform.rotation;
 
+            /*
             if (Application.platform == RuntimePlatform.WindowsEditor
-                /*|| Application.platform == RuntimePlatform.OSXEditor*/)
+                || Application.platform == RuntimePlatform.OSXEditor)
             {
                 HeuristicStep();
             }
+            */
+            HeuristicStep();
         }
 
         void FixedUpdate()

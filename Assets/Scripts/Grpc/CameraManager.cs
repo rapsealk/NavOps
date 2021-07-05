@@ -36,10 +36,11 @@ public class CameraManager : MonoBehaviour
     {
         timestep += 1;
 
+        /*
         if (timestep < 512)
         {
             CaptureCameraFrame();
-        }
+        }*/
     }
 
     public byte[] CaptureCameraFrame()
