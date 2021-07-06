@@ -120,10 +120,12 @@ namespace NavOps.Grpc
             if (Application.platform == RuntimePlatform.WindowsEditor
                 || Application.platform == RuntimePlatform.OSXEditor)
             {
-                HeuristicStep();
+                if (TeamId == 2)
+                {
+                    HeuristicStep();
+                }
             }
             */
-            HeuristicStep();
         }
 
         void FixedUpdate()

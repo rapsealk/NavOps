@@ -16,6 +16,9 @@ TagManager:
   - Bullet0
   - Bullet1
   - SubCamera
+  - SubCamera5h
+  - SubCameraRot3h
+  - SubCameraSight
   layers:
   - Default
   - TransparentFX
@@ -30,7 +33,7 @@ TagManager:
   - Level
   - Terrain
   - Torpedo
-  - 
+  - Opponent
   - 
   - 
   - 

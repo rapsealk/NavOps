@@ -7,6 +7,9 @@ Assets/Scripts/Grpc/NavopsService*.cs.meta
 # Unity Build
 Build/
 
+# Unity Recording
+Recordings/
+
 # Unity ML-Agents
 Assets/ML-Agents/Timers
 ml-agents/

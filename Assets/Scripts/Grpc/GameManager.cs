@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     
     private float[] _hpValues;
     private float[] _opponentHpValues;
+    private Vector3[] _obstaclePositions;
     private float _reward;
     private bool _done;
 
@@ -73,6 +74,12 @@ public class GameManager : MonoBehaviour
         cameraManager = GetComponent<CameraManager>();
 
         ResetHpValues();
+
+        _obstaclePositions = new Vector3[Obstacles.Length];
+        for (int i = 0; i < Obstacles.Length; i++)
+        {
+            _obstaclePositions[i] = Obstacles[i].transform.position;
+        }
 
         m_GrpcServer = new NavOps.Grpc.GrpcServer
         {
@@ -321,7 +328,8 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < Obstacles.Length; i++)
         {
-            Vector3 obstaclePosition = Obstacles[i].transform.position;
+            // Vector3 obstaclePosition = Obstacles[i].transform.position;
+            Vector3 obstaclePosition = _obstaclePositions[i];
             observation.ObstaclePositions.Add(new NavOps.Grpc.Position
             {
                 X = obstaclePosition.x / BattleFieldLocalScale.x,
@@ -356,10 +364,12 @@ public class GameManager : MonoBehaviour
 
         AddReward(0.01f * dominationFactor);
 
+        /*
         Vector3 position = TaskForceBlue.Units[0].Position;
         float distanceReward = -Mathf.Pow(position.magnitude, 2f) / 100_000_000f;
         // Debug.Log($"[GameManager] position={position} (reward={distanceReward})");
         AddReward(distanceReward);
+        */
     }
 
     private void CheckControlAreaStatus()
