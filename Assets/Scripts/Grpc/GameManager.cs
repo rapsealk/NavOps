@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
     public Slider[] TaskForceBlueHpSliders;
     public Slider[] TaskForceBlueFuelSliders;
     public Slider[] TaskForceRedHpSliders;
-    public Slider[] TaskForceRedFuelSliders;
     public Text GrpcPortText;
     public float Reward {
         get {
@@ -180,7 +179,14 @@ public class GameManager : MonoBehaviour
 
         foreach (var unit in TaskForceBlue.Units.Concat(TaskForceRed.Units))
         {
-            unit.Reset();
+            try
+            {
+                unit.Reset();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[Error] {e}");
+            }
         }
 
         ResetHpValues();
@@ -204,17 +210,16 @@ public class GameManager : MonoBehaviour
     private void UpdateGUI()
     {
         NavOps.Grpc.Warship[] blueUnits = TaskForceBlue.Units;
-        for (int i = 0; i < blueUnits.Length; i++)
+        for (int i = 0; i < TaskForceBlueHpSliders.Length; i++)
         {
             TaskForceBlueHpSliders[i].value = blueUnits[i].CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth;
             TaskForceBlueFuelSliders[i].value = blueUnits[i].Engine.Fuel / Engine.maxFuel;
         }
 
         NavOps.Grpc.Warship[] redUnits = TaskForceRed.Units;
-        for (int i = 0; i < redUnits.Length; i++)
+        for (int i = 0; i < TaskForceRedHpSliders.Length; i++)
         {
             TaskForceRedHpSliders[i].value = redUnits[i].CurrentHealth / NavOps.Grpc.Warship.k_MaxHealth;
-            TaskForceRedFuelSliders[i].value = redUnits[i].Engine.Fuel / Engine.maxFuel;
         }
 
         // for (int i = 0; i < TaskForceBlue.Units.Length; i++)
